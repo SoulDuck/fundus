@@ -64,7 +64,7 @@ def crop_specify_point_and_resize(x,start_pos , end_pos , resize_):
     cropped_x=cropped_x.resize(resize_ , PIL.Image.ANTIALIAS)
     cropped_x = np.asarray(cropped_x)
     return cropped_x
-def fundus_crop(path):
+def optical_crop(path):
     extension='.npy'
     name=path.split('/')[-1].split('.')[0]
     img=Image.open(path)
@@ -73,6 +73,7 @@ def fundus_crop(path):
     else:
         img=crop_specify_point_and_resize(img, (400,1150),(1250,2000), resize_=(299, 299))
     return img , path
+
 
 def show_progress(i,max_iter):
     msg='\r Progress {0}/{1}'.format(i,max_iter)
