@@ -99,7 +99,6 @@ if __name__ == '__main__':
 
     """
 
-
     """usage: fundus optical crop """
     """
     paths=glob.glob('/Users/seongjungkim/Desktop/normal/*.png' )
@@ -122,10 +121,4 @@ if __name__ == '__main__':
         name = path.split('/')[-1].split('.')[0]
         np.save(save_folder + name + extension, img)
     """
-    #for path in paths:
-    #    np_=np.load(path)
-    #    plt.imshow(np_)
-    #    plt.show()
-    #    plt.close()
-    """test augmentatation Image  """
-    img=Image.open('./sample_image/original_images/43203_20140121_L.png')
+le_image/original_images/43203_20140121_L.png')
