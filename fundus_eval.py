@@ -19,21 +19,8 @@ overlay = overlay.convert("RGBA")
 new_img = Image.blend(background, overlay, 0.5)
 new_img.save("new.png","PNG")
 """
-
-def get_graph():
-    sess = tf.Session()
-    saver = tf.train.import_meta_graph('./cnn_model/best_acc.ckpt.meta')
-    saver.restore(sess, './cnn_model/best_acc.ckpt')
-    tf.get_default_graph()
-    accuray = tf.get_default_graph().get_tensor_by_name('accuracy:0')
-    x_ = tf.get_default_graph().get_tensor_by_name('x_:0')
-    y_ = tf.get_default_graph().get_tensor_by_name('y_:0')
-    cam_ = tf.get_default_graph().get_tensor_by_name('classmap_reshape:0')
-    top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
-    phase_train = tf.get_default_graph().get_tensor_by_name('phase_train:0')
-    y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
-
-    return sess, accuray, x_, y_, cam_, top_conv, phase_train, y_conv
+NORMAL_LABEL = 0
+ABNORMAL_LABEL = 1
 
 def get_activation_map(image , filename):
     try:### error contor
@@ -94,7 +81,7 @@ def get_activation_map(image , filename):
         plt.show()
     return vis_normal
 
-
+""" Usage:
 sess=tf.Session()
 saver=tf.train.import_meta_graph('./cnn_model/best_acc.ckpt.meta')
 saver.restore(sess,'./cnn_model/best_acc.ckpt')
@@ -106,13 +93,15 @@ cam_=tf.get_default_graph().get_tensor_by_name('classmap_reshape:0')
 top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
 phase_train=tf.get_default_graph().get_tensor_by_name('phase_train:0')
 y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
-NORMAL_LABEL = 0
-ABNORMAL_LABEL = 1
+"""
+
 if __name__ =='__main__':
     test_imgs = np.load('./test_imgs.npy')
     test_labs = np.load('./test_labs.npy')
     test_labs=test_labs.astype(np.int32)
     print test_labs
+    act_map=get_activation_map(test_imgs[3], './sample_image.png')
+
     """
     imgs_list , labels_list=utils.divide_images_labels_from_batch(test_imgs ,test_labs, batch_size=60)
     list_imgs_labs=zip(imgs_list , labels_list)
@@ -131,7 +120,6 @@ if __name__ =='__main__':
     plt.imshow(vis_normal)
     plt.show()
     """
-    act_map=get_activation_map(test_imgs[3], './sample_image.png')
 
 
 
