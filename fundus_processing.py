@@ -65,7 +65,6 @@ def crop_specify_point_and_resize(x,start_pos , end_pos , resize_):
     cropped_x = np.asarray(cropped_x)
     return cropped_x
 def optical_crop(path):
-    extension='.npy'
     name=path.split('/')[-1].split('.')[0]
     img=Image.open(path)
     if 'L' in path:
@@ -74,6 +73,17 @@ def optical_crop(path):
         img=crop_specify_point_and_resize(img, (400,1150),(1250,2000), resize_=(299, 299))
     return img , path
 
+def macula_crop(path):
+    img = Image.open(path)
+    if 'L' in path:
+        img = crop_specify_point_and_resize(img, (400, 1150), (1250, 2000), resize_=(299, 299))
+    else:
+        img = crop_specify_point_and_resize(img, (400, 500), (1250, 1350), resize_=(299, 299))
+    return img, path
+
+def find_optical(path):
+    img = Image.open(path)
+
 
 def show_progress(i,max_iter):
     msg='\r Progress {0}/{1}'.format(i,max_iter)
@@ -81,6 +91,18 @@ def show_progress(i,max_iter):
     sys.stdout.flush()
 
 if __name__ == '__main__':
+    path='./sample_image/original_images/43203_20140121_L.png'
+    path='./sample_image/original_images/43203_20140121_R.png'
+
+    ori_img=Image.open(path)
+    cropped_img,cropped_path=optical_crop(path)
+    fig= plt.figure()
+    a=fig.add_subplot(1,2,1)
+    plt.imshow(ori_img)
+    a=fig.add_subplot(1,2,2)
+    plt.imshow(cropped_img)
+    plt.show()
+
     """usage : crop_reisize_fundus """
     """
     target_folder='./sample_image/'
@@ -100,24 +122,26 @@ if __name__ == '__main__':
     """
 
     """usage: fundus optical crop """
-    """
-    paths=glob.glob('/Users/seongjungkim/Desktop/normal/*.png' )
+
+    paths=glob.glob('./sample_image/original_images/*.png' )
     pool=Pool()
     save_folder='/Users/seongjungkim/Desktop/normal_1_crop/'
-    for img , path in pool.imap(fundus_crop ,paths[:10000]):
+    save_folder='./macula_crop_images/'
+    for img , path in pool.imap(macula_crop ,paths[:10000]):
         extension = '.npy'
         name = path.split('/')[-1].split('.')[0]
         np.save(save_folder + name + extension, img)
 
-    for path in pool.imap(fundus_crop, paths[10000:20000]):
+    for path in pool.imap(macula_crop, paths[10000:20000]):
         save_folder = '/Users/seongjungkim/Desktop/normal_2_crop/'
+        save_folder = './macula_croppped_images'
         extension = '.npy'
         name = path.split('/')[-1].split('.')[0]
         np.save(save_folder + name + extension, img)
 
-    for path in pool.imap(fundus_crop, paths[20000:]):
+    for path in pool.imap(macula_crop, paths[20000:]):
         save_folder = '/Users/seongjungkim/Desktop/normal_2_crop/'
+        save_folder = './macula_croppped_images'
         extension = '.npy'
         name = path.split('/')[-1].split('.')[0]
         np.save(save_folder + name + extension, img)
-    """
