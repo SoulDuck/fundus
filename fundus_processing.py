@@ -8,33 +8,6 @@ import glob , sys, os
 
 from multiprocessing import Pool
 
-def random_rot_90(image):
-    ind=random.randint(0,4)
-    image=np.rot90(image,ind)
-    return image
-def random_ud_lr_flop(image):
-    if bool(random.randint(0, 1)):
-        image=np.flipud(image)
-    if bool(random.randint(0, 1)):
-        image=np.fliplr(image)
-    return image
-def aug_level_1(images):
-    print 'aug_level_1'
-    images=map(random_ud_lr_flop , images)
-    images=map(random_rot_90,images)
-
-    return images
-def elastic_aug(images):
-    random.randint(0,2)
-    print 'a'
-    return images
-
-
-def aug_level_2(images):
-    print 'aug_level_2'
-
-def aug_level_3(images):
-    print 'aug_level_3'
 
 def crop_resize_fundus(path):
     """

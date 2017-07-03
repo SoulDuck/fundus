@@ -5,6 +5,8 @@ from PIL import Image
 import random
 import matplotlib.pyplot as plt
 
+
+
 def cls2onehot(cls, depth):
     labels=np.zeros([len(cls),2])
     for i,ind in enumerate(cls):
@@ -96,8 +98,8 @@ def get_train_test_images_labels(normal_images,abnormal_images, train_ratio=0.95
     labels_abnormal_test.fill(ABNORMAL_LABEL)
 
 
-    train_labels=np.concatenate((labels_normal_train , labels_abnormal_train))
-    test_labels = np.concatenate((labels_normal_test, labels_abnormal_test))
+    train_labels = np.concatenate(labels_normal_train, labels_abnormal_train)
+    test_labels = np.concatenate(labels_normal_test, labels_abnormal_test)
     train_labels=train_labels.astype(np.int32)
     test_labels=test_labels .astype(np.int32)
     train_labels=cls2onehot(train_labels ,2 )
@@ -178,7 +180,7 @@ if __name__ == '__main__':
 
     print train_labs
     print test_labs
-    """
+    """ 
     cataract_paths=make_paths('/home/mediwhale/data/eye/resize_eye/abnormal/cataract/' ,'*.png' , 'cataract_paths')
     retina_paths = make_paths('/home/mediwhale/data/eye/resize_eye/abnormal/retina/', '*.png', 'retina_paths')
     glaucoma_paths = make_paths('/home/mediwhale/data/eye/resize_eye/abnormal/glaucoma/', '*.png', 'glaucoma_paths')
