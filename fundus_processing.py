@@ -121,4 +121,3 @@ if __name__ == '__main__':
         name = path.split('/')[-1].split('.')[0]
         np.save(save_folder + name + extension, img)
     """
-le_image/original_images/43203_20140121_L.png')
