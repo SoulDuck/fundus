@@ -5,8 +5,6 @@ from PIL import Image
 import random
 import matplotlib.pyplot as plt
 
-
-
 def cls2onehot(cls, depth):
     labels=np.zeros([len(cls),2])
     for i,ind in enumerate(cls):
@@ -62,10 +60,14 @@ def get_train_test_paths(*pathss):
     all_train_paths=[]
     all_test_paths=[]
     for i,paths in enumerate(pathss):
-        f=open(paths)
-        lines=f.readlines()
-
-        n_lines=len(lines)
+        def fn(path):
+            path.replace('\n' , '')
+            return path
+        f = open(paths)
+        lines = f.readlines()
+        n_lines = len(lines)
+        lines = map(fn, lines) # erase 'n'
+        random.shuffle(lines) # shuffle list
         n_test=int(n_lines*0.1)
         n_train=n_lines-n_test
         all_train_paths.extend(lines[:n_train])
@@ -77,9 +79,9 @@ def get_train_test_paths(*pathss):
     if __debug__==True:
         print 'all train paths :', len(all_train_paths)
         print 'all_test_paths :', len(all_test_paths)
+        print ''
     return all_train_paths , all_test_paths
 def get_train_test_images_labels(normal_images,abnormal_images, train_ratio=0.95 ):
-
     NORMAL_LABEL=0
     ABNORMAL_LABEL=1
     n_normal=len(normal_images)
@@ -180,18 +182,17 @@ def eye_299x299():
     normal_imgs, normal_labels = make_numpy_images_labels(normal_paths, label_num=0)
     train_imgs , train_labs , test_imgs , test_labs =get_train_test_images_labels(normal_images=normal_imgs , abnormal_images=abnormal_imgs)
 
-    #cata_imgs, cata_labels = make_numpy_images_labels(cataract_paths, label_num=1)
-    #cata_imgs , cata_labels= make_numpy_images_labels(cataract_paths, label_num=1)
-    #retina_imgs, retina_labels = make_numpy_images_labels(retina_paths, label_num=1)
-    #glaucoma_imgs,glaucoma_labels  = make_numpy_images_labels(glaucoma_paths , label_num=1)
-    #normal_imgs,normal_labels  = make_numpy_images_labels(normal_paths[:12000] , label_num=0)
-
     return image_height, image_width, image_color_ch, n_classes, train_imgs, train_labs, test_imgs, test_labs
 
 if __name__ == '__main__':
 
+    cata_train_paths, cata_test_paths = get_train_test_paths('./cataract_paths')
+    normal_train_paths, normal_test_paths = get_train_test_paths('./normal_paths')
+    glau_train_paths, glau_test_paths = get_train_test_paths('./glaucoma_paths')
+    retina_train_paths, retina_test_paths = get_train_test_paths('./retina_paths')
 
-    train_paths, test_paths=get_train_test_paths('./cataract_paths','./retina_paths','./normal_paths','./glaucoma_paths')
+
+
     """usage: get_train_test_paths"""
 
     """
