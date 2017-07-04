@@ -150,7 +150,7 @@ if __name__ == '__main__':
     pool=Pool()
     count=0
     for img , path in pool.imap(macula_crop ,paths):
-        save_img(img, save_folder , extension)
+        save_img(img, save_folder , saved_extension)
         utils.show_progress(count , len(paths))
         count+=1
 
