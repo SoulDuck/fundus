@@ -6,7 +6,7 @@ import time
 import argparse
 import random
 import glob , sys, os
-
+import utils
 from multiprocessing import Pool
 
 
@@ -148,8 +148,11 @@ if __name__ == '__main__':
         print 'saved extension', saved_extension
 
     pool=Pool()
+    count=0
     for img , path in pool.imap(macula_crop ,paths):
         save_img(img, save_folder , extension)
+        utils.show_progress(count , len(paths))
+        count+=1
 
     """
     #########   usage : crop_reisize_fundus   #########
