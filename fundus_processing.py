@@ -127,10 +127,12 @@ if __name__ == '__main__':
     else :
         save_folder='./sample_image/processed_images/'
 
-    print 'folder_path:', folder_path
-    print 'save_folder:', save_folder
-
     paths=glob.glob(folder_path)
+    if __debug__ == True:
+        print 'folder_path:', folder_path
+        print 'save_folder:', save_folder
+        print 'number of paths' , len(paths)
+
     pool=Pool()
     for img , path in pool.imap(macula_crop ,paths[:]):
         extension = '.png'
