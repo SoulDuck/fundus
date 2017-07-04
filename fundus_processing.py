@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import PIL
 import time
+import argparse
 import random
 import glob , sys, os
 
@@ -111,8 +112,33 @@ if __name__ == '__main__':
     plt.imshow(cropped_img)
     plt.show()
 
-    """usage : crop_reisize_fundus """
+
+    """usage: fundus optical crop """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dir" , help='folder to preprocessing')
+    parser.add_argument("--save_dir" , help='folder to save')
+    args = parser.parse_args()
+    if args.dir:
+        folder_path=args.dir
+    else:
+        folder_path='./sample_image/original_images/*.png'
+    if args.save_dir:
+        save_folder=args.save_dir
+    else :
+        save_folder='./sample_image/processed_images/'
+
+    print 'folder_path:', folder_path
+    print 'save_folder:', save_folder
+
+    paths=glob.glob(folder_path)
+    pool=Pool()
+    for img , path in pool.imap(macula_crop ,paths[:]):
+        extension = '.png'
+        save_img(img, save_folder , extension)
+
     """
+    #########   usage : crop_reisize_fundus   #########
+
     target_folder='./sample_image/'
     extension='*.png'
     paths=glob.glob(target_folder+extension)
@@ -126,15 +152,4 @@ if __name__ == '__main__':
         reshape_img_size=(228,228)
         img =img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
         img.save(save_path)
-
     """
-
-    """usage: fundus optical crop """
-    folder_path='./sample_image/original_images/*.png'
-    paths=glob.glob(folder_path)
-    pool=Pool()
-    save_folder='./macula_crop_images/normal'
-    for img , path in pool.imap(macula_crop ,paths[:]):
-        extension = '.png'
-        save_folder='./macula_crop_images/'
-        save_img(img, save_folder , extension)
