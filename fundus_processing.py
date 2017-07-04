@@ -135,17 +135,17 @@ if __name__ == '__main__':
     else:
         extension = '*.png'
 
-
-
     paths=glob.glob(folder_path + extension)
+    saved_extension=extension.replace('*' ,'')
     if __debug__ == True:
         print 'folder_path:', folder_path
         print 'save_folder:', save_folder
         print 'number of paths' , len(paths)
         print 'extension', extension
+        print 'saved extension', saved_extension
+
     pool=Pool()
     for img , path in pool.imap(macula_crop ,paths[:]):
-        extension = '.png'
         save_img(img, save_folder , extension)
 
     """
