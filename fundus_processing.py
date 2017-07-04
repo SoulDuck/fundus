@@ -75,6 +75,7 @@ def optical_crop(path):
     return img , path
 
 def macula_crop(path):
+    print path
     img = Image.open(path)
     if 'L' in path:
         img = crop_specify_point_and_resize(img, (400, 1150), (1250, 2000), resize_=(299, 299))
