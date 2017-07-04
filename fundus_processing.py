@@ -130,26 +130,11 @@ if __name__ == '__main__':
     """
 
     """usage: fundus optical crop """
-
-    paths=glob.glob('./sample_image/original_images/*.png' )
+    folder_path='./sample_image/original_images/*.png'
+    paths=glob.glob(folder_path)
     pool=Pool()
-    save_folder='/Users/seongjungkim/Desktop/normal_1_crop/'
-    save_folder='./macula_crop_images/'
-    for img , path in pool.imap(macula_crop ,paths[:10000]):
+    save_folder='./macula_crop_images/normal'
+    for img , path in pool.imap(macula_crop ,paths[:]):
         extension = '.png'
         save_folder='./macula_crop_images/'
         save_img(img, save_folder , extension)
-
-    for path in pool.imap(macula_crop, paths[10000:20000]):
-        save_folder = '/Users/seongjungkim/Desktop/normal_2_crop/'
-        save_folder = './macula_croppped_images'
-        extension = '.npy'
-        name = path.split('/')[-1].split('.')[0]
-        np.save(save_folder + name + extension, img)
-
-    for path in pool.imap(macula_crop, paths[20000:]):
-        save_folder = '/Users/seongjungkim/Desktop/normal_2_crop/'
-        save_folder = './macula_croppped_images'
-        extension = '.npy'
-        name = path.split('/')[-1].split('.')[0]
-        np.save(save_folder + name + extension, img)
