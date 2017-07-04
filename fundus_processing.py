@@ -101,6 +101,7 @@ def save_img(img, save_folder , extension):
         plt.imsave(save_folder + name + extension, img)
 
 if __name__ == '__main__':
+    """
     path='./sample_image/original_images/43203_20140121_L.png'
     path='./sample_image/original_images/43203_20140121_R.png'
 
@@ -112,6 +113,7 @@ if __name__ == '__main__':
     a=fig.add_subplot(1,2,2)
     plt.imshow(cropped_img)
     plt.show()
+    """
 
 
     """usage: fundus optical crop """
