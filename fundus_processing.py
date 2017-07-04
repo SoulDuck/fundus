@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
 
 
-    paths=glob.glob(folder_path)
+    paths=glob.glob(folder_path + extension)
     if __debug__ == True:
         print 'folder_path:', folder_path
         print 'save_folder:', save_folder
