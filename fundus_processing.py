@@ -117,15 +117,25 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir" , help='folder to preprocessing')
     parser.add_argument("--save_dir" , help='folder to save')
+    parser.add_argument("--extension" , help='extension')
     args = parser.parse_args()
+
     if args.dir:
         folder_path=args.dir
     else:
-        folder_path='./sample_image/original_images/*.png'
+        folder_path='./sample_image/original_images/'
+
     if args.save_dir:
         save_folder=args.save_dir
-    else :
+    else:
         save_folder='./sample_image/processed_images/'
+
+    if args.extension:
+        extension = args.extension
+    else:
+        extension = '*.png'
+
+
 
     paths=glob.glob(folder_path)
     if __debug__ == True:
