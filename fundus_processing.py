@@ -145,7 +145,7 @@ if __name__ == '__main__':
         print 'saved extension', saved_extension
 
     pool=Pool()
-    for img , path in pool.imap(macula_crop ,paths[:]):
+    for img , path in pool.imap(macula_crop ,paths):
         save_img(img, save_folder , extension)
 
     """
