@@ -142,7 +142,7 @@ if __name__ == '__main__':
         print 'folder_path:', folder_path
         print 'save_folder:', save_folder
         print 'number of paths' , len(paths)
-
+        print 'extension', extension
     pool=Pool()
     for img , path in pool.imap(macula_crop ,paths[:]):
         extension = '.png'
