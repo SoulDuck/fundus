@@ -56,6 +56,28 @@ def make_numpy_images_labels(paths , label_num):
         tmp.append(img)
     imgs=np.asarray(tmp)
     return imgs , labels
+
+def get_train_test_paths(*pathss):
+
+    all_train_paths=[]
+    all_test_paths=[]
+    for i,paths in enumerate(pathss):
+        f=open(paths)
+        lines=f.readlines()
+
+        n_lines=len(lines)
+        n_test=int(n_lines*0.1)
+        n_train=n_lines-n_test
+        all_train_paths.extend(lines[:n_train])
+        all_test_paths.extend(lines[n_train:])
+        if __debug__ ==True:
+            print 'sample type:', lines[0].split('/')[-2]
+            print 'total paths:', n_lines, 'train:',n_train , 'test',n_test
+            print '##########################################################'
+    if __debug__==True:
+        print 'all train paths :', len(all_train_paths)
+        print 'all_test_paths :', len(all_test_paths)
+    return all_train_paths , all_test_paths
 def get_train_test_images_labels(normal_images,abnormal_images, train_ratio=0.95 ):
 
     NORMAL_LABEL=0
@@ -167,6 +189,12 @@ def eye_299x299():
     return image_height, image_width, image_color_ch, n_classes, train_imgs, train_labs, test_imgs, test_labs
 
 if __name__ == '__main__':
+
+
+    train_paths, test_paths=get_train_test_paths('./cataract_paths','./retina_paths','./normal_paths','./glaucoma_paths')
+    """usage: get_train_test_paths"""
+
+    """
     image_height, image_width, image_color_ch, n_classes, train_imgs, train_labs, test_imgs, test_labs=eye_299x299()
     plt.imshow(train_imgs[0])
     plt.show()
@@ -180,6 +208,7 @@ if __name__ == '__main__':
 
     print train_labs
     print test_labs
+    """
     """ 
     cataract_paths=make_paths('/home/mediwhale/data/eye/resize_eye/abnormal/cataract/' ,'*.png' , 'cataract_paths')
     retina_paths = make_paths('/home/mediwhale/data/eye/resize_eye/abnormal/retina/', '*.png', 'retina_paths')

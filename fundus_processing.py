@@ -89,6 +89,14 @@ def show_progress(i,max_iter):
     msg='\r Progress {0}/{1}'.format(i,max_iter)
     sys.stdout.write(msg)
     sys.stdout.flush()
+def save_img(img, save_folder , extension):
+    name = path.split('/')[-1].split('.')[0]
+    if extension == '.npy':
+        np.save(save_folder + name + extension, img)
+    else :
+        img = Image.fromarray(img)
+        plt.imshow(img)
+        plt.imsave(save_folder + name + extension, img)
 
 if __name__ == '__main__':
     path='./sample_image/original_images/43203_20140121_L.png'
@@ -128,9 +136,9 @@ if __name__ == '__main__':
     save_folder='/Users/seongjungkim/Desktop/normal_1_crop/'
     save_folder='./macula_crop_images/'
     for img , path in pool.imap(macula_crop ,paths[:10000]):
-        extension = '.npy'
-        name = path.split('/')[-1].split('.')[0]
-        np.save(save_folder + name + extension, img)
+        extension = '.png'
+        save_folder='./macula_crop_images/'
+        save_img(img, save_folder , extension)
 
     for path in pool.imap(macula_crop, paths[10000:20000]):
         save_folder = '/Users/seongjungkim/Desktop/normal_2_crop/'
