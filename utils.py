@@ -16,6 +16,9 @@ overlay = overlay.convert("RGBA")
 new_img = Image.blend(background, overlay, 0.5)
 new_img.save("new.png","PNG")
 """
+def get_name(path):
+    name = path.split('/')[-1].split('.')[0]
+    return name
 def check_overlay_paths(all_paths , src_paths):
     """
     return not overlay image btw param all_paths and src_paths
@@ -25,8 +28,10 @@ def check_overlay_paths(all_paths , src_paths):
     """
     return_paths=[]
     overlay_paths=[]
+    src_names=map(get_name,src_paths)
     for path in all_paths:
-        if path in src_paths:
+        name=path.split('/')[-1].split('.')[0]
+        if name in src_names:
             overlay_paths.append(path)
         else:
             return_paths.append(path)
