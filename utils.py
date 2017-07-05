@@ -84,6 +84,8 @@ def delete_char_from_paths(folder_path , del_char):
         for path in paths:
             new_path=path.replace(del_char ,'')
             os.rename(path , new_path)
+
+
     """
     *usage:
         delete_char_from_paths(folder_path='../fundus_data/cropped_macula/' , del_char='*')
@@ -185,10 +187,13 @@ def draw_grpah(file_path,check_point=50):
     plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Loss ',folder_path,step_list, train_loss_list, val_loss_list)
 
 if __name__=='__main__':
+    delete_char_from_paths(folder_path='../fundus_data/cropped_macula/', del_char='*')
+    """
     paths=glob.glob('./sample_image/original_images/*.png')
     imgs=open_images(paths)
     print np.shape(imgs)
     plot_images(imgs)
+    """
     """
     #function divide_images_labels_from_batch test
     test_imgs=np.load('./test_imgs.npy')
