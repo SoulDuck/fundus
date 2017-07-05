@@ -16,6 +16,14 @@ overlay = overlay.convert("RGBA")
 new_img = Image.blend(background, overlay, 0.5)
 new_img.save("new.png","PNG")
 """
+def not_overlay_paths(all_paths , src_paths):
+    return_paths=[]
+    for path in all_paths:
+        if path in src_paths:
+            pass
+        else:
+            return_paths.append(path)
+    return return_paths
 def compare_images(ori_img, target_img):
     plt.title('debuging')
     fig= plt.figure()

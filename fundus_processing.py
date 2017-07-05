@@ -211,6 +211,7 @@ if __name__ == '__main__':
             os.mkdir(target_save_folder_path)
 
         paths = glob.glob(target_folder_path + extension)
+
         if __debug__ == True:
             print ''
             print '################################ '
@@ -223,6 +224,7 @@ if __name__ == '__main__':
         pool = Pool()
         count = 0
         for img, path in pool.imap(crop_resize_fundus, paths):
+
             utils.show_progress(count,len(paths))
             name = path.split('/')[-1]
             save_path = os.path.join(target_save_folder_path, name)
