@@ -16,7 +16,13 @@ overlay = overlay.convert("RGBA")
 new_img = Image.blend(background, overlay, 0.5)
 new_img.save("new.png","PNG")
 """
-def not_overlay_paths(all_paths , src_paths):
+def check_overlay_paths(all_paths , src_paths):
+    """
+    return not overlay image btw param all_paths and src_paths
+    :param all_paths:
+    :param src_paths:
+    :return:
+    """
     return_paths=[]
     for path in all_paths:
         if path in src_paths:
