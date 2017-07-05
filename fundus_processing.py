@@ -123,6 +123,7 @@ if __name__ == '__main__':
     parser.add_argument("--extension" , help='extension')
     args = parser.parse_args()
 
+
     if args.dir:
         folder_path=args.dir
     else:
@@ -137,6 +138,7 @@ if __name__ == '__main__':
         extension = args.extension
     else:
         extension = '*.png'
+
 
     paths=glob.glob(folder_path + extension)
     saved_extension=extension.replace('*' ,'')
@@ -153,6 +155,7 @@ if __name__ == '__main__':
         save_img(img, save_folder , saved_extension)
         utils.show_progress(count , len(paths))
         count+=1
+
 
     """
     #########   usage : crop_reisize_fundus   #########

@@ -4,6 +4,10 @@ import utils
 from PIL import Image
 import random
 import matplotlib.pyplot as plt
+def save_paths(src_paths,f_path):
+    f= open(f_path , 'w')
+    for path in src_paths:
+        f.write(path+'\n')
 
 def cls2onehot(cls, depth):
     labels=np.zeros([len(cls),2])
@@ -19,13 +23,13 @@ def cls2onehot(cls, depth):
     return labels
 def make_paths(folder_path , extension , f_name):
     paths=glob.glob(folder_path+extension)
-    if os.path.isfile('./'+f_name):
+    if os.path.isfile(f_name):
         print 'paths is already made. this function will be closed'
-        f=open('./'+f_name, 'r')
+        f=open(f_name, 'r')
         paths=[path.replace('\n','') for path in f.readlines()]
         return paths
     else:
-        f=open('./'+f_name, 'w')
+        f=open(f_name, 'w')
         for path in paths:
           f.write(path+'\n')
     return paths
@@ -55,20 +59,21 @@ def make_numpy_images_labels(paths , label_num):
     imgs=np.asarray(tmp)
     return imgs , labels
 
-def get_train_test_paths(*pathss):
+def get_train_test_paths(test_ratio,*pathss):
 
     all_train_paths=[]
     all_test_paths=[]
+    def fn(path):
+        path=path.replace('\n', '')
+        return path
+
     for i,paths in enumerate(pathss):
-        def fn(path):
-            path.replace('\n' , '')
-            return path
         f = open(paths)
         lines = f.readlines()
         n_lines = len(lines)
         lines = map(fn, lines) # erase 'n'
         random.shuffle(lines) # shuffle list
-        n_test=int(n_lines*0.1)
+        n_test=int(n_lines*test_ratio)
         n_train=n_lines-n_test
         all_train_paths.extend(lines[:n_train])
         all_test_paths.extend(lines[n_train:])
@@ -81,7 +86,7 @@ def get_train_test_paths(*pathss):
         print 'all_test_paths :', len(all_test_paths)
         print ''
     return all_train_paths , all_test_paths
-def get_train_test_images_labels(normal_images,abnormal_images, train_ratio=0.95 ):
+def get_train_test_images_labels(normal_images,abnormal_images, train_ratio=0.95):
     NORMAL_LABEL=0
     ABNORMAL_LABEL=1
     n_normal=len(normal_images)
@@ -184,13 +189,92 @@ def eye_299x299():
 
     return image_height, image_width, image_color_ch, n_classes, train_imgs, train_labs, test_imgs, test_labs
 
-if __name__ == '__main__':
 
+
+
+def fundus_macula_images(folder_path='../fundus_data/cropped_macula/'):
+    """
+    usage:
+    :param folder_path:
+    :return:
+    """
+    image_height = 299
+    image_width = 299
+    image_color_ch = 3
+    n_classes = 2
+
+    cataract_paths=make_paths(folder_path+'cataract/', '*.png', folder_path+'cataract/'+'cataract_paths.txt') #no random shuffle
+    retina_paths = make_paths(folder_path+'retina/', '*.png', folder_path+'retina/'+'retina_paths.txt')
+    glaucoma_paths = make_paths(folder_path+'glaucoma/', '*.png', folder_path+'/glaucoma/'+'glaucoma_paths.txt')
+    normal_paths = make_paths(folder_path+'normal/', '*.png', folder_path+'/normal/'+'normal_paths.txt')
+
+    cata_train_paths, cata_test_paths = get_train_test_paths(0.5, folder_path+'cataract/'+'cataract_paths.txt') # random shuffle here
+    glau_train_paths, glau_test_paths = get_train_test_paths(0.5, folder_path+'retina/'+'retina_paths.txt')
+    retina_train_paths, retina_test_paths = get_train_test_paths(0.5, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
+    normal_train_paths, normal_test_paths = get_train_test_paths(0.5, folder_path+'/normal/'+'normal_paths.txt')
+
+    save_paths(cata_train_paths,folder_path+'cataract/'+'cataract_train_paths.txt') ;save_paths(cata_test_paths,folder_path+'cataract/'+'cataract_test_paths.txt')
+    save_paths(glau_train_paths , folder_path+'glaucoma/'+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,folder_path+'glaucoma/'+'glaucoma_test_paths.txt')
+    save_paths(retina_train_paths,folder_path+'retina/'+'retina_train_paths.txt');save_paths(retina_test_paths,folder_path+'retina/'+'retina_test_paths.txt')
+    save_paths(normal_train_paths,folder_path+'normal/'+'normal_train_paths.txt');save_paths(normal_test_paths,folder_path+'normal/'+'normal_test_paths.txt')
+
+    ########################################  setting here ###############################################
+
+    ####################################################################################################
+    print 'Image Loading ....'
+    cata_train_imgs , cata_train_labels = make_numpy_images_labels(cata_train_paths , label_num=1)
+    glau_train_imgs , glau_train_labels = make_numpy_images_labels(glau_train_paths , label_num=1)
+    retina_train_imgs, retina_train_labels = make_numpy_images_labels(retina_train_paths, label_num=1)
+    normal_train_imgs, normal_train_labels = make_numpy_images_labels(normal_train_paths, label_num=0)
+
+    cata_test_imgs , cata_test_labels = make_numpy_images_labels(cata_test_paths , label_num=1)
+    glau_test_imgs , glau_test_labels = make_numpy_images_labels(glau_test_paths , label_num=1)
+    retina_test_imgs, retina_test_labels = make_numpy_images_labels(retina_test_paths, label_num=1)
+    normal_test_imgs, normal_test_labels = make_numpy_images_labels(normal_test_paths, label_num=0)
+
+
+
+    if __debug__ ==True:
+        print '# cataract :', len(cataract_paths)
+        print '# glaucoma :', len(glaucoma_paths)
+        print '# retina :', len(retina_paths)
+        print '# normal :', len(normal_paths)
+
+        print '# cataract train , :', len(cata_train_paths) , '# cataract test :', len(cata_test_paths)
+        print '# glaucoma train , :', len(glau_train_paths) , '# glaucoma test :', len(glau_test_paths)
+        print '# retina train , :', len(retina_train_paths) , '# retina test :', len(retina_test_paths)
+        print '# normal train , :', len(normal_train_paths) , '# normal test :', len(normal_test_paths)
+
+        print cata_train_paths
+        print 'shape of cata_train_imgs' , cata_train_imgs.shape
+        fig = plt.figure()
+        a=fig.add_subplot(1,2,1)
+        a.set_xlabel('')
+        plt.imshow(cata_train_imgs[0])
+        a = fig.add_subplot(1, 2, 2)
+        a.set_xlabel('')
+        plt.imshow(cata_train_imgs[1])
+        plt.show()
+
+    return [cata_train_imgs , cata_test_imgs , cata_train_paths , cata_test_paths] ,\
+            [glau_train_imgs , glau_test_imgs , glau_train_paths , glau_test_paths],\
+            [retina_train_imgs , retina_test_imgs , retina_train_paths , retina_test_paths],\
+            [normal_train_imgs , normal_test_imgs , normal_train_paths , normal_test_paths]
+
+
+
+
+
+if __name__ == '__main__':
+    fundus_macula_images()
+
+
+    """
     cata_train_paths, cata_test_paths = get_train_test_paths('./cataract_paths')
     normal_train_paths, normal_test_paths = get_train_test_paths('./normal_paths')
     glau_train_paths, glau_test_paths = get_train_test_paths('./glaucoma_paths')
     retina_train_paths, retina_test_paths = get_train_test_paths('./retina_paths')
-
+    """
 
 
     """usage: get_train_test_paths"""
