@@ -77,6 +77,20 @@ def np2img(image):
         print 'input value isnt numpy type '
         return Image
 
+def delete_char_from_paths(folder_path , del_char):
+    folder_names=os.walk(folder_path).next()[1]
+    for folder_name in folder_names:
+        paths=glob.glob(folder_path+folder_name+'/*.png')
+        for path in paths:
+            new_path=path.replace(del_char ,'')
+            os.rename(path , new_path)
+    """
+    *usage:
+        delete_char_from_paths(folder_path='../fundus_data/cropped_macula/' , del_char='*')
+        test*.txt --> test.txt
+    """
+
+
 
 
 
