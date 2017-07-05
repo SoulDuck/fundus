@@ -267,8 +267,6 @@ def fundus_macula_images(folder_path='../fundus_data/cropped_macula/'):
 
 if __name__ == '__main__':
     fundus_macula_images()
-
-
     """
     cata_train_paths, cata_test_paths = get_train_test_paths('./cataract_paths')
     normal_train_paths, normal_test_paths = get_train_test_paths('./normal_paths')

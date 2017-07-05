@@ -16,6 +16,15 @@ overlay = overlay.convert("RGBA")
 new_img = Image.blend(background, overlay, 0.5)
 new_img.save("new.png","PNG")
 """
+def compare_images(ori_img, target_img):
+    fig= plt.figure()
+    a=fig.add_subplot(1,2,1)
+    a.set_xlabel('original image')
+    plt.imshow()
+
+    a = fig.add_subplot(1, 2, 1)
+    plt.imshow('changed image')
+    plt.show()
 
 def show_progress(i,max_iter):
     msg='\r progress {}/{}'.format(i, max_iter)
