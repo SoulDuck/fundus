@@ -11,6 +11,7 @@ from multiprocessing import Pool
 
 
 def crop_resize_fundus(path):
+    debug_flag=False
     """
     file name =1002959_20130627_L.png
     """
@@ -37,7 +38,7 @@ def crop_resize_fundus(path):
             break;
 
     crop_img = im.crop((up[0], left[1], left[0], up[1]))
-    print np.shape(np_img)
+
     #plt.imshow(crop_img)
 
     diameter_height = up[1] - left[1]
@@ -46,8 +47,9 @@ def crop_resize_fundus(path):
     crop_img = im.crop((up[0], left[1], left[0] + diameter_width, up[1] + diameter_height))
     end_time = time.time()
 
-    if __debug__ == True:
+    if __debug__ == debug_flag:
         print end_time - start_time
+        print np.shape(np_img)
 
     return crop_img ,path
 
@@ -65,22 +67,34 @@ def crop_specify_point_and_resize(x,start_pos , end_pos , resize_):
     cropped_x=cropped_x.resize(resize_ , PIL.Image.ANTIALIAS)
     cropped_x = np.asarray(cropped_x)
     return cropped_x
-def optical_crop(path):
-    name=path.split('/')[-1].split('.')[0]
-    img=Image.open(path)
+def macula_crop(path):
+
+    if path.endswith('.npy'):
+        img=Image.fromarray(np.load(path))
+    else:
+        img = Image.open(path)
+
     if 'L' in path:
         img=crop_specify_point_and_resize(img,(400,500),(1250,1350) , resize_=(299,299))
     else:
         img=crop_specify_point_and_resize(img, (400,1150),(1250,2000), resize_=(299, 299))
     return img , path
 
-def macula_crop(path):
-    print path
-    img = Image.open(path)
-    if 'L' in path:
-        img = crop_specify_point_and_resize(img, (400, 1150), (1250, 2000), resize_=(299, 299))
+def optical_crop(path):
+
+    if path.endswith('.npy'):
+        img=Image.fromarray(np.load(path))
     else:
-        img = crop_specify_point_and_resize(img, (400, 500), (1250, 1350), resize_=(299, 299))
+        img = Image.open(path)
+    try:
+        if 'L' in path:
+            img = crop_specify_point_and_resize(img, (400, 100), (1150, 850), resize_=(750, 750))  # cropped_original-image
+            #img = crop_specify_point_and_resize(img, (400, 1150), (1250, 2000), resize_=(299, 299)) #original-image
+        else:
+            img = crop_specify_point_and_resize(img, (400, 750), (1150, 1500), resize_=(750, 750))
+            #img = crop_specify_point_and_resize(img, (400, 500), (1250, 1350), resize_=(299, 299)) #original-image
+    except:
+        print '*error path*:',path
     return img, path
 
 def find_optical(path):
@@ -117,6 +131,7 @@ if __name__ == '__main__':
 
 
     """usage: fundus optical crop """
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir" , help='folder to preprocessing')
     parser.add_argument("--save_dir" , help='folder to save')
@@ -127,12 +142,12 @@ if __name__ == '__main__':
     if args.dir:
         folder_path=args.dir
     else:
-        folder_path='./sample_image/original_images/'
+        folder_path='../fundus_data/cropped_original_fundus/'
 
     if args.save_dir:
         save_folder=args.save_dir
     else:
-        save_folder='./sample_image/processed_images/'
+        save_folder='../fundus_data/cropped_optical/'
 
     if args.extension:
         extension = args.extension
@@ -140,37 +155,76 @@ if __name__ == '__main__':
         extension = '*.png'
 
 
-    paths=glob.glob(folder_path + extension)
-    saved_extension=extension.replace('*' ,'')
-    if __debug__ == True:
-        print 'folder_path:', folder_path
-        print 'save_folder:', save_folder
-        print 'number of paths' , len(paths)
-        print 'extension', extension
-        print 'saved extension', saved_extension
+    folder_names=os.walk(folder_path).next()[1]
+    saved_extension='.png'
+    for folder_name in folder_names:
+        target_folder_path=folder_path+folder_name+'/'
+        target_save_folder_path = save_folder + folder_name + '/'
 
-    pool=Pool()
-    count=0
-    for img , path in pool.imap(macula_crop ,paths):
-        save_img(img, save_folder , saved_extension)
-        utils.show_progress(count , len(paths))
-        count+=1
+        paths=glob.glob(target_folder_path+  extension)
+        if __debug__ == True:
+            print ''
+            print '################################ '
+            print 'folder_path:', target_folder_path
+            print 'save_folder:', target_save_folder_path
+            print 'number of paths' , len(paths)
+            print 'extension', extension
+            print 'saved extension', saved_extension
+
+        pool=Pool()
+        count=0
+        for img , path in pool.imap(optical_crop ,paths):
+            save_img(img, target_save_folder_path , saved_extension) #save image ==> save_folder+name+extension
+            utils.show_progress(count , len(paths))
+            count+=1
 
 
     """
     #########   usage : crop_reisize_fundus   #########
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dir", help='folder to preprocessing')
+    parser.add_argument("--save_dir", help='folder to save')
+    parser.add_argument("--extension", help='extension')
+    args = parser.parse_args()
 
-    target_folder='./sample_image/'
-    extension='*.png'
-    paths=glob.glob(target_folder+extension)
-    pool=Pool()
-    count=0
-    for img , path in pool.imap(crop_resize_fundus , paths):
-        print np.shape(img)
-        save_folder='./'
-        name=path.split('/')[-1]
-        save_path=os.path.join(save_folder , name)
-        reshape_img_size=(228,228)
-        img =img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
-        img.save(save_path)
-    """
+    if args.dir:
+        folder_path = args.dir
+    else:
+        folder_path = '../fundus_data/original_fundus/'
+
+    if args.save_dir:
+        save_folder = args.save_dir
+    else:
+        save_folder = '../fundus_data/cropped_original_fundus/'
+
+    if args.extension:
+        extension = args.extension
+    else:
+        extension = '*.png'
+
+    folder_names = os.walk(folder_path).next()[1]
+    saved_extension = '.png'
+    for folder_name in folder_names:
+        target_folder_path = folder_path + folder_name + '/'
+        target_save_folder_path = save_folder + folder_name + '/'
+        paths = glob.glob(target_folder_path + extension)
+        if __debug__ == True:
+            print ''
+            print '################################ '
+            print 'folder_path:', target_folder_path
+            print 'save_folder:', target_save_folder_path
+            print 'number of paths' , len(paths)
+            print 'extension', extension
+            print 'saved extension', saved_extension
+
+        pool = Pool()
+        count = 0
+        for img, path in pool.imap(crop_resize_fundus, paths):
+            utils.show_progress(count,len(paths))
+            name = path.split('/')[-1]
+            save_path = os.path.join(target_save_folder_path, name)
+            reshape_img_size = (750, 750)
+            img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
+            img.save(save_path + saved_extension)
+            count+=1
+
