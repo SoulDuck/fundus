@@ -24,11 +24,14 @@ def check_overlay_paths(all_paths , src_paths):
     :return:
     """
     return_paths=[]
+    overlay_paths=[]
     for path in all_paths:
         if path in src_paths:
-            pass
+            overlay_paths.append(path)
         else:
             return_paths.append(path)
+    if __debug__ ==True:
+        print 'the number of overlay images : ',len(overlay_paths)
     return return_paths
 def compare_images(ori_img, target_img):
     plt.title('debuging')
