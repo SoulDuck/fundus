@@ -207,6 +207,9 @@ if __name__ == '__main__':
     for folder_name in folder_names:
         target_folder_path = folder_path + folder_name + '/'
         target_save_folder_path = save_folder + folder_name + '/'
+        if not os.path.isdir(target_save_folder_path):
+            os.mkdir(target_save_folder_path)
+
         paths = glob.glob(target_folder_path + extension)
         if __debug__ == True:
             print ''
