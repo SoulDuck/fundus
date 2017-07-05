@@ -211,7 +211,8 @@ if __name__ == '__main__':
             os.mkdir(target_save_folder_path)
 
         paths = glob.glob(target_folder_path + extension)
-
+        saved_paths=glob.glob(target_folder_path +'*'+saved_extension)
+        paths=utils.check_overlay_paths(paths , saved_paths)
         if __debug__ == True:
             print ''
             print '################################ '
