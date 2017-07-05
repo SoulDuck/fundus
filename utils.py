@@ -26,7 +26,6 @@ def compare_images(ori_img, target_img):
     a = fig.add_subplot(1, 2, 1)
     plt.imshow('changed image')
     plt.show()
-
 def show_progress(i,max_iter):
     msg='\r progress {}/{}'.format(i, max_iter)
     sys.stdout.write(msg)
