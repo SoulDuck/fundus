@@ -209,7 +209,7 @@ if __name__ == '__main__':
         target_save_folder_path = save_folder + folder_name + '/'
         if not os.path.isdir(target_save_folder_path):
             os.mkdir(target_save_folder_path)
-
+            print target_save_folder_path,'is made'
         paths = glob.glob(target_folder_path + extension)
         saved_paths=glob.glob(target_save_folder_path +'*'+saved_extension)
         paths=utils.check_overlay_paths(paths , saved_paths) #check overlay paths
