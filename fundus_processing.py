@@ -236,7 +236,7 @@ if __name__ == '__main__':
                 reshape_img_size = (750, 750)
                 img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
                 img.save(save_path + saved_extension)
-                if count == 3000:
+                if count == 100:
                     pool.close()
                     pool.join()
                 if count == len(paths)-1:
