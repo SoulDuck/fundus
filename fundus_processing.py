@@ -237,7 +237,8 @@ if __name__ == '__main__':
             if count == 3000:
                 pool.close()
                 pool.join()
-                break;
+                continue;
+
             if count == len(paths)-1:
                 w_flag=False
             count+=1
