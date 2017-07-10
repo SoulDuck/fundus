@@ -185,6 +185,7 @@ if __name__ == '__main__':
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
     parser.add_argument("--extension", help='extension')
+    parser.add_augment("--limit_paths" , help='limit to paths for multiprocessing')
     args = parser.parse_args()
 
     if args.dir:
@@ -202,8 +203,15 @@ if __name__ == '__main__':
     else:
         extension = '*.png'
 
+    if args.limit_paths:
+        limit_paths=args.limit_paths
+    else:
+        limit_paths=3000
+
+
     folder_names = os.walk(folder_path).next()[1]
     saved_extension = '.png'
+    num_paths=3000
     for folder_name in folder_names:
         target_folder_path = folder_path + folder_name + '/'
         target_save_folder_path = save_folder + folder_name + '/'
@@ -214,6 +222,8 @@ if __name__ == '__main__':
         paths = glob.glob(target_folder_path + extension)
         saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
         paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
+
+        paths=paths[:num_paths]
         pool = Pool()
         count = 0
         if len(paths)==0:
@@ -234,13 +244,6 @@ if __name__ == '__main__':
             reshape_img_size = (750, 750)
             img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
             img.save(save_path + saved_extension)
-            if count == 3000:
-                pool.close()
-                pool.join()
-                continue;
-
-            if count == len(paths)-1:
-                w_flag=False
             count+=1
     print 'fundus_processing.py out'
 
