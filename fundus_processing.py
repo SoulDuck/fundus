@@ -241,5 +241,6 @@ if __name__ == '__main__':
             if count == len(paths)-1:
                 w_flag=False
             count+=1
+    print 'fundus_processing.py out'
 
 
