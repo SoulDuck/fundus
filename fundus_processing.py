@@ -211,37 +211,35 @@ if __name__ == '__main__':
             os.mkdir(target_save_folder_path)
             print target_save_folder_path,'is made'
 
-        w_flag=True
-        while w_flag:
-            pool = Pool()
-            count = 0
-            paths = glob.glob(target_folder_path + extension)
-            saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
-            paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
-            if len(paths)==0:
+        paths = glob.glob(target_folder_path + extension)
+        saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
+        paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
+        pool = Pool()
+        count = 0
+        if len(paths)==0:
+            break;
+        if __debug__ == True:
+            print ''
+            print '################################ '
+            print 'folder_path:', target_folder_path
+            print 'save_folder:', target_save_folder_path
+            print 'number of paths', len(paths)
+            print 'extension', extension
+            print 'saved extension', saved_extension
+
+        for img, path in pool.imap(crop_resize_fundus, paths):
+            utils.show_progress(count,len(paths))
+            name = path.split('/')[-1]
+            save_path = os.path.join(target_save_folder_path, name)
+            reshape_img_size = (750, 750)
+            img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
+            img.save(save_path + saved_extension)
+            if count == 3000:
+                pool.close()
+                pool.join()
                 break;
-            if __debug__ == True:
-                print ''
-                print '################################ '
-                print 'folder_path:', target_folder_path
-                print 'save_folder:', target_save_folder_path
-                print 'number of paths', len(paths)
-                print 'extension', extension
-                print 'saved extension', saved_extension
-
-            for img, path in pool.imap(crop_resize_fundus, paths):
-                utils.show_progress(count,len(paths))
-                name = path.split('/')[-1]
-                save_path = os.path.join(target_save_folder_path, name)
-                reshape_img_size = (750, 750)
-                img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
-                img.save(save_path + saved_extension)
-                if count == 100:
-                    pool.close()
-                    pool.join()
-                if count == len(paths)-1:
-                    w_flag=False
-
-                count+=1
+            if count == len(paths)-1:
+                w_flag=False
+            count+=1
 
 
