@@ -211,7 +211,7 @@ if __name__ == '__main__':
 
     folder_names = os.walk(folder_path).next()[1]
     saved_extension = '.png'
-    num_paths=3000
+
     for folder_name in folder_names:
         target_folder_path = folder_path + folder_name + '/'
         target_save_folder_path = save_folder + folder_name + '/'
@@ -223,7 +223,7 @@ if __name__ == '__main__':
         saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
         paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
 
-        paths=paths[:num_paths]
+        paths=paths[:limit_paths]
         pool = Pool()
         count = 0
         if len(paths)==0:
