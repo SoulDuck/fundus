@@ -226,8 +226,7 @@ if __name__ == '__main__':
         paths=paths[:limit_paths]
         pool = Pool()
         count = 0
-        if len(paths)==0:
-            break;
+
         if __debug__ == True:
             print ''
             print '################################ '
@@ -236,7 +235,8 @@ if __name__ == '__main__':
             print 'number of paths', len(paths)
             print 'extension', extension
             print 'saved extension', saved_extension
-
+        if len(paths)==0:
+            continue;
         for img, path in pool.imap(crop_resize_fundus, paths):
             utils.show_progress(count,len(paths))
             name = path.split('/')[-1]
