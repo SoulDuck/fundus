@@ -147,6 +147,7 @@ if __name__ == '__main__':
     parser.add_argument("--dir" , help='folder to preprocessing')
     parser.add_argument("--save_dir" , help='folder to save')
     parser.add_argument("--extension" , help='extension')
+    parser.add_argument("--limit_paths", help='limit to paths for multiprocessing')
     args = parser.parse_args()
 
 
@@ -208,6 +209,7 @@ if __name__ == '__main__':
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
     parser.add_argument("--extension", help='extension')
+    parser.add_argument("--limit_paths", help='limit to paths for multiprocessing')
     args = parser.parse_args()
 
     if args.dir:
