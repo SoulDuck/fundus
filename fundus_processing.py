@@ -165,6 +165,12 @@ if __name__ == '__main__':
     else:
         extension = '*.png'
 
+    if args.limit_paths:
+        limit_paths=args.limit_paths
+    else:
+        limit_paths=3000
+
+
     folder_names=os.walk(folder_path).next()[1]
     saved_extension='.png'
     for folder_name in folder_names:
@@ -177,6 +183,7 @@ if __name__ == '__main__':
         paths=glob.glob(target_folder_path+extension)
         saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
         paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
+        paths = paths[:limit_paths]
         if __debug__ == True:
             print ''
             print '################################ '
@@ -218,6 +225,11 @@ if __name__ == '__main__':
     else:
         extension = '*.png'
 
+    if args.limit_paths:
+        limit_paths=args.limit_paths
+    else:
+        limit_paths=3000
+
     folder_names = os.walk(folder_path).next()[1]
     saved_extension = '.png'
     for folder_name in folder_names:
@@ -231,6 +243,7 @@ if __name__ == '__main__':
         paths = glob.glob(target_folder_path + extension)
         saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
         paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
+        paths = paths[:limit_paths]
         if __debug__ == True:
             print ''
             print '################################ '
