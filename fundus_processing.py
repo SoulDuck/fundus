@@ -10,6 +10,9 @@ import utils
 from multiprocessing import Pool
 
 
+
+
+
 def crop_resize_fundus(path):
     debug_flag=False
     """
@@ -19,9 +22,7 @@ def crop_resize_fundus(path):
     start_time = time.time()
     im = Image.open(path)  # Can be many different formats.
     np_img = np.asarray(im)
-
     mean_pix = np.mean(np_img)
-
     pix = im.load()
     height, width = im.size  # Get the width and hight of the image for iterating over
     # pix[1000,1000] #Get the RGBA Value of the a pixel of an image

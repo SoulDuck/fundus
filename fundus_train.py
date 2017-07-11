@@ -9,6 +9,7 @@ import cam
 ##########################setting############################
 
 image_height, image_width, image_color_ch, n_classes, train_imgs, train_labs, test_imgs, test_labs = data.eye_299x299()
+f=utils.make_log_txt() # make log and log folder
 np.save('./train_imgs',train_imgs)
 np.save('./train_labs',train_labs)
 np.save('./test_imgs',test_imgs)
@@ -60,7 +61,6 @@ except tf.errors.NotFoundError:
 max_val = 0
 max_iter=500000
 check_point = 50
-f=utils.make_log_txt()
 train_acc=0;train_loss=0;
 for step in range(max_iter):
     utils.show_progress(step,max_iter)

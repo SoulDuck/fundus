@@ -136,15 +136,15 @@ def overlay_images(front_image , back_image):
 
 def make_log_txt():
     count=0
-    name='log'
+    folder_path = './log/' + str(count)
     while (True):
-        if os.path.isfile('./log/' + name + '.txt'):
-            name = 'log_' + str(count)
+        if os.path.isdir(folder_path):
             count+=1
         else:
+            os.mkdir(folder_path)
             break
 
-    f = open('./log/' + name + '.txt', 'a')
+    f = open(folder_path+'/log.txt', 'a')
     return f
 
 def write_acc_loss(f,train_acc,train_loss,test_acc,test_loss):
@@ -208,7 +208,8 @@ def draw_grpah(file_path,check_point=50):
     plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Loss ',folder_path,step_list, train_loss_list, val_loss_list)
 
 if __name__=='__main__':
-    delete_char_from_paths(folder_path='../fundus_data/cropped_macula/', del_char='*')
+    #make_log_txt()
+    #delete_char_from_paths(folder_path='../fundus_data/cropped_macula/', del_char='*')
     """
     paths=glob.glob('./sample_image/original_images/*.png')
     imgs=open_images(paths)
