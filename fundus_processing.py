@@ -69,19 +69,23 @@ def crop_specify_point_and_resize(x,start_pos , end_pos , resize_ =None):
     cropped_x = np.asarray(cropped_x)
     return cropped_x
 def macula_crop(path):
-
     if path.endswith('.npy'):
         img=Image.fromarray(np.load(path))
     else:
         img = Image.open(path)
+    try:
+        if 'L' in path:
+            #img=crop_specify_point_and_resize(img,(400,500),(1250,1350) , resize_=(299,299))
+            img = crop_specify_point_and_resize(img, (250, 400), (600, 750))  # 750_750 Image cropped_original-image
+        else:
+            #img=crop_specify_point_and_resize(img, (400,1150),(1250,2000), resize_=(299, 299))
+            img = crop_specify_point_and_resize(img, (250, 50), (600, 400))  # 750_750 Image cropped_original-image
+    except Exception as e :
+        print e
+        print '*error path*:',path
+        img = None
+        return img , path
 
-    if 'L' in path:
-        #img=crop_specify_point_and_resize(img,(400,500),(1250,1350) , resize_=(299,299))
-        img = crop_specify_point_and_resize(img, (250, 400), (600, 750))  # 750_750 Image cropped_original-image
-
-    else:
-        #img=crop_specify_point_and_resize(img, (400,1150),(1250,2000), resize_=(299, 299))
-        img = crop_specify_point_and_resize(img, (250, 50), (600, 400))  # 750_750 Image cropped_original-image
     return img , path
 
 def optical_crop(path):
@@ -105,6 +109,8 @@ def optical_crop(path):
     except Exception as e :
         print e
         print '*error path*:',path
+        img = None
+        return img, path
 
     return img, path
 
@@ -196,7 +202,11 @@ if __name__ == '__main__':
 
         pool=Pool()
         count=0
+        f=open(target_save_folder_path+'broken_images.txt' , 'w')
         for img , path in pool.imap(optical_crop ,paths):
+            if img==None:
+                f.write(path+'\n')
+                continue;
             save_img(img, target_save_folder_path , saved_extension) #save image ==> save_folder+name+extension
             utils.show_progress(count , len(paths))
             count+=1
@@ -258,9 +268,13 @@ if __name__ == '__main__':
         pool = Pool()
         count = 0
         for img, path in pool.imap(macula_crop, paths):
+            if img == None:
+                f.write(path + '\n')
+                continue;
             save_img(img, target_save_folder_path, saved_extension)  # save image ==> save_folder+name+extension
             utils.show_progress(count, len(paths))
             count += 1
+
 
     #########   usage : crop_reisize_fundus   #########
     """
