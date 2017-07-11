@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 print 'a'
 
-img=np.load('../fundus_data/cropped_original_fundus/cataract_glaucoma/8261421_20160614_R.npy')
+img=Image.open('../fundus_data/cropped_original_fundus/cataract/955512_20160808_R.png.png')
 plt.imshow(img)
+plt.savefig('./sample.png')
 plt.show()

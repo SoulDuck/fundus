@@ -53,7 +53,7 @@ def crop_resize_fundus(path):
 
     return crop_img ,path
 
-def crop_specify_point_and_resize(x,start_pos , end_pos , resize_):
+def crop_specify_point_and_resize(x,start_pos , end_pos , resize_ =None):
     """
     :param x: x shape has to be 4 dimension
     :param start_pos:
@@ -64,7 +64,8 @@ def crop_specify_point_and_resize(x,start_pos , end_pos , resize_):
     cropped_x=x[start_pos[0] : end_pos[0], start_pos[1]: end_pos[1] , :]
 
     cropped_x=Image.fromarray(cropped_x)
-    cropped_x=cropped_x.resize(resize_ , PIL.Image.ANTIALIAS)
+    if resize_ !=None:
+        cropped_x=cropped_x.resize(resize_ , PIL.Image.ANTIALIAS)
     cropped_x = np.asarray(cropped_x)
     return cropped_x
 def macula_crop(path):
@@ -75,26 +76,36 @@ def macula_crop(path):
         img = Image.open(path)
 
     if 'L' in path:
-        img=crop_specify_point_and_resize(img,(400,500),(1250,1350) , resize_=(299,299))
+        #img=crop_specify_point_and_resize(img,(400,500),(1250,1350) , resize_=(299,299))
+        img = crop_specify_point_and_resize(img, (250, 400), (600, 750))  # 750_750 Image cropped_original-image
+
     else:
-        img=crop_specify_point_and_resize(img, (400,1150),(1250,2000), resize_=(299, 299))
+        #img=crop_specify_point_and_resize(img, (400,1150),(1250,2000), resize_=(299, 299))
+        img = crop_specify_point_and_resize(img, (250, 50), (600, 400))  # 750_750 Image cropped_original-image
     return img , path
 
 def optical_crop(path):
-
     if path.endswith('.npy'):
         img=Image.fromarray(np.load(path))
     else:
         img = Image.open(path)
+    #print np.shape(img)
+    #print plt.imshow(img)
+    #print plt.show()
     try:
         if 'L' in path:
-            img = crop_specify_point_and_resize(img, (400, 100), (1150, 850), resize_=(750, 750))  # cropped_original-image
+            #img = crop_specify_point_and_resize(img, (400, 100), (1150, 850), resize_=(1150-400, 850-100))  # cropped_original-image
             #img = crop_specify_point_and_resize(img, (400, 1150), (1250, 2000), resize_=(299, 299)) #original-image
+            img = crop_specify_point_and_resize(img, (250, 50), (600, 400))  # 750_750 Image cropped_original-image
+            pass
         else:
-            img = crop_specify_point_and_resize(img, (400, 750), (1150, 1500), resize_=(750, 750))
+            #img = crop_specify_point_and_resize(img, (400, 750), (1150, 1500), resize_=(1150-400, 1500-750)) # cropped_original_image
             #img = crop_specify_point_and_resize(img, (400, 500), (1250, 1350), resize_=(299, 299)) #original-image
-    except:
+            img = crop_specify_point_and_resize(img, (250, 400), (600, 750))  # 750_750 Image cropped_original-image
+    except Exception as e :
+        print e
         print '*error path*:',path
+
     return img, path
 
 def find_optical(path):
@@ -130,8 +141,8 @@ if __name__ == '__main__':
     """
 
 
-    """usage: fundus optical crop """
-    """
+    """usage: fundus optical crop"""
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir" , help='folder to preprocessing')
     parser.add_argument("--save_dir" , help='folder to save')
@@ -154,14 +165,14 @@ if __name__ == '__main__':
     else:
         extension = '*.png'
 
-
     folder_names=os.walk(folder_path).next()[1]
     saved_extension='.png'
     for folder_name in folder_names:
         target_folder_path=folder_path+folder_name+'/'
         target_save_folder_path = save_folder + folder_name + '/'
-
-        paths=glob.glob(target_folder_path+  extension)
+        paths=glob.glob(target_folder_path+extension)
+        saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
+        paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
         if __debug__ == True:
             print ''
             print '################################ '
@@ -179,8 +190,56 @@ if __name__ == '__main__':
             count+=1
 
 
-    """
+
+    """usage: fundus macula crop"""
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dir", help='folder to preprocessing')
+    parser.add_argument("--save_dir", help='folder to save')
+    parser.add_argument("--extension", help='extension')
+    args = parser.parse_args()
+
+    if args.dir:
+        folder_path = args.dir
+    else:
+        folder_path = '../fundus_data/cropped_original_fundus/'
+
+    if args.save_dir:
+        save_folder = args.save_dir
+    else:
+        save_folder = '../fundus_data/cropped_macula/'
+
+    if args.extension:
+        extension = args.extension
+    else:
+        extension = '*.png'
+
+    folder_names = os.walk(folder_path).next()[1]
+    saved_extension = '.png'
+    for folder_name in folder_names:
+        target_folder_path = folder_path + folder_name + '/'
+        target_save_folder_path = save_folder + folder_name + '/'
+        paths = glob.glob(target_folder_path + extension)
+        saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
+        paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
+        if __debug__ == True:
+            print ''
+            print '################################ '
+            print 'folder_path:', target_folder_path
+            print 'save_folder:', target_save_folder_path
+            print 'number of paths', len(paths)
+            print 'extension', extension
+            print 'saved extension', saved_extension
+
+        pool = Pool()
+        count = 0
+        for img, path in pool.imap(macula_crop, paths):
+            save_img(img, target_save_folder_path, saved_extension)  # save image ==> save_folder+name+extension
+            utils.show_progress(count, len(paths))
+            count += 1
+
     #########   usage : crop_reisize_fundus   #########
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
@@ -247,4 +306,4 @@ if __name__ == '__main__':
             count+=1
     print 'fundus_processing.py out'
 
-
+"""
