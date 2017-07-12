@@ -64,6 +64,7 @@ def plot_images(imgs , names=None):
         plt.imshow(img)
         if not names==None:
             ax.set_xlabel(names[ind])
+    plt.savefig('./1.png')
     plt.show()
 def open_images(paths):
     imgs=[]
