@@ -224,6 +224,7 @@ def eye_299x299():
 
 
 def fundus_images(folder_path):
+    debug_flag=False
     """
     usage:
     :param folder_path:
@@ -260,7 +261,7 @@ def fundus_images(folder_path):
     normal_test = multiproc_make_numpy_images_labels(normal_test_paths, label_num=0)
 
 
-    if __debug__ ==True:
+    if __debug__ ==debug_flag:
         print ''
         print '# cataract :', len(cataract_paths)
         print '# glaucoma :', len(glaucoma_paths)
@@ -343,7 +344,7 @@ def make_train_batch(cata_train , glau_train , retina_train , normal_train):
     :param normal_train: =  (normal_train_imgs , normal_train_labs)
     :return:
     """
-    debug_flag=True
+    debug_flag=False
     cata_batch=7
     glau_batch=13
     retina_batch=10
@@ -364,6 +365,7 @@ def make_train_batch(cata_train , glau_train , retina_train , normal_train):
     batch_ys=batch_ys.astype(np.int32)
     batch_ys=cls2onehot(batch_ys,2)
     if __debug__ == debug_flag:
+        print '**** make_train_batch ****'
         print 'the number of batch',n_batch
         print 'the shape of batch xs ' , batch_xs.shape
         print 'the shape of batch ys ', batch_ys.shape
