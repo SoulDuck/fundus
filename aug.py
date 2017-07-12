@@ -15,7 +15,7 @@ def check_type_numpy(a):
 
 def random_rotate(image):
     if check_type_numpy(image):
-        image=Image.fromarray(image)
+        img=Image.fromarray(image)
     ### usage: map(random_rotate , images) ###
     ind=random.randint(0,180)
     minus = random.randint(0,1)
