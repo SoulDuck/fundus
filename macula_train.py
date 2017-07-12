@@ -10,8 +10,10 @@ import aug
 ##########################setting############################
 image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.macula_299x299()
 
-f=utils.make_log_txt() # make log and log folder
 model_saved_folder_path=utils.make_folder('./cnn_model', 'macula/')
+graph_saved_folder_path=utils.make_folder('./graph', 'macula/')
+log_saved_folder_path=utils.make_folder('./log', 'macula/')
+f=open(log_saved_folder_path+'log.txt','w+')
 
 x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
 y_ = tf.placeholder(dtype=tf.int32, shape=[None, n_classes], name='y_')
@@ -85,4 +87,4 @@ for step in range(max_iter):
     batch_xs, batch_ys = data.make_train_batch(train_imgs_labs[0], train_imgs_labs[1], train_imgs_labs[2],train_imgs_labs[3])
     batch_xs=aug.aug_level_1(batch_xs)
     train_acc, train_loss, _ = sess.run([accuracy, cost, train_op], feed_dict={x_: batch_xs, y_: batch_ys , phase_train:True})
-
+utils.draw_grpah(graph_saved_folder_path)

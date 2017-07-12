@@ -118,7 +118,7 @@ def delete_char_from_paths(folder_path , del_char):
 
 
 
-
+"""
 def overlay_images(front_image , back_image):
     try:
         front_image=Image.fromarray(front_image)
@@ -132,20 +132,11 @@ def overlay_images(front_image , back_image):
     back_image.paste(front_image, (0, 0), front_image)
     back_image.show()
     return b_image
+"""
 
 
 
-
-def make_log_txt():
-    count=0
-    folder_path = './log/' + str(count)
-    while (True):
-        if os.path.isdir(folder_path):
-            count+=1
-        else:
-            os.mkdir(folder_path)
-            break
-
+def make_log_txt(folder_path):
     f = open(folder_path+'/log.txt', 'a')
     return f
 
@@ -188,8 +179,13 @@ def plot_xs_ys(title,xs_title, ys_title , folder_path,xs ,*arg_ys ):
     plt.savefig(folder_path +'/'+ys_title)
     plt.close()
 
-def draw_grpah(file_path,check_point=50):
-    f=open(file_path,'r')
+def draw_grpah(file_pointer,check_point=50):
+    if isinstance(file_pointer , str):
+        file_path=file_pointer
+        f=open(file_path,'r')
+    else:
+        f=file_pointer
+
     lines=f.readlines()
     train_acc_list=[];train_loss_list=[];val_acc_list=[];val_loss_list=[];step_list=[]
     for i,line in enumerate(lines):
