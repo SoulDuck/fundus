@@ -12,7 +12,7 @@ image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs
 
 model_saved_folder_path=utils.make_folder('./cnn_model/', 'macula/')
 graph_saved_folder_path=utils.make_folder('./graph/', 'macula/')
-log_saved_folder_path=utils.make_folder('./log/˚', 'macula/')
+log_saved_folder_path=utils.make_folder('./log/', 'macula/')
 f=open(log_saved_folder_path+'log.txt','w+')
 
 x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
