@@ -6,17 +6,12 @@ import numpy as np
 import utils
 from inception_v4 import stem , stem_1 , stem_2 ,reductionA , reductionB , blockA , blockB , blockC
 import cam
+import aug
 ##########################setting############################
+image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.macula_299x299()
 
-image_height, image_width, image_color_ch, n_classes, train_imgs, train_labs, test_imgs, test_labs = data.eye_299x299()
-np.save('./train_imgs',train_imgs)
-np.save('./train_labs',train_labs)
-np.save('./test_imgs',test_imgs)
-np.save('./test_labs',test_labs)
-#image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.macula_299x299()
-
-#batch_xs , batch_ys=make_train_batch(cata[0] , glau[0] , retina[0] , normal[0])
 f=utils.make_log_txt() # make log and log folder
+model_saved_folder_path=utils.make_folder('./cnn_model', 'macula')
 
 x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
 y_ = tf.placeholder(dtype=tf.int32, shape=[None, n_classes], name='y_')
@@ -56,7 +51,7 @@ sess = tf.Session()
 init_op = tf.global_variables_initializer()
 sess.run(init_op)
 try:
-    saver.restore(sess, './cnn_model/best_acc.ckpt')
+    saver.restore(sess, model_saved_folder_path+'/best_acc.ckpt')
     print 'model was restored!'
 except tf.errors.NotFoundError:
     print 'there was no model'
@@ -65,6 +60,7 @@ max_val = 0
 max_iter=500000
 check_point = 50
 train_acc=0;train_loss=0;
+
 for step in range(max_iter):
     utils.show_progress(step,max_iter)
     if step % check_point == 0:
@@ -80,10 +76,10 @@ for step in range(max_iter):
         utils.write_acc_loss(f,train_acc,train_loss ,val_acc , val_loss)
         print '\n',val_acc, val_loss
         if val_acc > max_val:
-            saver.save(sess, './cnn_model/best_acc.ckpt')
+            saver.save(sess, model_saved_folder_path+'/best_acc.ckpt')
             print 'model was saved!'
-
             max_val=val_acc
-    batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size)
+    batch_xs, batch_ys = data.make_train_batch(train_imgs_labs[0], train_imgs_labs[1], train_imgs_labs[2],train_imgs_labs[3])
+    batch_xs=aug.aug_level_1(batch_xs)
     train_acc, train_loss, _ = sess.run([accuracy, cost, train_op], feed_dict={x_: batch_xs, y_: batch_ys , phase_train:True})
 

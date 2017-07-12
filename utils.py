@@ -208,6 +208,16 @@ def draw_grpah(file_path,check_point=50):
     plot_xs_ys('Normal Vs Abnormal', 'Step', 'Validation Loss', folder_path,step_list, val_acc_list)
     plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Accuracy ',folder_path,step_list, train_acc_list, val_acc_list)
     plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Loss ',folder_path,step_list, train_loss_list, val_loss_list)
+def make_folder(root_folder_path , folder_name):
+    count=0
+    w_flag=True
+    while w_flag:
+        if not os.path.isdir(root_folder_path+folder_name+str(count)):
+             os.mkdir(root_folder_path+folder_name)
+             w_flag=False
+        else:
+           count+=1
+    return root_folder_path+folder_name
 
 if __name__=='__main__':
     #make_log_txt()

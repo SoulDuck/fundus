@@ -291,6 +291,29 @@ def fundus_macula_images(folder_path='../fundus_data/cropped_macula/'):
             [retina_train , retina_test , retina_train_paths , retina_test_paths],\
             [normal_train , normal_test , normal_train_paths , normal_test_paths]
 
+def macula_299x299():
+    debug_flag=True
+
+    n_classes=2
+    cata,glau,retina,normal=fundus_macula_images()
+    train_imgs_labs=(cata[0], glau[0], retina[0], normal[0])
+    #test_imgs_labs=(cata[1], glau[1], retina[1], normal[1])
+    test_imgs=np.concatenate((cata[1][0],glau[1][0],retina[1][0],normal[1][0]))
+    test_labs = np.concatenate((cata[1][1], glau[1][1], retina[1][1], normal[1][1]))
+    test_labs=test_labs.astype(np.int32)
+    test_labs=cls2onehot(test_labs,2)
+    image_height , image_width , image_color_ch=np.shape(train_imgs_labs[0][0][0])
+
+    if __debug__==debug_flag:
+        print 'image_height',image_height
+        print 'image_weight', image_height
+        print 'image_color_ch', image_color_ch
+        print 'n classes' , n_classes
+        print 'test_imgs shape', test_imgs.shape
+        print 'test_labs shape', test_labs.shape
+
+    return image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs , test_labs
+
 
 
 def make_train_batch(cata_train , glau_train , retina_train , normal_train):
@@ -319,6 +342,9 @@ def make_train_batch(cata_train , glau_train , retina_train , normal_train):
     batch_xs = batch_xs[random_indices]
     batch_ys = batch_ys[random_indices]
 
+    np.asarray(batch_ys)
+    batch_ys=batch_ys.astype(np.int32)
+    batch_ys=cls2onehot(batch_ys,2)
     if __debug__ == debug_flag:
         print 'the number of batch',n_batch
         print 'the shape of batch xs ' , batch_xs.shape
@@ -330,6 +356,9 @@ def make_train_batch(cata_train , glau_train , retina_train , normal_train):
 
 
 if __name__ == '__main__':
+    image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs=macula_299x299()
+    batch_xs , batch_ys= make_train_batch(train_imgs_labs[0] , train_imgs_labs[1],train_imgs_labs[2],train_imgs_labs[3])
+    """
     #make_paths('./fundus_data/cropped_optical',)
     cata , glau , retina , normal =fundus_macula_images()
     batch_xs , batch_ys=make_train_batch(cata[0] , glau[0] , retina[0] , normal[0])
@@ -339,7 +368,7 @@ if __name__ == '__main__':
     batch_xs = map(aug.random_rotate, batch_xs)
 
     utils.plot_images(batch_xs)
-
+    """
 
     """
     cata_train_paths, cata_test_paths = get_train_test_paths('./cataract_paths')

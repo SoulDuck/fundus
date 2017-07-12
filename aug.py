@@ -5,7 +5,7 @@ import PIL
 from PIL import Image
 import random
 from PIL import ImageFilter
-
+import aug
 
 def check_type_numpy(a):
     if type(a).__module__ ==np.__name__:
@@ -50,7 +50,12 @@ def random_blur(image):
     ind=random.randint(0,10)
     blurred_image = image.filter(ImageFilter.GaussianBlur(radius=ind))
     return blurred_image
+def aug_level_1(imgs):
+    imgs = map(aug.random_blur , imgs)
+    imgs = map(aug.random_flip , imgs)
+    imgs = map(aug.random_rotate, imgs)
 
+    return imgs
 if __name__ == '__main__':
     img=Image.open('./data/rion.png')
     img=random_rotate(img)
