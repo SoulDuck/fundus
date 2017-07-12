@@ -209,7 +209,7 @@ def make_folder(root_folder_path , folder_name):
     w_flag=True
     while w_flag:
         if not os.path.isdir(root_folder_path+folder_name+str(count)):
-             os.mkdir(root_folder_path+folder_name)
+             os.mkdir(root_folder_path+folder_name+str(count))
              w_flag=False
         else:
            count+=1
