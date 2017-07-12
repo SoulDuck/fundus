@@ -221,19 +221,19 @@ def fundus_macula_images(folder_path='../fundus_data/cropped_macula/'):
 
     ####################################################################################################
     print 'Image Loading ....'
-    cata_train_imgs , cata_train_labels = make_numpy_images_labels(cata_train_paths , label_num=1)
-    glau_train_imgs , glau_train_labels = make_numpy_images_labels(glau_train_paths , label_num=1)
-    retina_train_imgs, retina_train_labels = make_numpy_images_labels(retina_train_paths, label_num=1)
-    normal_train_imgs, normal_train_labels = make_numpy_images_labels(normal_train_paths, label_num=0)
+    cata_train = make_numpy_images_labels(cata_train_paths , label_num=1)
+    glau_train = make_numpy_images_labels(glau_train_paths , label_num=1)
+    retina_train = make_numpy_images_labels(retina_train_paths, label_num=1)
+    normal_train = make_numpy_images_labels(normal_train_paths, label_num=0)
 
-    cata_test_imgs , cata_test_labels = make_numpy_images_labels(cata_test_paths , label_num=1)
-    glau_test_imgs , glau_test_labels = make_numpy_images_labels(glau_test_paths , label_num=1)
-    retina_test_imgs, retina_test_labels = make_numpy_images_labels(retina_test_paths, label_num=1)
-    normal_test_imgs, normal_test_labels = make_numpy_images_labels(normal_test_paths, label_num=0)
-
+    cata_test = make_numpy_images_labels(cata_test_paths , label_num=1)
+    glau_test = make_numpy_images_labels(glau_test_paths , label_num=1)
+    retina_test = make_numpy_images_labels(retina_test_paths, label_num=1)
+    normal_test = make_numpy_images_labels(normal_test_paths, label_num=0)
 
 
     if __debug__ ==True:
+        print ''
         print '# cataract :', len(cataract_paths)
         print '# glaucoma :', len(glaucoma_paths)
         print '# retina :', len(retina_paths)
@@ -245,28 +245,64 @@ def fundus_macula_images(folder_path='../fundus_data/cropped_macula/'):
         print '# normal train , :', len(normal_train_paths) , '# normal test :', len(normal_test_paths)
 
         print cata_train_paths
-        print 'shape of cata_train_imgs' , cata_train_imgs.shape
+        print 'shape of cata_train_imgs' , cata_train[0].shape
         fig = plt.figure()
         a=fig.add_subplot(1,2,1)
         a.set_xlabel('')
-        plt.imshow(cata_train_imgs[0])
+        plt.imshow(cata_train[0][0])
         a = fig.add_subplot(1, 2, 2)
         a.set_xlabel('')
-        plt.imshow(cata_train_imgs[1])
+        plt.imshow(cata_train[0][1])
         plt.show()
 
-    return [cata_train_imgs , cata_test_imgs , cata_train_paths , cata_test_paths] ,\
-            [glau_train_imgs , glau_test_imgs , glau_train_paths , glau_test_paths],\
-            [retina_train_imgs , retina_test_imgs , retina_train_paths , retina_test_paths],\
-            [normal_train_imgs , normal_test_imgs , normal_train_paths , normal_test_paths]
+    return [cata_train  , cata_test , cata_train_paths , cata_test_paths] ,\
+            [glau_train , glau_test , glau_train_paths , glau_test_paths],\
+            [retina_train , retina_test , retina_train_paths , retina_test_paths],\
+            [normal_train , normal_test , normal_train_paths , normal_test_paths]
 
 
+
+def make_train_batch(cata_train , glau_train , retina_train , normal_train):
+    """
+
+    :param cata_train = (cata_train_imgs , cata_train_labs)
+    :param glau_train: = (glau_train_imgs , glau_train_labs)
+    :param retina_train =  (retina_train_imgs , retina_train_labs)
+    :param normal_train: =  (normal_train_imgs , normal_train_labs)
+    :return:
+    """
+    debug_flag=True
+    cata_batch=2
+    glau_batch=2
+    retina_batch=2
+    normal_batch=2
+    n_batch=cata_batch+glau_batch+retina_batch+normal_batch
+    cata_xs, cata_ys=next_batch(cata_train[0],cata_train[1],cata_batch)
+    glau_xs, glau_ys = next_batch(glau_train[0], glau_train[1], glau_batch)
+    retina_xs, retina_ys=next_batch(retina_train[0],retina_train[1],retina_batch)
+    normal_xs, normal_ys=next_batch(normal_train[0],normal_train[1],normal_batch)
+
+    batch_xs =np.concatenate((cata_xs,glau_xs,retina_xs,normal_xs) , axis=0)
+    batch_ys=np.concatenate((cata_ys, glau_ys, retina_ys, normal_ys) , axis=0)
+    random_indices=random.sample(range(n_batch), n_batch)
+    batch_xs = batch_xs[random_indices]
+    batch_ys = batch_ys[random_indices]
+
+    if __debug__ == debug_flag:
+        print 'the number of batch',n_batch
+        print 'the shape of batch xs ' , batch_xs.shape
+        print 'the shape of batch ys ', batch_ys.shape
+
+
+    return batch_xs , batch_ys
 
 
 
 if __name__ == '__main__':
-    #make_paths('./fundus_data/cropped_optical',  )
-    fundus_macula_images()
+    #make_paths('./fundus_data/cropped_optical',)
+    cata , glau , retina , normal =fundus_macula_images()
+    make_train_batch(cata[0] , glau[0] , retina[0] , normal[0])
+
     """
     cata_train_paths, cata_test_paths = get_train_test_paths('./cataract_paths')
     normal_train_paths, normal_test_paths = get_train_test_paths('./normal_paths')

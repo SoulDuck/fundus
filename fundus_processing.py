@@ -212,8 +212,6 @@ if __name__ == '__main__':
             utils.show_progress(count , len(paths))
             count+=1
 
-
-
     """usage: fundus macula crop"""
 
     parser = argparse.ArgumentParser()
