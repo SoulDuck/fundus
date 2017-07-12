@@ -6,6 +6,7 @@ import random
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import aug
+%matplotlib inline
 def save_paths(src_paths,f_path):
     f= open(f_path , 'w')
     for path in src_paths:
