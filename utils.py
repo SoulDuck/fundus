@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import math
 import glob
 from PIL import Image
+import random
 """
 import Image
 

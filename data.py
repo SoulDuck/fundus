@@ -337,7 +337,7 @@ if __name__ == '__main__':
     batch_xs = map(aug.random_flip , batch_xs)
     batch_xs = map(aug.random_rotate, batch_xs)
 
-
+    utils.plot_images(batch_xs)
 
 
     """

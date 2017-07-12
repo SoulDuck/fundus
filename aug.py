@@ -14,13 +14,15 @@ def check_type_numpy(a):
         return False
 
 def random_rotate(image):
+    if check_type_numpy(image):
+        image=Image.fromarray(image)
     ### usage: map(random_rotate , images) ###
     ind=random.randint(0,180)
     minus = random.randint(0,1)
     minus=bool(minus)
     if minus==True:
         ind=ind*-1
-    img = image.rotate(ind)
+    #image type is must be PIL
     if __debug__ == True:
         print ind
     return img
@@ -47,25 +49,25 @@ def random_blur(image):
     blurred_image = image.filter(ImageFilter.GaussianBlur(radius=ind))
     return blurred_image
 
-
-img=Image.open('./data/rion.png')
-img=random_rotate(img)
-img=random_flip(img)
-img=random_blur(img)
-#print np.shape(img)
-#img=img.rotate(45)
-#print np.shape(img)
-plt.imshow(img)
-plt.show()
-"""
-img=cv2.imread('./data/rion.png',0)
-rows, cols=img.shape
-rotated_img=cv2.getRotationMatrix2D((cols/2, rows/2),90,1)
-img=np.asarray(img )
-img=img/255.
-print img.shape
-plt.imshow(img)
-plt.show()
-plt.imshow(rotated_img)
-plt.show()
-"""
+if __name__ == '__main__':
+    img=Image.open('./data/rion.png')
+    img=random_rotate(img)
+    img=random_flip(img)
+    img=random_blur(img)
+    #print np.shape(img)
+    #img=img.rotate(45)
+    #print np.shape(img)
+    plt.imshow(img)
+    plt.show()
+    """
+    img=cv2.imread('./data/rion.png',0)
+    rows, cols=img.shape
+    rotated_img=cv2.getRotationMatrix2D((cols/2, rows/2),90,1)
+    img=np.asarray(img )
+    img=img/255.
+    print img.shape
+    plt.imshow(img)
+    plt.show()
+    plt.imshow(rotated_img)
+    plt.show()
+    """
