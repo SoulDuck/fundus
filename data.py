@@ -271,7 +271,7 @@ def fundus_macula_images(folder_path='../fundus_data/cropped_macula/'):
         print '# retina train , :', len(retina_train_paths) , '# retina test :', len(retina_test_paths)
         print '# normal train , :', len(normal_train_paths) , '# normal test :', len(normal_test_paths)
 
-        print cata_train_paths
+        #print cata_train_paths
         print 'shape of cata_train_imgs' , cata_train[0].shape
         fig = plt.figure()
         a=fig.add_subplot(1,2,1)
