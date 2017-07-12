@@ -302,10 +302,10 @@ def make_train_batch(cata_train , glau_train , retina_train , normal_train):
     :return:
     """
     debug_flag=True
-    cata_batch=2
-    glau_batch=2
-    retina_batch=2
-    normal_batch=2
+    cata_batch=5
+    glau_batch=20
+    retina_batch=15
+    normal_batch=30
     n_batch=cata_batch+glau_batch+retina_batch+normal_batch
     cata_xs, cata_ys=next_batch(cata_train[0],cata_train[1],cata_batch)
     glau_xs, glau_ys = next_batch(glau_train[0], glau_train[1], glau_batch)
