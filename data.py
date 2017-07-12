@@ -228,10 +228,6 @@ def fundus_macula_images(folder_path='../fundus_data/cropped_macula/'):
     :param folder_path:
     :return:
     """
-    image_height = 299
-    image_width = 299
-    image_color_ch = 3
-    n_classes = 2
 
     cataract_paths=make_paths(folder_path+'cataract/', '*.png', folder_path+'cataract/'+'cataract_paths.txt') #no random shuffle
     retina_paths = make_paths(folder_path+'retina/', '*.png', folder_path+'retina/'+'retina_paths.txt')
@@ -297,7 +293,6 @@ def macula_299x299():
     n_classes=2
     cata,glau,retina,normal=fundus_macula_images()
     train_imgs_labs=(cata[0], glau[0], retina[0], normal[0])
-    #test_imgs_labs=(cata[1], glau[1], retina[1], normal[1])
     test_imgs=np.concatenate((cata[1][0],glau[1][0],retina[1][0],normal[1][0]))
     test_labs = np.concatenate((cata[1][1], glau[1][1], retina[1][1], normal[1][1]))
     test_labs=test_labs.astype(np.int32)
