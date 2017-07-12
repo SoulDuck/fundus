@@ -7,6 +7,7 @@ import utils
 from inception_v4 import stem , stem_1 , stem_2 ,reductionA , reductionB , blockA , blockB , blockC
 import cam
 import aug
+import random
 ##########################setting############################
 image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.macula_299x299()
 
@@ -62,9 +63,10 @@ max_val = 0
 max_iter=500000
 check_point = 50
 train_acc=0;train_loss=0;
-
-val_imgs=test_imgs[:60]
-val_labs=test_labs[:60]
+val_indices=range(len(test_labs))
+random.shuffle(val_indices)
+val_imgs=test_imgs[val_indices[:300]]
+val_labs=test_labs[val_indices[:300]]
 for step in range(max_iter):
     utils.show_progress(step,max_iter)
     if step % check_point == 0:

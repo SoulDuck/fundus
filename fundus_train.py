@@ -62,8 +62,8 @@ except tf.errors.NotFoundError:
     print 'there was no model'
 ########################training##############################
 max_val = 0
-max_iter=500000
-check_point = 50
+max_iter=100000
+check_point = 100
 train_acc=0;train_loss=0;
 for step in range(max_iter):
     utils.show_progress(step,max_iter)
