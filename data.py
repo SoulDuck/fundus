@@ -5,6 +5,7 @@ from PIL import Image
 import random
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
+import aug
 def save_paths(src_paths,f_path):
     f= open(f_path , 'w')
     for path in src_paths:
@@ -330,7 +331,14 @@ def make_train_batch(cata_train , glau_train , retina_train , normal_train):
 if __name__ == '__main__':
     #make_paths('./fundus_data/cropped_optical',)
     cata , glau , retina , normal =fundus_macula_images()
-    make_train_batch(cata[0] , glau[0] , retina[0] , normal[0])
+    batch_xs , batch_ys=make_train_batch(cata[0] , glau[0] , retina[0] , normal[0])
+
+    batch_xs = map(aug.random_blur , batch_xs)
+    batch_xs = map(aug.random_flip , batch_xs)
+    batch_xs = map(aug.random_rotate, batch_xs)
+
+
+
 
     """
     cata_train_paths, cata_test_paths = get_train_test_paths('./cataract_paths')
