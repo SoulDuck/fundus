@@ -56,10 +56,8 @@ def random_blur(image):
     return blurred_image
 def aug_level_1(imgs):
     imgs = map(aug.random_blur , imgs)
-
     imgs = map(aug.random_flip , imgs)
     imgs = map(aug.random_rotate, imgs)
-    print imgs
     return imgs
 if __name__ == '__main__':
     img=Image.open('./data/rion.png')

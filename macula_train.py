@@ -66,12 +66,6 @@ train_acc=0;train_loss=0;
 val_imgs=test_imgs[:60]
 val_labs=test_labs[:60]
 for step in range(max_iter):
-    batch_xs, batch_ys = data.make_train_batch(train_imgs_labs[0], train_imgs_labs[1], train_imgs_labs[2],
-                                               train_imgs_labs[3])
-    batch_xs = aug.aug_level_1(batch_xs)
-    print batch_xs
-    train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],
-                                        feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True})
     utils.show_progress(step,max_iter)
     if step % check_point == 0:
         cam.inspect_cam(sess, cam_ , top_conv,test_imgs, test_labs, step , 50 , x_,y_ , y_conv  )
