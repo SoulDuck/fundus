@@ -332,10 +332,7 @@ if __name__ == '__main__':
     #make_paths('./fundus_data/cropped_optical',)
     cata , glau , retina , normal =fundus_macula_images()
     batch_xs , batch_ys=make_train_batch(cata[0] , glau[0] , retina[0] , normal[0])
-    utils.plot_images(cata[0])
-    utils.plot_images(glau[0])
-    utils.plot_images(retina[0])
-    utils.plot_images(normal[0])
+
     batch_xs = map(aug.random_blur , batch_xs)
     batch_xs = map(aug.random_flip , batch_xs)
     batch_xs = map(aug.random_rotate, batch_xs)
