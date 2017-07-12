@@ -14,6 +14,7 @@ def check_type_numpy(a):
         return False
 
 def random_rotate(image):
+    debug_flag=False
     if check_type_numpy(image):
         img=Image.fromarray(image)
     ### usage: map(random_rotate , images) ###
@@ -23,11 +24,12 @@ def random_rotate(image):
     if minus==True:
         ind=ind*-1
     #image type is must be PIL
-    if __debug__ == True:
+    if __debug__ == debug_flag:
         print ind
     return img
 
 def random_flip(image):
+    debug_flag = False
     if not check_type_numpy(image):
         image=np.asarray(image)
     flipud_flag=bool(random.randint(0,1))
@@ -38,7 +40,7 @@ def random_flip(image):
     if fliplr_flag==True:
         image = np.fliplr(image)
 
-    if __debug__==True:
+    if __debug__==debug_flag:
         print 'flip lr ', str(fliplr_flag)
         print 'flip ud ', str(flipud_flag)
     return image
