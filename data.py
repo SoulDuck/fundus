@@ -13,11 +13,12 @@ def save_paths(src_paths,f_path):
         f.write(path+'\n')
 
 def cls2onehot(cls, depth):
+    debug_flag=False
     labels=np.zeros([len(cls),2])
     for i,ind in enumerate(cls):
 
         labels[i][ind:ind+1]=1
-    if __debug__==True:
+    if __debug__==debug_flag:
         print 'show sample cls and converted labels'
         print cls[:10]
         print labels[:10]
