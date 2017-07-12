@@ -16,6 +16,7 @@ def get_class_map(name,x , label , im_width):
     return classmap
 
 def inspect_cam(sess, cam , top_conv ,test_imgs, test_labs, global_step , num_images , x, y_ , y):
+    debug_flag=False
     try:
         os.mkdir('./out');
     except Exception:
@@ -25,7 +26,7 @@ def inspect_cam(sess, cam , top_conv ,test_imgs, test_labs, global_step , num_im
         save_dir='./out/img_{}'.format(s)
         try:os.mkdir(save_dir);
         except Exception:pass;
-        if __debug__ ==True:
+        if __debug__ ==debug_flag:
             print test_imgs[s].shape
         if test_imgs[s].shape[-1]==1:
             plt.imsave('{}/image_test.png'.format(save_dir) ,test_imgs[s].reshape([test_imgs[s].shape[0] , test_imgs.shape[1]]))
