@@ -55,7 +55,8 @@ def show_progress(i,max_iter):
     sys.stdout.flush()
 def plot_images(imgs , names=None):
 
-    h=math.floor(math.sqrt(len(imgs)))
+    h=math.ceil(math.sqrt(len(imgs)))
+    print 'h',h , len(imgs)
     fig=plt.figure()
     for i in range(len(imgs)):
         ax=fig.add_subplot(h,h,i+1)
