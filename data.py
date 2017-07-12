@@ -4,6 +4,7 @@ import utils
 from PIL import Image
 import random
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
 def save_paths(src_paths,f_path):
     f= open(f_path , 'w')
     for path in src_paths:
@@ -57,6 +58,33 @@ def make_numpy_images_labels(paths , label_num):
         #print np.shape(img)
         tmp.append(img)
     imgs=np.asarray(tmp)
+    return imgs , labels
+def open_Image(path):
+    try:
+        img = Image.open(path)
+        img = np.asarray(img)
+    except IOError as ioe:
+        print str(ioe)
+    return img, path
+def multiproc_make_numpy_images_labels(paths , label_num):
+
+    count=0
+    pool=Pool()
+    n_paths=len(paths)
+    labels=np.zeros([n_paths])
+    labels.fill(label_num)
+    tmp=[]
+
+
+    for img,path in pool.imap(open_Image , paths):
+        if img ==None:
+            continue
+        utils.show_progress(count, len(paths))
+        tmp.append(img)
+    print np.shape(tmp)
+    imgs=np.asarray(tmp)
+    pool.close()
+    pool.join()
     return imgs , labels
 
 def get_train_test_paths(test_ratio,*pathss):
@@ -207,10 +235,10 @@ def fundus_macula_images(folder_path='../fundus_data/cropped_macula/'):
     glaucoma_paths = make_paths(folder_path+'glaucoma/', '*.png', folder_path+'/glaucoma/'+'glaucoma_paths.txt')
     normal_paths = make_paths(folder_path+'normal/', '*.png', folder_path+'/normal/'+'normal_paths.txt')
 
-    cata_train_paths, cata_test_paths = get_train_test_paths(0.05, folder_path+'cataract/'+'cataract_paths.txt') # random shuffle here
-    glau_train_paths, glau_test_paths = get_train_test_paths(0.05, folder_path+'retina/'+'retina_paths.txt')
-    retina_train_paths, retina_test_paths = get_train_test_paths(0.05, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
-    normal_train_paths, normal_test_paths = get_train_test_paths(0.05, folder_path+'/normal/'+'normal_paths.txt')
+    cata_train_paths, cata_test_paths = get_train_test_paths(0.5, folder_path+'cataract/'+'cataract_paths.txt') # random shuffle here
+    glau_train_paths, glau_test_paths = get_train_test_paths(0.5, folder_path+'retina/'+'retina_paths.txt')
+    retina_train_paths, retina_test_paths = get_train_test_paths(0.5, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
+    normal_train_paths, normal_test_paths = get_train_test_paths(0.5, folder_path+'/normal/'+'normal_paths.txt')
 
     save_paths(cata_train_paths,folder_path+'cataract/'+'cataract_train_paths.txt') ;save_paths(cata_test_paths,folder_path+'cataract/'+'cataract_test_paths.txt')
     save_paths(glau_train_paths , folder_path+'glaucoma/'+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,folder_path+'glaucoma/'+'glaucoma_test_paths.txt')
@@ -221,15 +249,15 @@ def fundus_macula_images(folder_path='../fundus_data/cropped_macula/'):
 
     ####################################################################################################
     print 'Image Loading ....'
-    cata_train = make_numpy_images_labels(cata_train_paths , label_num=1)
-    glau_train = make_numpy_images_labels(glau_train_paths , label_num=1)
-    retina_train = make_numpy_images_labels(retina_train_paths, label_num=1)
-    normal_train = make_numpy_images_labels(normal_train_paths, label_num=0)
+    cata_train = multiproc_make_numpy_images_labels(cata_train_paths , label_num=1)
+    glau_train = multiproc_make_numpy_images_labels(glau_train_paths , label_num=1)
+    retina_train = multiproc_make_numpy_images_labels(retina_train_paths, label_num=1)
+    normal_train = multiproc_make_numpy_images_labels(normal_train_paths, label_num=0)
 
-    cata_test = make_numpy_images_labels(cata_test_paths , label_num=1)
-    glau_test = make_numpy_images_labels(glau_test_paths , label_num=1)
-    retina_test = make_numpy_images_labels(retina_test_paths, label_num=1)
-    normal_test = make_numpy_images_labels(normal_test_paths, label_num=0)
+    cata_test = multiproc_make_numpy_images_labels(cata_test_paths , label_num=1)
+    glau_test = multiproc_make_numpy_images_labels(glau_test_paths , label_num=1)
+    retina_test = multiproc_make_numpy_images_labels(retina_test_paths, label_num=1)
+    normal_test = multiproc_make_numpy_images_labels(normal_test_paths, label_num=0)
 
 
     if __debug__ ==True:
