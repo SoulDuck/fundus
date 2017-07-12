@@ -81,6 +81,7 @@ def multiproc_make_numpy_images_labels(paths , label_num):
             continue
         utils.show_progress(count, len(paths))
         tmp.append(img)
+        count+=1
     print np.shape(tmp)
     imgs=np.asarray(tmp)
     pool.close()
