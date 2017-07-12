@@ -213,7 +213,7 @@ def make_folder(root_folder_path , folder_name):
              w_flag=False
         else:
            count+=1
-    return root_folder_path+folder_name+str(count)
+    return root_folder_path+folder_name+str(count)+'/'
 
 if __name__=='__main__':
     #make_log_txt()
