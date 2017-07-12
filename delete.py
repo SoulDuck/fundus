@@ -14,3 +14,4 @@ list_=np.asarray(list_)
 list__=[1,2]
 print list_[list__]
 print random.sample(list_,10)
+print random.randint(0,1)
