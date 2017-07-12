@@ -23,6 +23,8 @@ def random_rotate(image):
     minus=bool(minus)
     if minus==True:
         ind=ind*-1
+    img=img.rotate(ind)
+    img=np.asarray(img)
     #image type is must be PIL
     if __debug__ == debug_flag:
         print ind
@@ -49,12 +51,15 @@ def random_blur(image):
         image=Image.fromarray(image)
     ind=random.randint(0,10)
     blurred_image = image.filter(ImageFilter.GaussianBlur(radius=ind))
+    blurred_image=np.asarray(blurred_image)
+
     return blurred_image
 def aug_level_1(imgs):
     imgs = map(aug.random_blur , imgs)
+
     imgs = map(aug.random_flip , imgs)
     imgs = map(aug.random_rotate, imgs)
-
+    print imgs
     return imgs
 if __name__ == '__main__':
     img=Image.open('./data/rion.png')
