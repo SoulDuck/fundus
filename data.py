@@ -237,10 +237,10 @@ def fundus_images(folder_path):
     glaucoma_paths = make_paths(folder_path+'glaucoma/', '*.png', folder_path+'/glaucoma/'+'glaucoma_paths.txt')
     normal_paths = make_paths(folder_path+'normal/', '*.png', folder_path+'/normal/'+'normal_paths.txt')
 
-    cata_train_paths, cata_test_paths = get_train_test_paths(0.5, folder_path+'cataract/'+'cataract_paths.txt') # random shuffle here
-    glau_train_paths, glau_test_paths = get_train_test_paths(0.5, folder_path+'retina/'+'retina_paths.txt')
-    retina_train_paths, retina_test_paths = get_train_test_paths(0.5, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
-    normal_train_paths, normal_test_paths = get_train_test_paths(0.5, folder_path+'/normal/'+'normal_paths.txt')
+    cata_train_paths, cata_test_paths = get_train_test_paths(0.05, folder_path+'cataract/'+'cataract_paths.txt') # random shuffle here
+    glau_train_paths, glau_test_paths = get_train_test_paths(0.05, folder_path+'retina/'+'retina_paths.txt')
+    retina_train_paths, retina_test_paths = get_train_test_paths(0.05, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
+    normal_train_paths, normal_test_paths = get_train_test_paths(0.05, folder_path+'/normal/'+'normal_paths.txt')
 
     save_paths(cata_train_paths,folder_path+'cataract/'+'cataract_train_paths.txt') ;save_paths(cata_test_paths,folder_path+'cataract/'+'cataract_test_paths.txt')
     save_paths(glau_train_paths , folder_path+'glaucoma/'+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,folder_path+'glaucoma/'+'glaucoma_test_paths.txt')
