@@ -236,10 +236,10 @@ def fundus_images(folder_path):
     glaucoma_paths = make_paths(folder_path+'glaucoma/', '*.png', folder_path+'/glaucoma/'+'glaucoma_paths.txt')
     normal_paths = make_paths(folder_path+'normal/', '*.png', folder_path+'/normal/'+'normal_paths.txt')
 
-    cata_train_paths, cata_test_paths = get_train_test_paths(0.05, folder_path+'cataract/'+'cataract_paths.txt') # random shuffle here
-    glau_train_paths, glau_test_paths = get_train_test_paths(0.05, folder_path+'retina/'+'retina_paths.txt')
-    retina_train_paths, retina_test_paths = get_train_test_paths(0.05, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
-    normal_train_paths, normal_test_paths = get_train_test_paths(0.05, folder_path+'/normal/'+'normal_paths.txt')
+    cata_train_paths, cata_test_paths = get_train_test_paths(0.5, folder_path+'cataract/'+'cataract_paths.txt') # random shuffle here
+    glau_train_paths, glau_test_paths = get_train_test_paths(0.5, folder_path+'retina/'+'retina_paths.txt')
+    retina_train_paths, retina_test_paths = get_train_test_paths(0.5, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
+    normal_train_paths, normal_test_paths = get_train_test_paths(0.5, folder_path+'/normal/'+'normal_paths.txt')
 
     save_paths(cata_train_paths,folder_path+'cataract/'+'cataract_train_paths.txt') ;save_paths(cata_test_paths,folder_path+'cataract/'+'cataract_test_paths.txt')
     save_paths(glau_train_paths , folder_path+'glaucoma/'+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,folder_path+'glaucoma/'+'glaucoma_test_paths.txt')
@@ -295,6 +295,10 @@ def macula_299x299():
     n_classes=2
     cata,glau,retina,normal=fundus_images(folder_path='../fundus_data/cropped_macula/')
     train_imgs_labs=(cata[0], glau[0], retina[0], normal[0])
+    print 'aaa',np.shape(cata[1][0])
+    print 'aaa', np.shape(glau[1][0])
+    print 'aaa', np.shape(retina[1][0])
+    print 'aaa', np.shape(normal[1][0])
     test_imgs=np.concatenate((cata[1][0],glau[1][0],retina[1][0],normal[1][0]))
     test_labs = np.concatenate((cata[1][1], glau[1][1], retina[1][1], normal[1][1]))
     test_labs=test_labs.astype(np.int32)
