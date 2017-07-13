@@ -66,8 +66,8 @@ def open_Image(path):
     try:
         img = Image.open(path)
         img = np.asarray(img)
-    except IOError as ioe:
-        print str(ioe)
+    except Exception as e:
+        print str(e)
         img=None
     return img, path
 def multiproc_make_numpy_images_labels(paths , label_num):
