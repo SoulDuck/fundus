@@ -55,7 +55,7 @@ def random_blur(image):
 
     return blurred_image
 def aug_level_1(imgs):
-    imgs = map(aug.random_blur , imgs)
+    #simgs = map(aug.random_blur , imgs)
     imgs = map(aug.random_flip , imgs)
     imgs = map(aug.random_rotate, imgs)
     return imgs
