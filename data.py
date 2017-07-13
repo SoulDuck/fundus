@@ -82,6 +82,7 @@ def multiproc_make_numpy_images_labels(paths , label_num):
 
     for img,path in pool.imap(open_Image , paths):
         if img ==None:
+            print 'multiproc make numpy images error'
             continue
         utils.show_progress(count, len(paths))
         tmp.append(img)
