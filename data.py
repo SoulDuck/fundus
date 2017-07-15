@@ -68,7 +68,7 @@ def open_Image(path):
         img = np.asarray(img)
     except Exception as e:
         print str(e)
-        img=None
+        img='None'
     return img, path
 def multiproc_make_numpy_images_labels(paths , label_num):
 
@@ -81,7 +81,7 @@ def multiproc_make_numpy_images_labels(paths , label_num):
 
 
     for img,path in pool.imap(open_Image , paths):
-        if img ==None:
+        if img =='None':
             continue
         utils.show_progress(count, len(paths))
         tmp.append(img)
