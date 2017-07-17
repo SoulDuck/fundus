@@ -242,10 +242,10 @@ def fundus_images(folder_path):
     retina_train_paths, retina_test_paths = get_train_test_paths(0.05, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
     normal_train_paths, normal_test_paths = get_train_test_paths(0.05, folder_path+'/normal/'+'normal_paths.txt')
 
-    save_paths(cata_train_paths,folder_path+'cataract/'+'cataract_train_paths.txt') ;save_paths(cata_test_paths,folder_path+'cataract/'+'cataract_test_paths.txt')
-    save_paths(glau_train_paths , folder_path+'glaucoma/'+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,folder_path+'glaucoma/'+'glaucoma_test_paths.txt')
-    save_paths(retina_train_paths,folder_path+'retina/'+'retina_train_paths.txt');save_paths(retina_test_paths,folder_path+'retina/'+'retina_test_paths.txt')
-    save_paths(normal_train_paths,folder_path+'normal/'+'normal_train_paths.txt');save_paths(normal_test_paths,folder_path+'normal/'+'normal_test_paths.txt')
+    save_paths(cata_train_paths,folder_path+'paths/'+'cataract_train_paths.txt') ;save_paths(cata_test_paths,folder_path+'paths/'+'cataract_test_paths.txt')
+    save_paths(glau_train_paths , folder_path+'paths/'+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,folder_path+'paths/'+'glaucoma_test_paths.txt')
+    save_paths(retina_train_paths,folder_path+'paths/'+'retina_train_paths.txt');save_paths(retina_test_paths,folder_path+'paths/'+'retina_test_paths.txt')
+    save_paths(normal_train_paths,folder_path+'paths/'+'normal_train_paths.txt');save_paths(normal_test_paths,folder_path+'paths/'+'normal_test_paths.txt')
 
     ########################################  setting here ###############################################
 
@@ -376,6 +376,7 @@ def make_train_batch(cata_train , glau_train , retina_train , normal_train):
 
 
 if __name__ == '__main__':
+
     image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs=macula_299x299()
     batch_xs , batch_ys= make_train_batch(train_imgs_labs[0] , train_imgs_labs[1],train_imgs_labs[2],train_imgs_labs[3])
     """
