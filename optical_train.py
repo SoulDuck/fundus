@@ -66,7 +66,7 @@ train_acc=0;train_loss=0;
 val_indices=range(len(test_labs))
 random.shuffle(val_indices)
 val_imgs=test_imgs[val_indices[:1200]]
-val_labs=test_labs[val_indices[:300]]
+val_labs=test_labs[val_indices[:1200]]
 for step in range(max_iter):
 
     utils.show_progress(step,max_iter)
