@@ -121,7 +121,7 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 if __name__ =='__main__':
     folder_paths='../fundus_data/cropped_optical/paths/15/'
     test_imgs,test_labs=load_fundus_test_imgs_labs(folder_paths , 'cataract')
-    print test_labs
+    print np.shape(test_imgs)
     act_map=get_activation_map(test_imgs[3], './sample_image.png')
 
     """
