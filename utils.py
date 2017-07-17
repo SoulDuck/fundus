@@ -108,7 +108,6 @@ def delete_char_from_paths(folder_path , del_char):
             new_path=path.replace(del_char ,'')
             os.rename(path , new_path)
 
-
     """
     *usage:
         delete_char_from_paths(folder_path='../fundus_data/cropped_macula/' , del_char='*')
