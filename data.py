@@ -85,7 +85,6 @@ def multiproc_make_numpy_images_labels(paths , label_num):
         if img =='None':
             continue
         utils.show_progress(count, len(paths))
-        print path
         images[count]=img
         count+=1
     print 'images shape',np.shape(images)
@@ -275,10 +274,14 @@ def fundus_images(folder_path):
     retina_test = multiproc_make_numpy_images_labels(retina_test_paths, label_num=1)
     normal_test = multiproc_make_numpy_images_labels(normal_test_paths, label_num=0)
 
-    np.save(folder_path+'cata_test.npy',cata_test[0])
-    np.save(folder_path + 'glau_test.npy', glau_test[0])
-    np.save(folder_path + 'retina_test.npy', retina_test[0])
-    np.save(folder_path + 'normal_test.npy', normal_test[0])
+    np.save(folder_path+'cata_test_images.npy',cata_test[0])
+    np.save(folder_path + 'glau_test_images.npy', glau_test[0])
+    np.save(folder_path + 'retina_test_images.npy', retina_test[0])
+    np.save(folder_path + 'normal_test_images_.npy', normal_test[0])
+    np.save(folder_path + 'cata_test_labels_.npy', cata_test[1])
+    np.save(folder_path + 'glau_test_labels.npy', glau_test[1])
+    np.save(folder_path + 'retina_test_labels_.npy', retina_test[1])
+    np.save(folder_path + 'normal_test_labels.npy', normal_test[1])
 
     if __debug__ ==debug_flag:
         print ''
