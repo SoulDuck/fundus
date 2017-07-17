@@ -242,10 +242,19 @@ def fundus_images(folder_path):
     retina_train_paths, retina_test_paths = get_train_test_paths(0.05, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
     normal_train_paths, normal_test_paths = get_train_test_paths(0.05, folder_path+'/normal/'+'normal_paths.txt')
 
-    save_paths(cata_train_paths,folder_path+'paths/'+'cataract_train_paths.txt') ;save_paths(cata_test_paths,folder_path+'paths/'+'cataract_test_paths.txt')
-    save_paths(glau_train_paths , folder_path+'paths/'+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,folder_path+'paths/'+'glaucoma_test_paths.txt')
-    save_paths(retina_train_paths,folder_path+'paths/'+'retina_train_paths.txt');save_paths(retina_test_paths,folder_path+'paths/'+'retina_test_paths.txt')
-    save_paths(normal_train_paths,folder_path+'paths/'+'normal_train_paths.txt');save_paths(normal_test_paths,folder_path+'paths/'+'normal_test_paths.txt')
+    count=0
+    w_flag=True
+    while w_flag:
+        if not os.path.isdir(folder_path+'paths/'+str(count)+'/'):
+            os.mkdir(folder_path+'paths/'+str(count)+'/')
+            w_flag=False
+        else:
+            count+=1
+    folder_path = folder_path + 'paths/' + str(count) + '/'
+    save_paths(cata_train_paths,folder_path+'cataract_train_paths.txt') ;save_paths(cata_test_paths,folder_path+'cataract_test_paths.txt')
+    save_paths(glau_train_paths , folder_path+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,folder_path+'glaucoma_test_paths.txt')
+    save_paths(retina_train_paths,folder_path+'retina_train_paths.txt');save_paths(retina_test_paths,folder_path+'retina_test_paths.txt')
+    save_paths(normal_train_paths,folder_path+'normal_train_paths.txt');save_paths(normal_test_paths,folder_path+'normal_test_paths.txt')
 
     ########################################  setting here ###############################################
 
