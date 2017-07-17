@@ -70,7 +70,7 @@ for step in range(max_iter):
 
     utils.show_progress(step,max_iter)
     if step % check_point == 0:
-        cam.inspect_cam(sess, cam_ , top_conv,test_imgs, test_labs, step , 50 , x_,y_ , y_conv  )
+        #cam.inspect_cam(sess, cam_ , top_conv,test_imgs, test_labs, step , 50 , x_,y_ , y_conv  )
         imgs,labs=utils.divide_images_labels_from_batch(val_imgs,val_labs,batch_size)
         list_imgs_labs=zip(imgs,labs)
         val_acc_mean=[];val_loss_mean=[]
