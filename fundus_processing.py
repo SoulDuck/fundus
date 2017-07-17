@@ -274,7 +274,6 @@ if __name__ == '__main__':
             utils.show_progress(count, len(paths))
             count += 1
 
-
     #########   usage : crop_reisize_fundus   #########
     """
     parser = argparse.ArgumentParser()

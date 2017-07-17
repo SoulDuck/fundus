@@ -274,12 +274,12 @@ def fundus_images(folder_path):
     retina_test = multiproc_make_numpy_images_labels(retina_test_paths, label_num=1)
     normal_test = multiproc_make_numpy_images_labels(normal_test_paths, label_num=0)
 
-    np.save(folder_path+'cata_test_images.npy',cata_test[0])
-    np.save(folder_path + 'glau_test_images.npy', glau_test[0])
+    np.save(folder_path+'cataract_test_images.npy',cata_test[0])
+    np.save(folder_path + 'glaucoma_test_images.npy', glau_test[0])
     np.save(folder_path + 'retina_test_images.npy', retina_test[0])
     np.save(folder_path + 'normal_test_images_.npy', normal_test[0])
-    np.save(folder_path + 'cata_test_labels_.npy', cata_test[1])
-    np.save(folder_path + 'glau_test_labels.npy', glau_test[1])
+    np.save(folder_path + 'cataract_test_labels_.npy', cata_test[1])
+    np.save(folder_path + 'glaucoma_test_labels.npy', glau_test[1])
     np.save(folder_path + 'retina_test_labels_.npy', retina_test[1])
     np.save(folder_path + 'normal_test_labels.npy', normal_test[1])
 
@@ -398,8 +398,14 @@ def make_train_batch(cata_train , glau_train , retina_train , normal_train):
 
 if __name__ == '__main__':
 
+
+
+    """macula_299x299 test"""
+    """
     image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs=macula_299x299()
     batch_xs , batch_ys= make_train_batch(train_imgs_labs[0] , train_imgs_labs[1],train_imgs_labs[2],train_imgs_labs[3])
+    """
+
     """
     #make_paths('./fundus_data/cropped_optical',)
     cata , glau , retina , normal =fundus_macula_images()
