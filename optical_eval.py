@@ -27,19 +27,23 @@ def load_fundus_test_imgs_labs(folder_paths , name):
     NORMAL_LABEL = 0
     ABNORMAL_LABEL = 1
 
-    if os.path.isfile(folder_paths+name+'_test_images.npy') and os.path.isfile(folder_paths+name+'_test_labels.npy'):
+    if os.path.isfile(folder_paths+name+'_test_images.npy')==False and os.path.isfile(folder_paths+name+'_test_labels.npy')==False:
         print name+' test images or labels numpy file isnt exist'
+        print 'make '+name+' images and labels'
         if name == 'normal':
             label= NORMAL_LABEL
         else:
             label=ABNORMAL_LABEL
         images , labels=data.make_numpy_images_labels(folder_paths+name+'_test_paths.txt',label)
-        np.save('./'+name+'_test_images.npy',images)
-        np.save('./'+name+'cata_test_labels.npy', labels)
+        np.save(folder_paths+name+'_test_images.npy',images)
+        np.save(folder_paths+name+'_test_labels.npy', labels)
 
     else:
-        np.load(name)
+        print 'load '+name+' test images , labels'
+        images=np.load(folder_paths + name + '_test_images.npy')
+        labels=np.load(folder_paths + name + '_test_labels.npy')
 
+    return images, labels
 
 def get_activation_map(image , filename):
     try:### error contor
@@ -115,12 +119,17 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 """
 
 if __name__ =='__main__':
+    folder_paths='../fundus_data/cropped_optical/paths/15/'
+    print ''
+    print 'a'
+    images,labels=load_fundus_test_imgs_labs(folder_paths , 'cataract')
+    """
     test_imgs = np.load('./test_imgs.npy')
     test_labs = np.load('./test_labs.npy')
     test_labs=test_labs.astype(np.int32)
     print test_labs
     act_map=get_activation_map(test_imgs[3], './sample_image.png')
-
+    """
     """
     imgs_list , labels_list=utils.divide_images_labels_from_batch(test_imgs ,test_labs, batch_size=60)
     list_imgs_labs=zip(imgs_list , labels_list)
