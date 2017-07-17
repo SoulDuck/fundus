@@ -78,14 +78,14 @@ def multiproc_make_numpy_images_labels(paths , label_num):
     labels=np.zeros([n_paths])
     labels.fill(label_num)
     h,w,ch=np.shape(Image.open(paths[0]))
-    images=np.zeros([n_paths,h,w,ch])
+    images=[]
 
 
     for img,path in pool.imap(open_Image , paths):
         if img =='None':
             continue
         utils.show_progress(count, len(paths))
-        images[count]=img
+        images.append(img)
         count+=1
     print 'images shape',np.shape(images)
     pool.close()
