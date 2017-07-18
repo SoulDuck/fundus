@@ -23,29 +23,14 @@ new_img.save("new.png","PNG")
 NORMAL_LABEL = 0
 ABNORMAL_LABEL = 1
 
-def load_fundus_test_imgs_labs(folder_paths , name):
-    NORMAL_LABEL = 0
-    ABNORMAL_LABEL = 1
-
-    if os.path.isfile(folder_paths+name+'_test_images.npy')==False and os.path.isfile(folder_paths+name+'_test_labels.npy')==False:
-        print name+' test images or labels numpy file isnt exist'
-        print 'make '+name+' images and labels'
-        if name == 'normal':
-            label= NORMAL_LABEL
-        else:
-            label=ABNORMAL_LABEL
-        images , labels=data.make_numpy_images_labels(folder_paths+name+'_test_paths.txt',label)
-        np.save(folder_paths+name+'_test_images.npy',images)
-        np.save(folder_paths+name+'_test_labels.npy', labels)
-
-    else:
-        print 'load '+name+' test images , labels'
-        images=np.load(folder_paths + name + '_test_images.npy')
-        labels=np.load(folder_paths + name + '_test_labels.npy')
-
-    return images, labels
 
 def get_activation_map(image , filename):
+    """
+    :param
+    :param image:
+    :param filename:
+    :return:
+    """
     try:### error contor
         assert type(image).__module__ == np.__name__##check type if not image
     except AssertionError as ae:
@@ -104,6 +89,34 @@ def get_activation_map(image , filename):
         plt.show()
     return vis_normal
 
+
+def eval(model_folder_path , images, labels=None):
+    sess = tf.Session()
+    saver = tf.train.import_meta_graph(model_folder_path+'best_acc.ckpt.meta')
+    saver.restore(sess, model_folder_path+'best_acc.ckpt')
+    tf.get_default_graph()
+    accuray = tf.get_default_graph().get_tensor_by_name('accuracy:0')
+    prediction = tf.get_default_graph().get_tensor_by_name('softmax:0')
+
+    x_ = tf.get_default_graph().get_tensor_by_name('x_:0')
+    y_ = tf.get_default_graph().get_tensor_by_name('y_:0')
+    top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
+    phase_train = tf.get_default_graph().get_tensor_by_name('phase_train:0')
+    y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
+
+    #cam_ = tf.get_default_graph().get_tensor_by_name('classmap_reshape:0')
+    #vis_abnormal, vis_normal = cam.eval_inspect_cam(sess, cam_, top_conv, images, 1, x_, y_, y_conv)
+    #NORMAL_LABEL = 0
+    #ABNORMAL_LABEL = 1
+
+    if not labels==None:
+        acc,pred=sess.run([accuray , prediction] , feed_dict={x_:images ,y_ : labels , phase_train: False})
+        return acc,pred
+    else:
+        pred=sess.run([ prediction] , feed_dict={x_:images ,y_ : labels , phase_train: False})
+        return pred
+
+
 """ Usage:
 sess=tf.Session()
 saver=tf.train.import_meta_graph('./cnn_model/best_acc.ckpt.meta')
@@ -119,10 +132,51 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 """
 
 if __name__ =='__main__':
-    folder_paths='../fundus_data/cropped_optical/paths/15/'
-    test_imgs,test_labs=load_fundus_test_imgs_labs(folder_paths , 'cataract')
-    print np.shape(test_imgs)
-    act_map=get_activation_map(test_imgs[3], './sample_image.png')
+
+    folder_path='../fundus_data/cropped_optical/paths/0/'
+    files=glob.glob(folder_path+'*.txt')
+    for file in files:
+        if 'test' in file:
+            file_name=file.split('/')[-1] #e.g glaucoma_test_paths.txt
+            imgs_name=file_name.replace('paths.txt' , 'imgs.npy') #e.g glaucoma_test_imgs.npy
+            labs_name = file_name.replace('paths.txt', 'labs.npy')  # e.g glaucoma_test_imgs.npy
+
+            paths=utils.get_paths_from_text(file)
+            if 'normal' in file_name:
+                label=0
+            else:
+                label=1
+            imgs,labs=data.make_numpy_images_labels(paths , label)
+            labs=labs.astype(np.int32)
+            labs=data.cls2onehot(labs,2)
+            np.save(folder_path+imgs_name ,imgs )
+            np.save(folder_path + labs_name, labs)
+
+            if __debug__ ==True:
+                print ''
+                print '############debug##############'
+                print 'file name',file_name
+                print '# paths ',len(paths)
+                print 'image shape',np.shape(imgs)
+                print 'label' , label
+                print 'label shape',np.shape(labs[:9])
+                #print utils.plot_images(imgs)
+
+    """eval"""
+
+    model_path='./cnn_model/optical/0/'
+    acc,predict = eval(model_path,imgs,labs[:9])
+    print acc,
+    print predict
+
+
+
+
+    #folder_paths='../fundus_data/cropped_optical/paths/15/'
+    #test_imgs,test_labs=load_fundus_test_imgs_labs(folder_paths , 'cataract')
+    #print np.shape(test_imgs),
+    #print eval('./cnn_model/optical/0/',test_imgs,test_labs)
+    #act_map=get_activation_map(test_imgs[3], './sample_image.png')
 
     """
     imgs_list , labels_list=utils.divide_images_labels_from_batch(test_imgs ,test_labs, batch_size=60)

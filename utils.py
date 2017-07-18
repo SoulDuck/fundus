@@ -113,6 +113,13 @@ def delete_char_from_paths(folder_path , del_char):
         delete_char_from_paths(folder_path='../fundus_data/cropped_macula/' , del_char='*')
         test*.txt --> test.txt
     """
+def get_paths_from_text(text_locate):
+    f=open(text_locate , 'r')
+    lines=f.readlines()
+    lines=map(lambda x: x.replace('\n' , '' ) , lines)
+
+    return lines
+
 
 
 

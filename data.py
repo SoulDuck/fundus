@@ -397,11 +397,20 @@ def make_train_batch(cata_train , glau_train , retina_train , normal_train):
 
     return batch_xs , batch_ys
 
-
+def get_paths_from_file(filepath):
+    f=open(filepath)
+    lines=f.readlines()
+    newlines=[]
+    for line in lines:
+        line=line.replace('\n' , '')
+        newlines.append(line)
+    return newlines
 
 if __name__ == '__main__':
-
-
+    lines=get_paths_from_file('../fundus_data/cropped_optical/paths/cataract_test_paths.txt')
+    imgs,labs=make_numpy_images_labels(lines, 1)
+    print ''
+    print np.shape(imgs)
 
     """macula_299x299 test"""
     """
