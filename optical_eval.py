@@ -161,6 +161,8 @@ if __name__ =='__main__':
                 acc, predict = eval(model_path, imgs, labs[:len(imgs)])
                 acc_list.append(acc)
                 predict_list.append(predict)
+                acc_list=np.asarray(acc_list)
+                pred_list = np.asarray(pred_list)
             acc=acc_list.mean()
             print 'accuracy', acc
             if __debug__ ==True:
