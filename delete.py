@@ -18,3 +18,8 @@ print random.randint(0,1)
 
 a='asdf'
 print isinstance(a, str)
+
+a=np.array([0,1,1,1,1,1])
+a.fill(0)
+print a
+

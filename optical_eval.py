@@ -89,7 +89,6 @@ def get_activation_map(image , filename):
         plt.show()
     return vis_normal
 
-
 def eval(model_folder_path , images, labels=None):
     sess = tf.Session()
     saver = tf.train.import_meta_graph(model_folder_path+'best_acc.ckpt.meta')
@@ -139,6 +138,7 @@ if __name__ =='__main__':
 
     for file in files:
         if 'test' in file:
+
             file_name=file.split('/')[-1] #e.g glaucoma_test_paths.txt
             imgs_name=file_name.replace('paths.txt' , 'imgs.npy') #e.g glaucoma_test_imgs.npy
             labs_name = file_name.replace('paths.txt', 'labs.npy')  # e.g glaucoma_test_imgs.npy
@@ -149,11 +149,19 @@ if __name__ =='__main__':
             else:
                 label=1
             imgs,labs=data.make_numpy_images_labels(paths , label)
-            labs=labs.astype(np.int32)
-            labs=data.cls2onehot(labs,2)
-            np.save(folder_path+imgs_name ,imgs )
-            np.save(folder_path + labs_name, labs)
-            acc, predict = eval(model_path, imgs, labs[:len(imgs)])
+            imgs_list,labs_list=utils.divide_images_labels_from_batch(imgs,labs,60)
+            imgs_labs_list=zip(imgs_list,labs_list)
+            acc_list=[]
+            predict_list=[]
+            for imgs,labs in imgs_labs_list:
+                labs=labs.astype(np.int32)
+                labs=data.cls2onehot(labs,2)
+                np.save(folder_path+imgs_name ,imgs )
+                np.save(folder_path + labs_name, labs)
+                acc, predict = eval(model_path, imgs, labs[:len(imgs)])
+                acc_list.append(acc)
+                predict_list.append(predict)
+            acc=acc_list.mean()
             print 'accuracy', acc
             if __debug__ ==True:
                 print ''
@@ -194,6 +202,5 @@ if __name__ =='__main__':
     plt.imshow(vis_normal)
     plt.show()
     """
-
 
 

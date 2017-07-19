@@ -9,7 +9,90 @@ import glob , sys, os
 import utils
 from multiprocessing import Pool
 
+def red_free_image(image):
+    # if not type(imgs).__module__ == np.__name__:
+    try:
+        if not type(image).__moduel__ == __name__:
+            image=np.asarray(image)
+    except AttributeError as attr_error:
+        print attr_error
+        image = np.asarray(image)
+    h,w,ch = np.shape(np.asarray(image))
 
+    image_r = np.zeros([h,w])
+    image_r.fill(0)
+    image_g = image[:, :, 1]
+    image_b = image[:, :, 2]
+
+    image_r=image_r.reshape([h,w,1])
+    image_g = image_g.reshape([h, w, 1])
+    image_b = image_b.reshape([h, w, 1])
+
+
+    image=np.concatenate([image_r , image_g, image_b] , axis=2)
+    if __debug__ == True:
+        print 'image red shape',np.shape(image_r)
+        print image[:,:,0].mean()
+    return image
+
+
+
+def green_free_image(image):
+    # if not type(imgs).__module__ == np.__name__:
+    try:
+        if not type(image).__moduel__ == __name__:
+            image=np.asarray(image)
+    except AttributeError as attr_error:
+        print attr_error
+        image = np.asarray(image)
+    h,w,ch = np.shape(np.asarray(image))
+
+    image_r = image[:, :, 0]
+    #image_g = image[:, :, 1]
+    image_g = np.zeros([h,w])
+    image_g.fill(0)
+    image_b = image[:, :, 2]
+
+    image_r=image_r.reshape([h,w,1])
+    image_g = image_g.reshape([h, w, 1])
+    image_b = image_b.reshape([h, w, 1])
+
+
+    image=np.concatenate([image_r , image_g, image_b] , axis=2)
+    if __debug__ == True:
+        print 'image green shape',np.shape(image_g)
+        print image[:,:,0].mean()
+    return image
+
+
+def blue_free_image(image):
+    # if not type(imgs).__module__ == np.__name__:
+    try:
+        if not type(image).__moduel__ == __name__:
+            image=np.asarray(image)
+    except AttributeError as attr_error:
+        print attr_error
+        image = np.asarray(image)
+    h,w,ch = np.shape(np.asarray(image))
+
+    image_r = image[:, :, 0]
+    image_g = image[:, :, 1]
+    #image_b = image[:, :, 2]
+    image_b = np.zeros([h,w])
+    image_b.fill(0)
+
+    image_r = image_r.reshape([h ,w ,1])
+    image_g = image_g.reshape([h, w, 1])
+    image_b = image_b.reshape([h, w, 1])
+
+
+    image=np.concatenate([image_r , image_g, image_b] , axis=2)
+    if __debug__ == True:
+        print 'image blue shape',np.shape(image_b)
+        print image[:,:,0].mean()
+        print image[:, :, 1].mean()
+        print image[:, :, 2].mean()
+    return image
 
 
 
@@ -133,6 +216,20 @@ def save_img(img, save_folder , extension):
         plt.imsave(save_folder + name + extension, img)
 
 if __name__ == '__main__':
+    """usage:red free image"""
+    img = Image.open('./normal/43203_20140121_L.png')
+    img=red_free_image(img)
+    plt.imshow(img/255.)
+    plt.show()
+    img = Image.open('./normal/43203_20140121_L.png')
+    img = green_free_image(img)
+    plt.imshow(img / 255.)
+    plt.show()
+    img = Image.open('./normal/43203_20140121_L.png')
+    img = blue_free_image(img)
+    plt.imshow(img / 255.)
+    plt.show()
+
     """
     path='./sample_image/original_images/43203_20140121_L.png'
     path='./sample_image/original_images/43203_20140121_R.png'
@@ -149,7 +246,7 @@ if __name__ == '__main__':
 
 
     """usage: fundus optical crop"""
-
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir" , help='folder to preprocessing')
     parser.add_argument("--save_dir" , help='folder to save')
@@ -211,9 +308,10 @@ if __name__ == '__main__':
             save_img(img, target_save_folder_path , saved_extension) #save image ==> save_folder+name+extension
             utils.show_progress(count , len(paths))
             count+=1
+    """
 
     """usage: fundus macula crop"""
-
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
@@ -273,7 +371,7 @@ if __name__ == '__main__':
             save_img(img, target_save_folder_path, saved_extension)  # save image ==> save_folder+name+extension
             utils.show_progress(count, len(paths))
             count += 1
-
+    """
     #########   usage : crop_reisize_fundus   #########
     """
     parser = argparse.ArgumentParser()
