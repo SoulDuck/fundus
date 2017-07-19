@@ -135,6 +135,8 @@ if __name__ =='__main__':
 
     folder_path='../fundus_data/cropped_optical/paths/0/'
     files=glob.glob(folder_path+'*.txt')
+    model_path='./cnn_model/optical/0/'
+
     for file in files:
         if 'test' in file:
             file_name=file.split('/')[-1] #e.g glaucoma_test_paths.txt
@@ -151,7 +153,8 @@ if __name__ =='__main__':
             labs=data.cls2onehot(labs,2)
             np.save(folder_path+imgs_name ,imgs )
             np.save(folder_path + labs_name, labs)
-
+            acc, predict = eval(model_path, imgs, labs[:len(imgs)])
+            print 'accuracy', acc
             if __debug__ ==True:
                 print ''
                 print '############debug##############'
@@ -162,12 +165,7 @@ if __name__ =='__main__':
                 print 'label shape',np.shape(labs[:9])
                 #print utils.plot_images(imgs)
 
-    """eval"""
 
-    model_path='./cnn_model/optical/0/'
-    acc,predict = eval(model_path,imgs,labs[:9])
-    print acc,
-    print predict
 
 
 
