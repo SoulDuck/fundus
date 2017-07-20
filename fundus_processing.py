@@ -419,6 +419,7 @@ if __name__ == '__main__':
         paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
 
         paths=paths[:limit_paths]
+        print len(paths)
         pool = Pool()
         count = 0
 
