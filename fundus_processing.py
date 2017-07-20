@@ -375,7 +375,7 @@ if __name__ == '__main__':
             count += 1
     """
     #########   usage : crop_reisize_fundus   #########
-
+    print 'aaa'
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
