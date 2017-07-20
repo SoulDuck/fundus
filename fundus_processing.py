@@ -216,7 +216,9 @@ def save_img(img, save_folder , extension):
         plt.imsave(save_folder + name + extension, img)
 
 if __name__ == '__main__':
+
     """usage:red free image"""
+    """
     img = Image.open('./normal/43203_20140121_L.png')
     img=red_free_image(img)
     plt.imshow(img/255.)
@@ -229,7 +231,7 @@ if __name__ == '__main__':
     img = blue_free_image(img)
     plt.imshow(img / 255.)
     plt.show()
-
+    """
     """
     path='./sample_image/original_images/43203_20140121_L.png'
     path='./sample_image/original_images/43203_20140121_R.png'
@@ -373,7 +375,7 @@ if __name__ == '__main__':
             count += 1
     """
     #########   usage : crop_reisize_fundus   #########
-    """
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
@@ -440,4 +442,3 @@ if __name__ == '__main__':
             count+=1
     print 'fundus_processing.py out'
 
-"""

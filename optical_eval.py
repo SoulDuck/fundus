@@ -159,6 +159,7 @@ if __name__ =='__main__':
                 np.save(folder_path+imgs_name ,imgs )
                 np.save(folder_path + labs_name, labs)
                 acc, predict = eval(model_path, imgs, labs[:len(imgs)])
+                get_activation_map()
                 acc_list.append(acc)
                 predict_list.append(predict)
             acc_list=np.asarray(acc_list)
@@ -174,7 +175,6 @@ if __name__ =='__main__':
                 print 'label' , label
                 print 'label shape',np.shape(labs[:9])
                 #print utils.plot_images(imgs)
-
 
 
 
