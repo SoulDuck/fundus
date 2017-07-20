@@ -379,7 +379,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
-    parser.add_argument("--extension", help='extension')
+    parser.add_argument("--extension", help='extension') #'.png'
     parser.add_argument("--limit_paths" , help='limit to paths for multiprocessing')
     args = parser.parse_args()
 
@@ -436,7 +436,7 @@ if __name__ == '__main__':
             utils.show_progress(count,len(paths))
             name = path.split('/')[-1]
             save_path = os.path.join(target_save_folder_path, name)
-            reshape_img_size = (750, 750)
+            reshape_img_size = (300, 300)
             img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
             img.save(save_path + saved_extension)
             count+=1
