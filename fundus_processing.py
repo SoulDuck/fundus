@@ -217,8 +217,12 @@ def save_img(img, save_folder , extension):
         plt.imsave(save_folder + name + extension, img)
 
 def image_resize(path):
-    img=Image.open(path)
-    img=img.resize((300,300) , PIL.Image.ANTIALIAS)
+    try:
+        img=Image.open(path)
+        img=img.resize((300,300) , PIL.Image.ANTIALIAS)
+    except IOError:
+        print path ,'has some problem'
+        img =None
     return img , path
 
 
@@ -524,6 +528,8 @@ if __name__ == '__main__':
         if len(paths)==0:
             continue;
         for img, path in pool.imap(image_resize , paths):
+            if img ==None:
+                continue
             utils.show_progress(count,len(paths))
             name = path.split('/')[-1]
             save_path = os.path.join(target_save_folder_path, name)

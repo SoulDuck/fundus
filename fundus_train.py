@@ -9,7 +9,6 @@ import cam
 import aug
 import random
 
-
 def train():
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299(folder_path='../fundus_data/cropped_original_fundus_300x300/')
@@ -22,7 +21,7 @@ def train():
     x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
     y_ = tf.placeholder(dtype=tf.int32, shape=[None, n_classes], name='y_')
     phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
-    batch_size = 10
+    batch_size = 60
     ##########################structure##########################
 
     layer = stem('stem', x_)
@@ -72,7 +71,6 @@ def train():
     val_imgs = test_imgs[val_indices[:1200]]
     val_labs = test_labs[val_indices[:1200]]
     for step in range(max_iter):
-
         utils.show_progress(step, max_iter)
         if step % check_point == 0:
             # cam.inspect_cam(sess, cam_ , top_conv,test_imgs, test_labs, step , 50 , x_,y_ , y_conv  )
