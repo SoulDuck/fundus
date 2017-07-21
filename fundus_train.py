@@ -102,4 +102,4 @@ def train(model_saved_folder_path=None):
 
 
 if __name__ == '__main__':
-    train(model_saved_folder_path='./cnn_model/fundus/8/')
+    train()
