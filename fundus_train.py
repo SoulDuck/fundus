@@ -62,7 +62,7 @@ def train():
         print 'there was no model'
     ########################training##############################
     max_val = 0
-    max_iter = 100000
+    max_iter = 130000
     check_point = 100
     train_acc = 0;
     train_loss = 0;
