@@ -13,9 +13,9 @@ import random
 def train():
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299()
-    model_saved_folder_path = utils.make_folder('./cnn_model/', 'optical/')
-    graph_saved_folder_path = utils.make_folder('./graph/', 'optical/')
-    log_saved_folder_path = utils.make_folder('./log/', 'optical/')
+    model_saved_folder_path = utils.make_folder('./cnn_model/', 'fundus/')
+    graph_saved_folder_path = utils.make_folder('./graph/', 'fundus/')
+    log_saved_folder_path = utils.make_folder('./log/', 'fundus/')
     f = open(log_saved_folder_path + 'log.txt', 'w+')
 
     x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
