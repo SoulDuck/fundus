@@ -240,10 +240,10 @@ def fundus_images(folder_path , extension='png'):
 
     debug_flag=True
     if __debug__ == debug_flag:
-        cata_test_ratio=0.5
-        glau_test_ratio=0.5
-        retina_test_ratio=0.5
-        normal_test_ratio=0.5
+        cata_test_ratio=0.05
+        glau_test_ratio=0.05
+        retina_test_ratio=0.05
+        normal_test_ratio=0.05
     else:
         cata_test_ratio = 0.05
         glau_test_ratio = 0.05
@@ -454,7 +454,7 @@ def get_paths_from_file(filepath):
     return newlines
 
 if __name__ == '__main__':
-    fundus_299x299()
+    fundus_299x299(folder_path='../fundus_data/cropped_original_fundus_300x300/')
     """
     lines=get_paths_from_file('../fundus_data/cropped_optical/paths/cataract_test_paths.txt')
     imgs,labs=make_numpy_images_labels(lines, 1)
