@@ -9,6 +9,7 @@ import glob , sys, os
 import utils
 from multiprocessing import Pool
 
+
 def red_free_image(image):
     # if not type(imgs).__module__ == np.__name__:
     try:
@@ -215,7 +216,16 @@ def save_img(img, save_folder , extension):
         plt.imshow(img)
         plt.imsave(save_folder + name + extension, img)
 
+def image_resize(path):
+    img=Image.open(path)
+    img=img.resize((300,300) , PIL.Image.ANTIALIAS)
+    return img , path
+
+
+
+
 if __name__ == '__main__':
+
 
     """usage:red free image"""
     """
@@ -385,7 +395,7 @@ if __name__ == '__main__':
             subDir_2
             subDir_3
     """
-
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
@@ -453,4 +463,70 @@ if __name__ == '__main__':
             img.save(save_path + saved_extension)
             count+=1
     print 'fundus_processing.py out'
+    """
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dir", help='folder to preprocessing')
+    parser.add_argument("--save_dir", help='folder to save')
+    parser.add_argument("--extension", help='extension') #'.png'
+    parser.add_argument("--limit_paths" , help='limit to paths for multiprocessing')
+    args = parser.parse_args()
+
+    if args.dir:
+        folder_path = args.dir
+    else:
+        folder_path = '../fundus_data/cropped_original_fundus/'
+
+    if args.save_dir:
+        save_folder = args.save_dir
+    else:
+        save_folder = '../fundus_data/cropped_original_fundus_300x300/'
+
+    if args.extension:
+        extension = args.extension
+    else:
+        extension = '*.png'
+
+    if args.limit_paths:
+        limit_paths=args.limit_paths
+    else:
+        limit_paths=3000
+
+
+    folder_names = os.walk(folder_path).next()[1]
+    print folder_names
+    saved_extension = extension.replace('*','.') #extension = '.jpg'
+
+    for folder_name in folder_names:
+        target_folder_path = folder_path + folder_name + '/'
+        target_save_folder_path = save_folder + folder_name + '/'
+        if not os.path.isdir(target_save_folder_path):
+            os.mkdir(target_save_folder_path)
+            print target_save_folder_path,'is made'
+
+        paths = glob.glob(target_folder_path + extension)
+        saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
+        paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
+
+        paths=paths[:limit_paths]
+        print len(paths)
+        pool = Pool()
+        count = 0
+
+        if __debug__ == True:
+            print ''
+            print '################################ '
+            print 'folder_path:', target_folder_path
+            print 'save_folder:', target_save_folder_path
+            print 'number of paths', len(paths)
+            print 'extension', extension
+            print 'saved extension', saved_extension
+        if len(paths)==0:
+            continue;
+        for img, path in pool.imap(image_resize , paths):
+            utils.show_progress(count,len(paths))
+            name = path.split('/')[-1]
+            save_path = os.path.join(target_save_folder_path, name)
+            img.save(save_path + saved_extension)
+            count+=1
+    print 'fundus_processing.py out'
