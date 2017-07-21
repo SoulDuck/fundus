@@ -211,12 +211,24 @@ def draw_grpah(file_pointer,check_point=50):
     plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Accuracy ',folder_path,step_list, train_acc_list, val_acc_list)
     plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Loss ',folder_path,step_list, train_loss_list, val_loss_list)
 def make_folder(root_folder_path , folder_name):
+    """
+    usage:
+
+    :param root_folder_path:
+    :param folder_name:
+    :return:
+    """
+
+    if not os.path.isdir(root_folder_path):
+        os.mkdir(root_folder_path)
+        print root_folder_path ,'is made'
     count=0
     w_flag=True
     while w_flag:
         if not os.path.isdir(root_folder_path+folder_name+str(count)):
-             os.mkdir(root_folder_path+folder_name+str(count))
-             w_flag=False
+            os.mkdir(root_folder_path+folder_name+str(count))
+            print root_folder_path+folder_name+str(count),'is made'
+            w_flag=False
         else:
            count+=1
     return root_folder_path+folder_name+str(count)+'/'

@@ -90,6 +90,7 @@ def multiproc_make_numpy_images_labels(paths , label_num):
         utils.show_progress(count, len(paths))
         images.append(img)
         count+=1
+    print ''
     print 'images shape',np.shape(images)
     pool.close()
     pool.join()
@@ -227,38 +228,44 @@ def eye_299x299():
 
 
 
-def fundus_images(folder_path):
-    debug_flag=False
+def fundus_images(folder_path , extension='png'):
     """
     usage:
     :param folder_path:
     :return:
+
+    have to read!!
+    ** paths will save here --> '/fundus/paths/0'
     """
 
-    cataract_paths=make_paths(folder_path+'cataract/', '*.png', folder_path+'cataract/'+'cataract_paths.txt') #no random shuffle
-    retina_paths = make_paths(folder_path+'retina/', '*.png', folder_path+'retina/'+'retina_paths.txt')
-    glaucoma_paths = make_paths(folder_path+'glaucoma/', '*.png', folder_path+'/glaucoma/'+'glaucoma_paths.txt')
-    normal_paths = make_paths(folder_path+'normal/', '*.png', folder_path+'/normal/'+'normal_paths.txt')
+    debug_flag=True
+    if __debug__ == debug_flag:
+        cata_test_ratio=0.5
+        glau_test_ratio=0.5
+        retina_test_ratio=0.5
+        normal_test_ratio=0.5
+    else:
+        cata_test_ratio = 0.05
+        glau_test_ratio = 0.05
+        retina_test_ratio = 0.05
+        normal_test_ratio = 0.05
 
-    cata_train_paths, cata_test_paths = get_train_test_paths(0.05, folder_path+'cataract/'+'cataract_paths.txt') # random shuffle here
-    glau_train_paths, glau_test_paths = get_train_test_paths(0.05, folder_path+'retina/'+'retina_paths.txt')
-    retina_train_paths, retina_test_paths = get_train_test_paths(0.05, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
-    normal_train_paths, normal_test_paths = get_train_test_paths(0.05, folder_path+'/normal/'+'normal_paths.txt')
+    cataract_paths=make_paths(folder_path+'cataract/', '*.'+extension, folder_path+'cataract/'+'cataract_paths.txt') #no random shuffle
+    retina_paths = make_paths(folder_path+'retina/', '*.'+extension, folder_path+'retina/'+'retina_paths.txt')
+    glaucoma_paths = make_paths(folder_path+'glaucoma/', '*.'+extension, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
+    normal_paths = make_paths(folder_path+'normal/', '*.'+extension, folder_path+'/normal/'+'normal_paths.txt')
 
-    count=0
-    w_flag=True
-    while w_flag:
-        if not os.path.isdir(folder_path+'paths/'+str(count)+'/'):
-            os.mkdir(folder_path+'paths/'+str(count)+'/')
-            w_flag=False
-        else:
-            count+=1
-    folder_path = folder_path + 'paths/' + str(count) + '/'
+    cata_train_paths, cata_test_paths = get_train_test_paths(cata_test_ratio, folder_path+'cataract/'+'cataract_paths.txt') # random shuffle here
+    glau_train_paths, glau_test_paths = get_train_test_paths(glau_test_ratio, folder_path+'retina/'+'retina_paths.txt')
+    retina_train_paths, retina_test_paths = get_train_test_paths(retina_test_ratio, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
+    normal_train_paths, normal_test_paths = get_train_test_paths(normal_test_ratio, folder_path+'/normal/'+'normal_paths.txt')
 
-    save_paths(cata_train_paths,folder_path+'cataract_train_paths.txt') ;save_paths(cata_test_paths,folder_path+'cataract_test_paths.txt')
-    save_paths(glau_train_paths , folder_path+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,folder_path+'glaucoma_test_paths.txt')
-    save_paths(retina_train_paths,folder_path+'retina_train_paths.txt');save_paths(retina_test_paths,folder_path+'retina_test_paths.txt')
-    save_paths(normal_train_paths,folder_path+'normal_train_paths.txt');save_paths(normal_test_paths,folder_path+'normal_test_paths.txt')
+
+    save_folder_path= utils.make_folder( os.path.join('./fundus/') , 'paths')
+    save_paths(cata_train_paths,save_folder_path+'cataract_train_paths.txt') ;save_paths(cata_test_paths,save_folder_path+'cataract_test_paths.txt')
+    save_paths(glau_train_paths , save_folder_path+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,save_folder_path+'glaucoma_test_paths.txt')
+    save_paths(retina_train_paths,save_folder_path+'retina_train_paths.txt');save_paths(retina_test_paths,save_folder_path+'retina_test_paths.txt')
+    save_paths(normal_train_paths,save_folder_path+'normal_train_paths.txt');save_paths(normal_test_paths,save_folder_path+'normal_test_paths.txt')
 
     ########################################  setting here ###############################################
 
@@ -272,19 +279,20 @@ def fundus_images(folder_path):
     retina_train = multiproc_make_numpy_images_labels(retina_train_paths, label_num=1)
     normal_train = multiproc_make_numpy_images_labels(normal_train_paths, label_num=0)
 
+    print cata_test_paths
     cata_test = multiproc_make_numpy_images_labels(cata_test_paths , label_num=1)
     glau_test = multiproc_make_numpy_images_labels(glau_test_paths , label_num=1)
     retina_test = multiproc_make_numpy_images_labels(retina_test_paths, label_num=1)
     normal_test = multiproc_make_numpy_images_labels(normal_test_paths, label_num=0)
 
-    np.save(folder_path+'cataract_test_images.npy',cata_test[0])
-    np.save(folder_path + 'glaucoma_test_images.npy', glau_test[0])
-    np.save(folder_path + 'retina_test_images.npy', retina_test[0])
-    np.save(folder_path + 'normal_test_images_.npy', normal_test[0])
-    np.save(folder_path + 'cataract_test_labels_.npy', cata_test[1])
-    np.save(folder_path + 'glaucoma_test_labels.npy', glau_test[1])
-    np.save(folder_path + 'retina_test_labels_.npy', retina_test[1])
-    np.save(folder_path + 'normal_test_labels.npy', normal_test[1])
+    np.save(save_folder_path+'cataract_test_images.npy',cata_test[0])
+    np.save(save_folder_path + 'glaucoma_test_images.npy', glau_test[0])
+    np.save(save_folder_path + 'retina_test_images.npy', retina_test[0])
+    np.save(save_folder_path + 'normal_test_images_.npy', normal_test[0])
+    np.save(save_folder_path + 'cataract_test_labels_.npy', cata_test[1])
+    np.save(save_folder_path + 'glaucoma_test_labels.npy', glau_test[1])
+    np.save(save_folder_path + 'retina_test_labels_.npy', retina_test[1])
+    np.save(save_folder_path + 'normal_test_labels.npy', normal_test[1])
 
     if __debug__ ==debug_flag:
         print ''
@@ -298,8 +306,9 @@ def fundus_images(folder_path):
         print '# retina train , :', len(retina_train_paths) , '# retina test :', len(retina_test_paths)
         print '# normal train , :', len(normal_train_paths) , '# normal test :', len(normal_test_paths)
 
-        #print cata_train_paths
-        print 'shape of cata_train_imgs' , cata_train[0].shape
+        print 'path saved here ',save_folder_path
+        print np.shape(cata_train)
+        print 'shape of cata_train_imgs' , np.shape(cata_train[0])
         fig = plt.figure()
         a=fig.add_subplot(1,2,1)
         a.set_xlabel('')
@@ -309,10 +318,48 @@ def fundus_images(folder_path):
         plt.imshow(cata_train[0][1])
         plt.show()
 
-    return [cata_train  , cata_test , cata_train_paths , cata_test_paths] ,\
-            [glau_train , glau_test , glau_train_paths , glau_test_paths],\
-            [retina_train , retina_test , retina_train_paths , retina_test_paths],\
-            [normal_train , normal_test , normal_train_paths , normal_test_paths]
+    return [cata_train  , cata_test , cata_train_paths , cata_test_paths] , \
+           [glau_train , glau_test , glau_train_paths , glau_test_paths], \
+           [retina_train , retina_test , retina_train_paths , retina_test_paths], \
+           [normal_train , normal_test , normal_train_paths , normal_test_paths]
+
+def fundus_299x299():
+    """
+    dir tree
+        fundus_data
+        |
+        fundus
+            |
+            cropped_macula #299x299
+            cropped_optical #299x299
+            resized_fundus #299x299
+    fundus_images
+    cata=[cata_train  , cata_test , cata_train_paths , cata_test_paths] ,\
+    glau=[glau_train , glau_test , glau_train_paths , glau_test_paths],\
+    retina=[retina_train , retina_test , retina_train_paths , retina_test_paths],\
+    normal=[normal_train , normal_test , normal_train_paths , normal_test_paths]
+    :return:
+    """
+
+    debug_flag=True
+    n_classes=2
+
+    cata, glau, retina, normal = fundus_images(folder_path='../fundus_data/cropped_original_fundus/')
+    train_imgs_labs = (cata[0], glau[0], retina[0], normal[0])
+    test_imgs = np.concatenate((cata[1][0], glau[1][0], retina[1][0], normal[1][0]))
+    test_labs = np.concatenate((cata[1][1], glau[1][1], retina[1][1], normal[1][1]))
+    test_labs = test_labs.astype(np.int32)
+    test_labs = cls2onehot(test_labs, 2)
+    image_height, image_width, image_color_ch = np.shape(train_imgs_labs[0][0][0])
+
+    if __debug__ == debug_flag:
+        print 'image_height', image_height
+        print 'image_weight', image_height
+        print 'image_color_ch', image_color_ch
+        print 'n classes', n_classes
+        print 'test_imgs shape', test_imgs.shape
+        print 'test_labs shape', test_labs.shape
+    return image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs
 
 def macula_299x299():
     debug_flag=True
@@ -407,11 +454,13 @@ def get_paths_from_file(filepath):
     return newlines
 
 if __name__ == '__main__':
+    fundus_299x299()
+    """
     lines=get_paths_from_file('../fundus_data/cropped_optical/paths/cataract_test_paths.txt')
     imgs,labs=make_numpy_images_labels(lines, 1)
     print ''
     print np.shape(imgs)
-
+    """
     """macula_299x299 test"""
     """
     image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs=macula_299x299()

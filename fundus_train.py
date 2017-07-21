@@ -25,6 +25,7 @@ x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, im
 y_ = tf.placeholder(dtype=tf.int32, shape=[None, n_classes], name='y_')
 phase_train=tf.placeholder(dtype=tf.bool , name='phase_train')
 batch_size=60
+learning_rate=0.001
 ##########################structure##########################
 
 layer=stem('stem' , x_)
@@ -53,7 +54,7 @@ y_conv=affine('end_layer' , layer , n_classes , keep_prob=1.0)
 """
 #############################################################
 #cam = get_class_map('gap', top_conv, 0, im_width=image_width)
-pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, 0.001)
+pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, learning_rate)
 saver = tf.train.Saver()
 sess = tf.Session()
 init_op = tf.global_variables_initializer()
