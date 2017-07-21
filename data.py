@@ -231,7 +231,7 @@ def eye_299x299():
 def fundus_images(folder_path , extension='png'):
     """
     usage:
-    :param folder_path:
+    :param folder_path: e.g) ../fundus/cropped_optical/
     :return:
 
     have to read!!
@@ -260,8 +260,8 @@ def fundus_images(folder_path , extension='png'):
     retina_train_paths, retina_test_paths = get_train_test_paths(retina_test_ratio, folder_path+'/glaucoma/'+'glaucoma_paths.txt')
     normal_train_paths, normal_test_paths = get_train_test_paths(normal_test_ratio, folder_path+'/normal/'+'normal_paths.txt')
 
-
-    save_folder_path= utils.make_folder( os.path.join('./') , 'paths/')
+    foler_name=folder_path.split('/')[-2]
+    save_folder_path= utils.make_folder( os.path.join('./paths/') , foler_name+'/')
     save_paths(cata_train_paths,save_folder_path+'cataract_train_paths.txt') ;save_paths(cata_test_paths,save_folder_path+'cataract_test_paths.txt')
     save_paths(glau_train_paths , save_folder_path+'glaucoma_train_paths.txt') ;save_paths(glau_test_paths,save_folder_path+'glaucoma_test_paths.txt')
     save_paths(retina_train_paths,save_folder_path+'retina_train_paths.txt');save_paths(retina_test_paths,save_folder_path+'retina_test_paths.txt')
