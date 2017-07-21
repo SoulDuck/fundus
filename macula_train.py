@@ -20,6 +20,7 @@ x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, im
 y_ = tf.placeholder(dtype=tf.int32, shape=[None, n_classes], name='y_')
 phase_train=tf.placeholder(dtype=tf.bool , name='phase_train')
 batch_size=60
+
 ##########################structure##########################
 
 layer=stem('stem' , x_)

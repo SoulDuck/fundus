@@ -219,9 +219,9 @@ def make_folder(root_folder_path , folder_name):
     :return:
     """
 
-    if not os.path.isdir(root_folder_path):
-        os.mkdir(root_folder_path)
-        print root_folder_path ,'is made'
+    if not os.path.isdir(root_folder_path+folder_name):
+        os.mkdir(root_folder_path+folder_name)
+        print root_folder_path+folder_name ,'is made'
     count=0
     w_flag=True
     while w_flag:
