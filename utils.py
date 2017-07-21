@@ -185,7 +185,7 @@ def plot_xs_ys(title,xs_title, ys_title , folder_path,xs ,*arg_ys ):
     plt.savefig(folder_path +'/'+ys_title)
     plt.close()
 
-def draw_grpah(file_pointer,check_point=50):
+def draw_grpah(file_pointer,save_folder ,check_point=50):
     if isinstance(file_pointer , str):
         file_path=file_pointer
         f=open(file_path,'r')
@@ -199,17 +199,18 @@ def draw_grpah(file_pointer,check_point=50):
         step_list.append(step)
         train_acc, train_loss , val_acc , val_loss=line.split('\t')
         train_acc_list.append(train_acc);train_loss_list.append(train_loss);val_acc_list.append(val_acc);val_loss_list.append(val_loss)
+    #folder_path = './graph/' + file_path.split('/')[-1].split('.')[0] #
+    plot_xs_ys('Normal Vs Abnormal','Step','Train Accuracy',save_folder,step_list , train_acc_list)
+    plot_xs_ys('Normal Vs Abnormal', 'Step', 'Train Loss', save_folder,step_list, train_loss_list )
+    plot_xs_ys('Normal Vs Abnormal', 'Step', 'Validation Accuracy', save_folder,step_list, val_acc_list)
+    plot_xs_ys('Normal Vs Abnormal', 'Step', 'Validation Loss', save_folder,step_list, val_acc_list)
+    plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Accuracy ',save_folder,step_list, train_acc_list, val_acc_list)
+    plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Loss ',save_folder,step_list, train_loss_list, val_loss_list)
     if __debug__==True:
         print 'the number of steps',len(step_list)
         print 'the number of train accuracy , loss',len(train_acc_list),len(train_loss_list)
         print 'the number of validation accuracy and loss',len(val_acc_list) , len(val_loss_list)
-    folder_path = './graph/' + file_path.split('/')[-1].split('.')[0]
-    plot_xs_ys('Normal Vs Abnormal','Step','Train Accuracy',folder_path,step_list , train_acc_list)
-    plot_xs_ys('Normal Vs Abnormal', 'Step', 'Train Loss', folder_path,step_list, train_loss_list )
-    plot_xs_ys('Normal Vs Abnormal', 'Step', 'Validation Accuracy', folder_path,step_list, val_acc_list)
-    plot_xs_ys('Normal Vs Abnormal', 'Step', 'Validation Loss', folder_path,step_list, val_acc_list)
-    plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Accuracy ',folder_path,step_list, train_acc_list, val_acc_list)
-    plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Loss ',folder_path,step_list, train_loss_list, val_loss_list)
+        print 'all graph was saved here',save_folder
 def make_folder(root_folder_path , folder_name):
     """
     usage:

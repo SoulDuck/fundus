@@ -16,12 +16,13 @@ def train():
     model_saved_folder_path = utils.make_folder('./cnn_model/', 'fundus/')
     graph_saved_folder_path = utils.make_folder('./graph/', 'fundus/')
     log_saved_folder_path = utils.make_folder('./log/', 'fundus/')
-    f = open(log_saved_folder_path + 'log.txt', 'w+')
+    log_saved_file_path = log_saved_folder_path + 'log.txt'
+    f = open(log_saved_file_path , 'w+')
 
     x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
     y_ = tf.placeholder(dtype=tf.int32, shape=[None, n_classes], name='y_')
     phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
-    batch_size = 60
+    batch_size = 10
     ##########################structure##########################
 
     layer = stem('stem', x_)
@@ -97,7 +98,8 @@ def train():
         batch_xs = aug.aug_level_1(batch_xs)
         train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],
                                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True})
-    utils.draw_grpah(graph_saved_folder_path)
+    f.close()
+    utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
 
 
 if __name__ == '__main__':
