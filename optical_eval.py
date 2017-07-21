@@ -134,7 +134,7 @@ if __name__ =='__main__':
 
     folder_path='../fundus_data/cropped_optical/paths/0/'
     files=glob.glob(folder_path+'*.txt')
-    model_path='./cnn_model/optical/0/'
+    model_path='./cnn_model/optical/1/'
 
     for file in files:
         if 'test' in file:
@@ -159,7 +159,6 @@ if __name__ =='__main__':
                 np.save(folder_path+imgs_name ,imgs )
                 np.save(folder_path + labs_name, labs)
                 acc, predict = eval(model_path, imgs, labs[:len(imgs)])
-                get_activation_map()
                 acc_list.append(acc)
                 predict_list.append(predict)
             acc_list=np.asarray(acc_list)
