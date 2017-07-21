@@ -375,6 +375,17 @@ if __name__ == '__main__':
             count += 1
     """
     #########   usage : crop_reisize_fundus   #########
+
+    """
+    dir --- subDir_1
+                |- aaa.jpg
+                |- bbb.jpg
+                ...ccc.jpg
+                
+            subDir_2
+            subDir_3
+    """
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
@@ -405,7 +416,7 @@ if __name__ == '__main__':
 
     folder_names = os.walk(folder_path).next()[1]
     print folder_names
-    saved_extension = '.png'
+    saved_extension = extension.replace('*','.') #extension = '.jpg'
 
     for folder_name in folder_names:
         target_folder_path = folder_path + folder_name + '/'

@@ -6,7 +6,10 @@ import numpy as np
 import utils
 from inception_v4 import stem , stem_1 , stem_2 ,reductionA , reductionB , blockA , blockB , blockC
 import cam
+import argparse
 ##########################setting############################
+
+
 
 image_height, image_width, image_color_ch, n_classes, train_imgs, train_labs, test_imgs, test_labs = data.eye_299x299()
 np.save('./train_imgs',train_imgs)
