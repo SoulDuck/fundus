@@ -101,9 +101,10 @@ def train(data_saved_folder_path  , model_saved_folder_path ):
 
 
 if __name__ == '__main__':
-    args=argparse.ArgumentParser()
-    args.add_argument('--data_dir', help='data saved folder')
-    args.add_argument('--model_dir', help='folder to model saved')
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--data_dir', help='data saved folder')
+    parser.add_argument('--model_dir', help='folder to model saved')
+    args = parser.parse_args()
     if args.data_dir == None or args.model_dir == None:
         print 'data dir or model folder was not assigned '
         exit()
