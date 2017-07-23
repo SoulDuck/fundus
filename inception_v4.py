@@ -198,3 +198,33 @@ def resnet_blockC(name, x):
         print 'layer_name :', 'join'
         print 'layer_shape :', layer_join.get_shape()
         return layer_join
+def structure_A(x_):
+    print 'stem A -> B -> C -> blockA -> reductionA -> blockB -> reduction B -> blockC'
+
+    layer = stem('stem', x_)
+    layer = stem_1('stem_1', layer)
+    layer = stem_2('stem_2', layer)
+    layer = blockA('blockA_0', layer)
+    layer = reductionA('reductionA', layer)
+    layer = blockB('blockB_0', layer)
+    layer = reductionB('reductionB', layer)
+    layer = blockC('blockC_0', layer)
+    top_conv = tf.identity(layer, name='top_conv')
+    return top_conv
+
+def structure_B( x_ , phase_train):
+    print 'stem A -> B -> C -> blockA -> reductionA -> blockB -> reduction B -> blockC'
+    layer = stem('stem', x_)
+    layer=batch_norm_layer(layer,phase_train,'stem_bn')
+    layer = stem_1('stem_1', layer)
+    layer=batch_norm_layer(layer,phase_train,'stem1_bn')
+    layer = stem_2('stem_2', layer)
+    layer=batch_norm_layer(layer,phase_train,'stem2_bn')
+    layer = blockA('blockA_0', layer)
+    layer = reductionA('reductionA', layer)
+    layer = blockB('blockB_0', layer)
+    layer = batch_norm_layer(layer,phase_train,'reductionA_bn')
+    layer = reductionB('reductionB', layer)
+    layer = blockC('blockC_0', layer)
+    layer = tf.identity(layer, name='top_conv')
+    return layer

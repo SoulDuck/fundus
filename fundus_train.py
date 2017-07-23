@@ -12,7 +12,6 @@ import argparse
 
 
 
-
 def train_with_specified_gpu(model_saved_folder_path=None , gpu_device='/gpu:0'):
     with tf.device(gpu_device):
         ##########################setting############################
@@ -111,7 +110,7 @@ def train_with_specified_gpu(model_saved_folder_path=None , gpu_device='/gpu:0')
         utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
 
 
-def train(model_saved_folder_path=None):
+def train(max_iter , batch_size, learning_rate , structure='inception_A',model_saved_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299()
     if model_saved_folder_path == None:
@@ -124,23 +123,13 @@ def train(model_saved_folder_path=None):
     x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
     y_ = tf.placeholder(dtype=tf.int32, shape=[None, n_classes], name='y_')
     phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
-    batch_size = 60
+    #batch_size = 60
     ##########################structure##########################
+    if structure == 'inception_A':
+        top_conv=inception_v4.structure_A(x_)
+    elif structure == 'inception_B':
+        top_conv = inception_v4.structure_B(x_)
 
-    layer = stem('stem', x_)
-    # batch_norm_layer(layer,phase_train,'stem_bn')
-    layer = stem_1('stem_1', layer)
-    # batch_norm_layer(layer,phase_train,'stem1_bn')
-    layer = stem_2('stem_2', layer)
-    # batch_norm_layer(layer,phase_train,'stem2_bn')
-    layer = blockA('blockA_0', layer)
-    layer = reductionA('reductionA', layer)
-    layer = blockB('blockB_0', layer)
-    # batch_norm_layer(layer,phase_train,'reductionA_bn')
-    layer = reductionB('reductionB', layer)
-    layer = blockC('blockC_0', layer)
-    top_conv = tf.identity(layer, name='top_conv')
-    # batch_norm_layer(layer,phase_train,'reductionB_bn')
     y_conv = gap('gap', top_conv, 2)
     cam_ = cam.get_class_map('gap', top_conv, 0, image_height)
 
@@ -153,7 +142,7 @@ def train(model_saved_folder_path=None):
     """
     #############################################################
     # cam = get_class_map('gap', top_conv, 0, im_width=image_width)
-    pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, learning_rate=0.001)
+    pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, learning_rate)
     saver = tf.train.Saver()
     config = tf.ConfigProto(
         device_count={'GPU': 1},
@@ -169,7 +158,7 @@ def train(model_saved_folder_path=None):
         print 'there was no model'
     ########################training##############################
     max_val = 0
-    max_iter = 130000
+    #max_iter = 130000
     check_point = 100
     train_acc = 0;
     train_loss = 0;
@@ -215,4 +204,5 @@ if __name__ == '__main__':
     parser.add_argument("--gpu",help='used gpu')
 
     args = parser.parse_args()
-    train_with_specified_gpu(gpu_device='/gpu:1')
+    #train_with_specified_gpu(gpu_device='/gpu:1')
+    train(max_iter=100 , batch_size=10, learning_rate=0.001 , structure='inception_A',model_saved_folder_path=None)
