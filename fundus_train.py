@@ -10,6 +10,8 @@ import aug
 import random
 import argparse
 
+
+
 def train(model_saved_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299()
@@ -52,7 +54,7 @@ def train(model_saved_folder_path=None):
     """
     #############################################################
     # cam = get_class_map('gap', top_conv, 0, im_width=image_width)
-    pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, 0.001)
+    pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, learning_rate=0.001)
     saver = tf.train.Saver()
     sess = tf.Session()
     init_op = tf.global_variables_initializer()
@@ -103,11 +105,10 @@ def train(model_saved_folder_path=None):
 
 
 if __name__ == '__main__':
-    """
-    parser=argparse.ArgumentParser()
-    parser.add_argument('--model_dir', help='folder to model saved')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--iter", help='iteration')
+    parser.add_argument("--batch_size" ,help='batch size ')
+    parser.add_argument("--learning_rate" , help='learning rate ')
     args = parser.parse_args()
-    if args.model_dir == None:
-        print 'data dir or model folder was not assigned '
-    """
+
     train()
