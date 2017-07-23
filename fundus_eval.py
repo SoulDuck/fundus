@@ -155,12 +155,13 @@ if __name__ =='__main__':
             imgs_labs_list=zip(imgs_list,labs_list)
             acc_list=[]
             predict_list=[]
-            for imgs,labs in imgs_labs_list:
+            for i,(imgs,labs) in enumerate(imgs_labs_list):
                 labs=labs.astype(np.int32)
                 labs=data.cls2onehot(labs,2)
                 #np.save(folder_path+imgs_name ,imgs )
                 #np.save(folder_path + labs_name, labs)
                 acc, predict = eval(model_path, imgs, labs[:len(imgs)])
+                print i,' acc :',acc
                 acc_list.append(acc)
                 predict_list.append(predict)
             acc_list=np.asarray(acc_list)
