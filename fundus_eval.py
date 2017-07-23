@@ -128,7 +128,7 @@ if __name__ =='__main__':
     parser.add_argument("--path_dir", help='folder to load')
     args = parser.parse_args()
 
-    if args.dir == None:
+    if args.path_dir == None:
         folder_path='./paths/0/cropped_original_fundus_300x300/2/'
     else:
         folder_path =  args.path_dir
