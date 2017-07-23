@@ -129,7 +129,7 @@ if __name__ =='__main__':
     parser.add_argument("--model_dir" , help='model folder to load ')
     args = parser.parse_args()
 
-    if len(args) < 2:
+    if len(args.model_dir==None or args.model_dir==None) < 2:
         print 'args 1 : image and label paths folder to load '
         print 'args 2 : model folder to load '
         exit()
