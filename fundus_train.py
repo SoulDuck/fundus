@@ -10,9 +10,9 @@ import aug
 import random
 import argparse
 
-def train(data_saved_folder_path  , model_saved_folder_path ):
+def train(model_saved_folder_path ):
     ##########################setting############################
-    image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299(folder_path=data_saved_folder_path)
+    image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299()
     graph_saved_folder_path = utils.make_folder('./graph/', 'fundus/')
     log_saved_folder_path = utils.make_folder('./log/', 'fundus/')
     log_saved_file_path = log_saved_folder_path + 'log.txt'
@@ -102,10 +102,8 @@ def train(data_saved_folder_path  , model_saved_folder_path ):
 
 if __name__ == '__main__':
     parser=argparse.ArgumentParser()
-    parser.add_argument('--data_dir', help='data saved folder')
     parser.add_argument('--model_dir', help='folder to model saved')
     args = parser.parse_args()
-    if args.data_dir == None or args.model_dir == None:
+    if args.model_dir == None:
         print 'data dir or model folder was not assigned '
-        exit()
-    train( args.data_dir , args.model_dir )
+    train(args.model_dir )

@@ -231,7 +231,7 @@ def eye_299x299():
 def fundus_images(folder_path , extension='png'):
     """
     usage:
-    :param folder_path: e.g) ../fundus/cropped_optical/
+    :param folder_path: e.g) ../fundus_data/cropped_optical/
     :return:
 
     have to read!!
