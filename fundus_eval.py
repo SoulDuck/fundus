@@ -158,8 +158,8 @@ if __name__ =='__main__':
             for imgs,labs in imgs_labs_list:
                 labs=labs.astype(np.int32)
                 labs=data.cls2onehot(labs,2)
-                np.save(folder_path+imgs_name ,imgs )
-                np.save(folder_path + labs_name, labs)
+                #np.save(folder_path+imgs_name ,imgs )
+                #np.save(folder_path + labs_name, labs)
                 acc, predict = eval(model_path, imgs, labs[:len(imgs)])
                 acc_list.append(acc)
                 predict_list.append(predict)
@@ -174,7 +174,7 @@ if __name__ =='__main__':
                 print '# paths ',len(paths)
                 print 'image shape',np.shape(imgs)
                 print 'label' , label
-                print 'label shape',np.shape(labs[:9])
+                print 'label shape',np.shape(labs)
                 #print utils.plot_images(imgs)
 
 
