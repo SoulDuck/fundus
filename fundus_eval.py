@@ -123,11 +123,12 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 """
 
 if __name__ =='__main__':
+    eval('./cnn_model/fundus/2/')
     test_imgs = np.load('./test_imgs.npy')
     test_labs = np.load('./test_labs.npy')
     test_labs=test_labs.astype(np.int32)
-    print test_labs
-    act_map=get_activation_map(test_imgs[3], './sample_image.png')
+    #print test_labs
+    #act_map=get_activation_map(test_imgs[3], './sample_image.png')
 
     """
     imgs_list , labels_list=utils.divide_images_labels_from_batch(test_imgs ,test_labs, batch_size=60)
