@@ -60,6 +60,8 @@ def train_with_specified_gpu(model_saved_folder_path=None , gpu_device='/gpu:0')
         saver = tf.train.Saver()
         config = tf.ConfigProto(
             device_count={'GPU': 1}
+
+
         )
         sess = tf.Session(config=config)
         init_op = tf.global_variables_initializer()
@@ -154,7 +156,8 @@ def train(model_saved_folder_path=None):
     pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, learning_rate=0.001)
     saver = tf.train.Saver()
     config = tf.ConfigProto(
-        device_count={'GPU': 1}
+        device_count={'GPU': 1},
+        log_device_placement=True
     )
     sess = tf.Session(config=config)
     init_op = tf.global_variables_initializer()
