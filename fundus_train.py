@@ -10,7 +10,7 @@ import aug
 import random
 import argparse
 
-def train(model_saved_folder_path):
+def train(model_saved_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299()
     if model_saved_folder_path == None:
