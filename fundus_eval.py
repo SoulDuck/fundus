@@ -125,14 +125,17 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 
 if __name__ =='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path_dir", help='folder to load')
+    parser.add_argument("--path_dir", help='image folder to load')
+    parser.add_argument("--model_dir" , help='model folder to load ')
     args = parser.parse_args()
 
-    if args.path_dir == None:
-        folder_path='./paths/cropped_original_fundus_300x300/2/'
+    if len(args) < 2:
+        print 'args 1 : image and label paths folder to load '
+        print 'args 2 : model folder to load '
+        exit()
     else:
-        folder_path =  args.path_dir
-
+        folder_path = args.path_dir
+        model_path = args.model_dir
     files=glob.glob(folder_path+'*.txt')
 
     for file in files:
