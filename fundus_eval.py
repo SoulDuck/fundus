@@ -81,6 +81,33 @@ def get_activation_map(image , filename):
         plt.show()
     return vis_normal
 
+def eval(model_folder_path , images, labels=None):
+    sess = tf.Session()
+    saver = tf.train.import_meta_graph(model_folder_path+'best_acc.ckpt.meta')
+    saver.restore(sess, model_folder_path+'best_acc.ckpt')
+    tf.get_default_graph()
+    accuray = tf.get_default_graph().get_tensor_by_name('accuracy:0')
+    prediction = tf.get_default_graph().get_tensor_by_name('softmax:0')
+
+    x_ = tf.get_default_graph().get_tensor_by_name('x_:0')
+    y_ = tf.get_default_graph().get_tensor_by_name('y_:0')
+    top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
+    phase_train = tf.get_default_graph().get_tensor_by_name('phase_train:0')
+    y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
+
+    #cam_ = tf.get_default_graph().get_tensor_by_name('classmap_reshape:0')
+    #vis_abnormal, vis_normal = cam.eval_inspect_cam(sess, cam_, top_conv, images, 1, x_, y_, y_conv)
+    #NORMAL_LABEL = 0
+    #ABNORMAL_LABEL = 1
+
+    if not labels==None:
+        acc,pred=sess.run([accuray , prediction] , feed_dict={x_:images ,y_ : labels , phase_train: False})
+        return acc,pred
+    else:
+        pred=sess.run([ prediction] , feed_dict={x_:images ,y_ : labels , phase_train: False})
+        return pred
+
+
 """ Usage:
 sess=tf.Session()
 saver=tf.train.import_meta_graph('./cnn_model/best_acc.ckpt.meta')
