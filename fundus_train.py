@@ -9,11 +9,9 @@ import cam
 import aug
 import random
 
-def train(model_saved_folder_path=None):
+def train(data_saved_folder_path  , model_saved_folder_path ):
     ##########################setting############################
-    image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299(folder_path='../fundus_data/cropped_original_fundus_300x300/')
-    if model_saved_folder_path == None:
-        model_saved_folder_path = utils.make_folder('./cnn_model/', 'fundus/')
+    image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299(folder_path=data_saved_folder_path)
     graph_saved_folder_path = utils.make_folder('./graph/', 'fundus/')
     log_saved_folder_path = utils.make_folder('./log/', 'fundus/')
     log_saved_file_path = log_saved_folder_path + 'log.txt'
