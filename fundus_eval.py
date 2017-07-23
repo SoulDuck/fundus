@@ -123,12 +123,53 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 """
 
 if __name__ =='__main__':
-    eval('./cnn_model/fundus/2/')
-    test_imgs = np.load('./test_imgs.npy')
-    test_labs = np.load('./test_labs.npy')
-    test_labs=test_labs.astype(np.int32)
-    #print test_labs
-    #act_map=get_activation_map(test_imgs[3], './sample_image.png')
+
+    folder_path='./cnn_model/0/'
+    files=glob.glob(folder_path+'*.txt')
+    model_path='./cnn_model/optical/1/'
+
+    for file in files:
+        if 'test' in file:
+
+            file_name=file.split('/')[-1] #e.g glaucoma_test_paths.txt
+            imgs_name=file_name.replace('paths.txt' , 'imgs.npy') #e.g glaucoma_test_imgs.npy
+            labs_name = file_name.replace('paths.txt', 'labs.npy')  # e.g glaucoma_test_imgs.npy
+
+            paths=utils.get_paths_from_text(file)
+            if 'normal' in file_name:
+                label=0
+            else:
+                label=1
+            imgs,labs=data.make_numpy_images_labels(paths , label)
+            imgs_list,labs_list=utils.divide_images_labels_from_batch(imgs,labs,60)
+            imgs_labs_list=zip(imgs_list,labs_list)
+            acc_list=[]
+            predict_list=[]
+            for imgs,labs in imgs_labs_list:
+                labs=labs.astype(np.int32)
+                labs=data.cls2onehot(labs,2)
+                np.save(folder_path+imgs_name ,imgs )
+                np.save(folder_path + labs_name, labs)
+                acc, predict = eval(model_path, imgs, labs[:len(imgs)])
+                acc_list.append(acc)
+                predict_list.append(predict)
+            acc_list=np.asarray(acc_list)
+            predict_list= np.asarray(predict_list)
+            acc=acc_list.mean()
+            print 'accuracy', acc
+            if __debug__ ==True:
+                print ''
+                print '############debug##############'
+                print 'file name',file_name
+                print '# paths ',len(paths)
+                print 'image shape',np.shape(imgs)
+                print 'label' , label
+                print 'label shape',np.shape(labs[:9])
+                #print utils.plot_images(imgs)
+
+
+
+
 
     """
     imgs_list , labels_list=utils.divide_images_labels_from_batch(test_imgs ,test_labs, batch_size=60)
