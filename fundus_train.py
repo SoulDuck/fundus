@@ -56,7 +56,10 @@ def train(model_saved_folder_path=None):
     # cam = get_class_map('gap', top_conv, 0, im_width=image_width)
     pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, learning_rate=0.001)
     saver = tf.train.Saver()
-    sess = tf.Session()
+    config = tf.ConfigProto(
+        device_count={'GPU': 0}
+    )
+    sess = tf.Session(config=config)
     init_op = tf.global_variables_initializer()
     sess.run(init_op)
     try:
