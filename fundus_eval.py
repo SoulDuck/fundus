@@ -125,11 +125,11 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 
 if __name__ =='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path_dir", help='image folder to load')
-    parser.add_argument("--model_dir" , help='model folder to load ')
+    parser.add_argument("--path_dir" , help='image folder to load')
+    parser.add_argument("--model_dir" , help='model folder to load')
     args = parser.parse_args()
 
-    if args.model_dir=='' or args.model_dir=='':
+    if args.model_dir==None or args.model_dir==None:
         print 'args 1 : image and label paths folder to load '
         print 'args 2 : model folder to load '
         exit()
