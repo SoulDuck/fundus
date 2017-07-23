@@ -323,7 +323,7 @@ def fundus_images(folder_path , extension='png'):
            [retina_train , retina_test , retina_train_paths , retina_test_paths], \
            [normal_train , normal_test , normal_train_paths , normal_test_paths]
 
-def fundus_299x299(folder_path='../fundus_data/cropped_original_fundus/'):
+def fundus_299x299(folder_path='../fundus_data/cropped_original_fundus_300x300/'):
     """
     dir tree
         fundus_data
