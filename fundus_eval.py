@@ -129,7 +129,7 @@ if __name__ =='__main__':
     args = parser.parse_args()
 
     if args.path_dir == None:
-        folder_path='./paths/0/cropped_original_fundus_300x300/2/'
+        folder_path='./paths/cropped_original_fundus_300x300/2/'
     else:
         folder_path =  args.path_dir
 
