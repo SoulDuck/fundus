@@ -6,6 +6,7 @@ import data
 import cam
 import utils
 from PIL import Image
+import argparse
 import PIL
 """
 import Image
@@ -123,10 +124,17 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 """
 
 if __name__ =='__main__':
-    print 'a'
-    folder_path='./cnn_model/0/'
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dir", help='folder to load')
+    args = parser.parse_args()
+
+    if args.dir == None:
+        folder_path='./cnn_model/0/'
+    else:
+        folder_path =  args.dir
+
     files=glob.glob(folder_path+'*.txt')
-    model_path='./cnn_model/optical/1/'
+    model_path='./cnn_model/fundus/1/'
 
     for file in files:
         if 'test' in file:
