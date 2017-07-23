@@ -8,6 +8,7 @@ from inception_v4 import stem, stem_1, stem_2, reductionA, reductionB, blockA, b
 import cam
 import aug
 import random
+import argparse
 
 def train(data_saved_folder_path  , model_saved_folder_path ):
     ##########################setting############################
@@ -100,4 +101,10 @@ def train(data_saved_folder_path  , model_saved_folder_path ):
 
 
 if __name__ == '__main__':
-    train()
+    args=argparse.ArgumentParser()
+    args.add_argument('--data_dir', help='data saved folder')
+    args.add_argument('--model_dir', help='folder to model saved')
+    if args.data_dir == None or args.model_dir == None:
+        print 'data dir or model folder was not assigned '
+        exit()
+    train( args.data_dir , args.model_dir )
