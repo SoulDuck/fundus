@@ -125,16 +125,15 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 
 if __name__ =='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", help='folder to load')
+    parser.add_argument("--path_dir", help='folder to load')
     args = parser.parse_args()
 
     if args.dir == None:
-        folder_path='./cnn_model/0/'
+        folder_path='./paths/0/cropped_original_fundus_300x300/2/'
     else:
-        folder_path =  args.dir
+        folder_path =  args.path_dir
 
     files=glob.glob(folder_path+'*.txt')
-    model_path='./cnn_model/fundus/1/'
 
     for file in files:
         if 'test' in file:
