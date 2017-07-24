@@ -108,7 +108,6 @@ def train_with_specified_gpu(model_saved_folder_path=None , gpu_device='/gpu:0')
         f.close()
         utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
 
-@profile
 def train(max_iter , batch_size, learning_rate , structure='inception_A',model_saved_folder_path=None):
 
     ##########################setting############################
