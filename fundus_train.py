@@ -10,6 +10,7 @@ import aug
 import random
 import argparse
 
+
 def train_with_specified_gpu(model_saved_folder_path=None , gpu_device='/gpu:0'):
     with tf.device(gpu_device):
         ##########################setting############################
@@ -107,7 +108,7 @@ def train_with_specified_gpu(model_saved_folder_path=None , gpu_device='/gpu:0')
         f.close()
         utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
 
-
+@profile
 def train(max_iter , batch_size, learning_rate , structure='inception_A',model_saved_folder_path=None):
 
     ##########################setting############################
@@ -127,7 +128,7 @@ def train(max_iter , batch_size, learning_rate , structure='inception_A',model_s
     if structure == 'inception_A':
         top_conv=inception_v4.structure_A(x_)
     elif structure == 'inception_B':
-        top_conv = inception_v4.structure_B(x_)
+        top_conv = inception_v4.structure_B(x_ , phase_train)
 
     y_conv = gap('gap', top_conv, 2)
     cam_ = cam.get_class_map('gap', top_conv, 0, image_height)
@@ -287,17 +288,14 @@ def train_with_redfree(max_iter, batch_size, learning_rate, structure='inception
     utils.draw_grpah(log_saved_file_path, graph_saved_folder_path, check_point)
 
 
-
-
-
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--iter", help='iteration')
     parser.add_argument("--batch_size" ,help='batch size ')
     parser.add_argument("--learning_rate" , help='learning rate ')
     parser.add_argument("--structure" , help = 'what structrue you need')
     parser.add_argument("--gpu",help='used gpu')
-
 
     args = parser.parse_args()
     args.iter=int(args.iter)

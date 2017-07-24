@@ -13,7 +13,7 @@ def red_free_image(image):
         if not type(image).__moduel__ == __name__:
             image=np.asarray(image)
     except AttributeError as attr_error:
-        print attr_error
+        #print attr_error
         image = np.asarray(image)
     h,w,ch = np.shape(np.asarray(image))
 
@@ -148,7 +148,8 @@ def aug_level_1(imgs):
     return imgs
 
 def get_redfree_images(images):
-    if __debug__ ==True:
+    debug_flag= False
+    if __debug__ ==debug_flag:
         print "get_redfree_images debug mode"
         print "image shape is ",np.shape(images)
     imgs = map(red_free_image, images)
