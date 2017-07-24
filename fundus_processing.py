@@ -10,93 +10,6 @@ import utils
 from multiprocessing import Pool
 
 
-def red_free_image(image):
-    # if not type(imgs).__module__ == np.__name__:
-    try:
-        if not type(image).__moduel__ == __name__:
-            image=np.asarray(image)
-    except AttributeError as attr_error:
-        print attr_error
-        image = np.asarray(image)
-    h,w,ch = np.shape(np.asarray(image))
-
-    image_r = np.zeros([h,w])
-    image_r.fill(0)
-    image_g = image[:, :, 1]
-    image_b = image[:, :, 2]
-
-    image_r=image_r.reshape([h,w,1])
-    image_g = image_g.reshape([h, w, 1])
-    image_b = image_b.reshape([h, w, 1])
-
-
-    image=np.concatenate([image_r , image_g, image_b] , axis=2)
-    if __debug__ == True:
-        print 'red_free_image debugging mode '
-        print 'image red shape',np.shape(image_r)
-        print 'red channel mean',image[:,:,0].mean()
-
-    return image
-
-
-
-def green_free_image(image):
-    # if not type(imgs).__module__ == np.__name__:
-    try:
-        if not type(image).__moduel__ == __name__:
-            image=np.asarray(image)
-    except AttributeError as attr_error:
-        print attr_error
-        image = np.asarray(image)
-    h,w,ch = np.shape(np.asarray(image))
-
-    image_r = image[:, :, 0]
-    #image_g = image[:, :, 1]
-    image_g = np.zeros([h,w])
-    image_g.fill(0)
-    image_b = image[:, :, 2]
-
-    image_r=image_r.reshape([h,w,1])
-    image_g = image_g.reshape([h, w, 1])
-    image_b = image_b.reshape([h, w, 1])
-
-
-    image=np.concatenate([image_r , image_g, image_b] , axis=2)
-    if __debug__ == True:
-        print 'image green shape',np.shape(image_g)
-        print image[:,:,0].mean()
-    return image
-
-
-def blue_free_image(image):
-    # if not type(imgs).__module__ == np.__name__:
-    try:
-        if not type(image).__moduel__ == __name__:
-            image=np.asarray(image)
-    except AttributeError as attr_error:
-        print attr_error
-        image = np.asarray(image)
-    h,w,ch = np.shape(np.asarray(image))
-
-    image_r = image[:, :, 0]
-    image_g = image[:, :, 1]
-    #image_b = image[:, :, 2]
-    image_b = np.zeros([h,w])
-    image_b.fill(0)
-
-    image_r = image_r.reshape([h ,w ,1])
-    image_g = image_g.reshape([h, w, 1])
-    image_b = image_b.reshape([h, w, 1])
-
-
-    image=np.concatenate([image_r , image_g, image_b] , axis=2)
-    if __debug__ == True:
-        print 'image blue shape',np.shape(image_b)
-        print image[:,:,0].mean()
-        print image[:, :, 1].mean()
-        print image[:, :, 2].mean()
-    return image
-
 
 
 def crop_resize_fundus(path):
@@ -232,31 +145,6 @@ def image_resize(path):
 
 
 if __name__ == '__main__':
-
-
-    """usage:red free image"""
-    extension='png'
-    src_folder='../fundus_data/cropped_original_fundus/'
-    target_folder='../fundus_data/cropped_original_fundus_redfree/'
-    root_folder, sub_folders, file_list=os.walk(src_folder).next()
-    for folder in sub_folders:
-        paths=glob.glob(os.path.join(root_folder , folder+'/') +'*.'+extension)
-        images=map(Image.open , paths[:30])
-        tmp_img=red_free_image(np.asarray(images[0])/255.)
-        plt.imshow(tmp_img)
-        plt.show()
-        """
-        redFree_images=map(red_free_image , images)
-        redFree_images=np.asarray(redFree_images)
-        utils.plot_images(redFree_images/255.)
-        """
-
-
-
-
-
-
-
 
     """
     img = Image.open('./normal/43203_20140121_L.png')

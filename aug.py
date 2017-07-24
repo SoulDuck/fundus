@@ -7,6 +7,93 @@ import random
 from PIL import ImageFilter
 import aug
 
+def red_free_image(image):
+    # if not type(imgs).__module__ == np.__name__:
+    try:
+        if not type(image).__moduel__ == __name__:
+            image=np.asarray(image)
+    except AttributeError as attr_error:
+        print attr_error
+        image = np.asarray(image)
+    h,w,ch = np.shape(np.asarray(image))
+
+    image_r = np.zeros([h,w])
+    image_r.fill(0)
+    image_g = image[:, :, 1]
+    image_b = image[:, :, 2]
+
+    image_r=image_r.reshape([h,w,1])
+    image_g = image_g.reshape([h, w, 1])
+    image_b = image_b.reshape([h, w, 1])
+
+
+    image=np.concatenate([image_r , image_g, image_b] , axis=2)
+    if __debug__ == True:
+        print 'red_free_image debugging mode '
+        print 'image red shape',np.shape(image_r)
+        print 'red channel mean',image[:,:,0].mean()
+        print 'image shape' , np.shape(np.asarray(image))
+    return image
+
+
+
+def green_free_image(image):
+    # if not type(imgs).__module__ == np.__name__:
+    try:
+        if not type(image).__moduel__ == __name__:
+            image=np.asarray(image)
+    except AttributeError as attr_error:
+        print attr_error
+        image = np.asarray(image)
+    h,w,ch = np.shape(np.asarray(image))
+
+    image_r = image[:, :, 0]
+    #image_g = image[:, :, 1]
+    image_g = np.zeros([h,w])
+    image_g.fill(0)
+    image_b = image[:, :, 2]
+
+    image_r=image_r.reshape([h,w,1])
+    image_g = image_g.reshape([h, w, 1])
+    image_b = image_b.reshape([h, w, 1])
+
+
+    image=np.concatenate([image_r , image_g, image_b] , axis=2)
+    if __debug__ == True:
+        print 'image green shape',np.shape(image_g)
+        print image[:,:,0].mean()
+    return image
+
+
+def blue_free_image(image):
+    # if not type(imgs).__module__ == np.__name__:
+    try:
+        if not type(image).__moduel__ == __name__:
+            image=np.asarray(image)
+    except AttributeError as attr_error:
+        print attr_error
+        image = np.asarray(image)
+    h,w,ch = np.shape(np.asarray(image))
+
+    image_r = image[:, :, 0]
+    image_g = image[:, :, 1]
+    #image_b = image[:, :, 2]
+    image_b = np.zeros([h,w])
+    image_b.fill(0)
+
+    image_r = image_r.reshape([h ,w ,1])
+    image_g = image_g.reshape([h, w, 1])
+    image_b = image_b.reshape([h, w, 1])
+
+
+    image=np.concatenate([image_r , image_g, image_b] , axis=2)
+    if __debug__ == True:
+        print 'image blue shape',np.shape(image_b)
+        print image[:,:,0].mean()
+        print image[:, :, 1].mean()
+        print image[:, :, 2].mean()
+    return image
+
 def check_type_numpy(a):
     if type(a).__module__ ==np.__name__:
         return True
@@ -59,6 +146,13 @@ def aug_level_1(imgs):
     imgs = map(aug.random_flip , imgs)
     imgs = map(aug.random_rotate, imgs)
     return imgs
+
+def get_redfree_images(images):
+    if __debug__ ==True:
+        print "get_redfree_images debug mode"
+        print "image shape is ",np.shape(images)
+    imgs = map(red_free_image, images)
+    return imgs
 if __name__ == '__main__':
     img=Image.open('./data/rion.png')
     img=random_rotate(img)
@@ -81,3 +175,24 @@ if __name__ == '__main__':
     plt.imshow(rotated_img)
     plt.show()
     """
+
+"""usage:red free image"""
+"""
+extension='png'
+src_root_folder='../fundus_data/cropped_original_fundus_300x300/'
+target_root_folder='../fundus_data/cropped_original_fundus_redfree/'
+root_folder, sub_folder_names, file_list=os.walk(src_root_folder).next()
+for sub_folder_name in sub_folder_names:
+    src_folder=os.path.join(src_root_folder, sub_folder_name)
+    saved_folder=os.path.join(target_root_folder , sub_folder_name)
+    if not os.path.isdir(saved_folder):
+        os.mkdir(saved_folder)
+        print saved_folder+'is made'
+    paths=glob.glob(src_folder +'/*.'+extension)
+    images=map(Image.open , paths[:])
+    names=map(lambda x : x.split('/')[-1].split('.')[0] ,paths[:3])
+    start_time=time.time()
+    redFree_images = map(red_free_image, images[:60])
+    print np.shape(redFree_images)
+    print  time.time() - start_time
+"""
