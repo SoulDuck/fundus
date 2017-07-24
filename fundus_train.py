@@ -214,7 +214,7 @@ def train_with_redfree(max_iter, batch_size, learning_rate, structure='inception
     if structure == 'inception_A':
         top_conv = inception_v4.structure_A(x_)
     elif structure == 'inception_B':
-        top_conv = inception_v4.structure_B(x_)
+        top_conv = inception_v4.structure_B(x_ , phase_train)
 
     y_conv = gap('gap', top_conv, 2)
     cam_ = cam.get_class_map('gap', top_conv, 0, image_height)
