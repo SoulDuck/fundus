@@ -204,5 +204,5 @@ if __name__ == '__main__':
     parser.add_argument("--gpu",help='used gpu')
 
     args = parser.parse_args()
+    train(args.max_iter , args.batch_size, args.learning_rate , args.structure , model_saved_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
-    train(max_iter=100 , batch_size=10, learning_rate=0.001 , structure='inception_A',model_saved_folder_path=None)

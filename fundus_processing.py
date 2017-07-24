@@ -32,8 +32,10 @@ def red_free_image(image):
 
     image=np.concatenate([image_r , image_g, image_b] , axis=2)
     if __debug__ == True:
+        print 'red_free_image debugging mode '
         print 'image red shape',np.shape(image_r)
-        print image[:,:,0].mean()
+        print 'red channel mean',image[:,:,0].mean()
+
     return image
 
 
@@ -207,6 +209,7 @@ def show_progress(i,max_iter):
     msg='\r Progress {0}/{1}'.format(i,max_iter)
     sys.stdout.write(msg)
     sys.stdout.flush()
+"""
 def save_img(img, save_folder , extension):
     name = path.split('/')[-1].split('.')[0]
     if extension == '.npy':
@@ -215,7 +218,7 @@ def save_img(img, save_folder , extension):
         img = Image.fromarray(img)
         plt.imshow(img)
         plt.imsave(save_folder + name + extension, img)
-
+"""
 def image_resize(path):
     try:
         img=Image.open(path)
@@ -232,6 +235,29 @@ if __name__ == '__main__':
 
 
     """usage:red free image"""
+    extension='png'
+    src_folder='../fundus_data/cropped_original_fundus/'
+    target_folder='../fundus_data/cropped_original_fundus_redfree/'
+    root_folder, sub_folders, file_list=os.walk(src_folder).next()
+    for folder in sub_folders:
+        paths=glob.glob(os.path.join(root_folder , folder+'/') +'*.'+extension)
+        images=map(Image.open , paths[:30])
+        tmp_img=red_free_image(np.asarray(images[0])/255.)
+        plt.imshow(tmp_img)
+        plt.show()
+        """
+        redFree_images=map(red_free_image , images)
+        redFree_images=np.asarray(redFree_images)
+        utils.plot_images(redFree_images/255.)
+        """
+
+
+
+
+
+
+
+
     """
     img = Image.open('./normal/43203_20140121_L.png')
     img=red_free_image(img)
@@ -469,6 +495,8 @@ if __name__ == '__main__':
     print 'fundus_processing.py out'
     """
 
+    """usage : fundus resize"""
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
@@ -536,3 +564,4 @@ if __name__ == '__main__':
             img.save(save_path + saved_extension)
             count+=1
     print 'fundus_processing.py out'
+    """

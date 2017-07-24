@@ -234,6 +234,8 @@ def make_folder(root_folder_path , folder_name):
            count+=1
     return root_folder_path+folder_name+str(count)+'/'
 
+
+
 if __name__=='__main__':
     #make_log_txt()
     #delete_char_from_paths(folder_path='../fundus_data/cropped_macula/', del_char='*')
