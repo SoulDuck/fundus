@@ -118,7 +118,7 @@ def train(max_iter , batch_size, learning_rate , structure='inception_A',model_s
     graph_saved_folder_path = utils.make_folder('./graph/', 'fundus/')
     log_saved_folder_path = utils.make_folder('./log/', 'fundus/')
     log_saved_file_path = log_saved_folder_path + 'log.txt'
-    f = open(log_saved_file_path , 'w+')
+    f = open(log_saved_file_path , 'w+' , 0)
 
     x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
     y_ = tf.placeholder(dtype=tf.int32, shape=[None, n_classes], name='y_')
