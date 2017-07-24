@@ -192,6 +192,7 @@ def train(max_iter , batch_size, learning_rate , structure='inception_A',model_s
         batch_xs = aug.aug_level_1(batch_xs)
         train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],
                                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True})
+        f.flush()
     f.close()
     utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
 
