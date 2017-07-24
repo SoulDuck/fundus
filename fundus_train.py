@@ -304,7 +304,5 @@ if __name__ == '__main__':
     args.batch_size = int(args.batch_size)
     args.learning_rate =float(args.learning_rate)
 
-
-
     train_with_redfree( args.iter , args.batch_size , args.learning_rate , args.structure , model_saved_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
