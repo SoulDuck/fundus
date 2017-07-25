@@ -8,6 +8,7 @@ from PIL import ImageFilter
 import aug
 
 def red_free_image(image):
+    debug_flag = False
     # if not type(imgs).__module__ == np.__name__:
     try:
         if not type(image).__moduel__ == __name__:
@@ -28,7 +29,7 @@ def red_free_image(image):
 
 
     image=np.concatenate([image_r , image_g, image_b] , axis=2)
-    if __debug__ == True:
+    if __debug__ == debug_flag:
         print 'red_free_image debugging mode '
         print 'image red shape',np.shape(image_r)
         print 'red channel mean',image[:,:,0].mean()
