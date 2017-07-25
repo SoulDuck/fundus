@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import tensorflow as tf
 from cnn import convolution2d, max_pool, algorithm, affine, batch_norm_layer, gap
 import inception_v4
@@ -108,6 +109,7 @@ def train_with_specified_gpu(model_saved_folder_path=None , gpu_device='/gpu:0')
         f.close()
         utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
 
+@profile
 def train(max_iter , batch_size, learning_rate , structure='inception_A',model_saved_folder_path=None):
 
     ##########################setting############################
@@ -300,6 +302,12 @@ if __name__ == '__main__':
     args.iter=int(args.iter)
     args.batch_size = int(args.batch_size)
     args.learning_rate =float(args.learning_rate)
-
-    train( args.iter , args.batch_size , args.learning_rate , args.structure , model_saved_folder_path=None)
+    """
+    debugging
+    args.iter=100
+    args.batch_size=10
+    args.learning_rate=0.001
+    args.structure='inception_A'
+    """
+    train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , model_saved_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')

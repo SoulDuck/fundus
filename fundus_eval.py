@@ -82,6 +82,7 @@ def get_activation_map(image , filename):
         plt.show()
     return vis_normal
 
+
 def eval(model_folder_path , images, labels=None):
     sess = tf.Session()
     saver = tf.train.import_meta_graph(model_folder_path+'best_acc.ckpt.meta')
