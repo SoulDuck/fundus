@@ -322,10 +322,10 @@ def fundus_images(folder_path, extension='png', reload_paths_folder=None):
 
     if __debug__ == debug_flag:
         print ''
-        print '# cataract :', len(cataract_paths)
-        print '# glaucoma :', len(glaucoma_paths)
-        print '# retina :', len(retina_paths)
-        print '# normal :', len(normal_paths)
+        print '# cataract :', len(cataract_train_paths)+len(cataract_test_paths)
+        print '# glaucoma :', len(glaucoma_train_paths)+len(glaucoma_test_paths)
+        print '# retina :', len(retina_train_paths)+len(retina_test_paths)
+        print '# normal :', len(normal_train_paths)+len(normal_test_paths)
 
         print '# cataract train , :', len(cataract_train_paths), '# cataract test :', len(cataract_test_paths)
         print '# glaucoma train , :', len(glaucoma_train_paths), '# glaucoma test :', len(glaucoma_test_paths)
