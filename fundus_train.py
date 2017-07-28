@@ -287,6 +287,11 @@ def train_with_redfree(max_iter, batch_size, learning_rate, structure='inception
     f.close()
     utils.draw_grpah(log_saved_file_path, graph_saved_folder_path, check_point)
 
+def re_train(path_saved_dir,model_dir):
+    data.fundus_299x299()
+
+
+
 
 if __name__ == '__main__':
 

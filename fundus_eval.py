@@ -8,6 +8,7 @@ import utils
 from PIL import Image
 import argparse
 import PIL
+import os
 """
 import Image
 
@@ -101,13 +102,103 @@ def eval(model_folder_path , images, labels=None):
     #vis_abnormal, vis_normal = cam.eval_inspect_cam(sess, cam_, top_conv, images, 1, x_, y_, y_conv)
     #NORMAL_LABEL = 0
     #ABNORMAL_LABEL = 1
-
     if not labels==None:
         acc,pred=sess.run([accuray , prediction] , feed_dict={x_:images ,y_ : labels , phase_train: False})
         return acc,pred
     else:
         pred=sess.run([ prediction] , feed_dict={x_:images ,y_ : labels , phase_train: False})
         return pred
+
+
+
+def eval_from_paths(ath_dir , model_dir):
+    for file in files:
+        if 'test' in file:
+
+            file_name = file.split('/')[-1]  # e.g glaucoma_test_paths.txt
+            imgs_name = file_name.replace('paths.txt', 'imgs.npy')  # e.g glaucoma_test_imgs.npy
+            labs_name = file_name.replace('paths.txt', 'labs.npy')  # e.g glaucoma_test_imgs.npy
+
+            paths = utils.get_paths_from_text(file)
+            if 'normal' in file_name:
+                label = 0
+            else:
+                label = 1
+            imgs, labs = data.make_numpy_images_labels(paths, label)
+            imgs_list, labs_list = utils.divide_images_labels_from_batch(imgs, labs, 60)
+            imgs_labs_list = zip(imgs_list, labs_list)
+            acc_list = []
+            predict_list = []
+            for i, (imgs, labs) in enumerate(imgs_labs_list):
+                labs = labs.astype(np.int32)
+                labs = data.cls2onehot(labs, 2)
+                # np.save(folder_path+imgs_name ,imgs )
+                # np.save(folder_path + labs_name, labs)
+                acc, predict = eval(model_path, imgs, labs[:len(imgs)])
+                print i, ' acc :', acc
+                acc_list.append(acc)
+                predict_list.append(predict)
+            acc_list = np.asarray(acc_list)
+            predict_list = np.asarray(predict_list)
+            acc = acc_list.mean()
+            print 'accuracy', acc
+            if __debug__ == True:
+                print ''
+                print '############debug##############'
+                print 'file name', file_name
+                print '# paths ', len(paths)
+                print 'image shape', np.shape(imgs)
+                print 'label', label
+                print 'label shape', np.shape(labs)
+                # print utils.plot_images(imgs)
+
+
+def eval_from_numpy_image(path_dir , model_dir):
+    files=glob.glob(folder_path+'*.txt')
+    for file in files:
+        if 'test' in file:
+
+            file_name=file.split('/')[-1] #e.g glaucoma_test_paths.txt
+            image_name=file_name.replace('paths.txt' , 'images.npy') #e.g glaucoma_test_images.npy
+            image_path=os.path.join(path_dir,image_name) # ./fundus/..../glaucoma_test_imgs.npy
+            label_name = file_name.replace('paths.txt', 'labels.npy')  # e.g glaucoma_test_labels.npy
+            label_path = os.path.join(path_dir, label_name) # ./fundus/..../glaucoma_test_labels.npy
+
+            paths=utils.get_paths_from_text(file)
+            if 'normal' in file_name:
+                label=0
+            else:
+                label=1
+            imgs=np.load(image_path);labs=np.load(label_path)
+            imgs_list,labs_list=utils.divide_images_labels_from_batch(imgs,labs,60)
+            imgs_labs_list=zip(imgs_list,labs_list)
+            acc_list=[]
+            predict_list=[]
+            for i,(imgs,labs) in enumerate(imgs_labs_list):
+                labs=labs.astype(np.int32)
+                labs=data.cls2onehot(labs,2)
+                #np.save(folder_path+imgs_name ,imgs )
+                #np.save(folder_path + labs_name, labs)
+                acc, predict = eval(model_path, imgs, labs[:len(imgs)])
+                print i,' acc :',acc
+                acc_list.append(acc)
+                predict_list.append(predict)
+            acc_list=np.asarray(acc_list)
+            predict_list= np.asarray(predict_list)
+            acc=acc_list.mean()
+            print 'accuracy', acc
+            if __debug__ ==True:
+                print ''
+                print '############debug##############'
+                print 'file name',file_name
+                print '# paths ',len(paths)
+                print 'image shape',np.shape(imgs)
+                print 'label' , label
+                print 'label shape',np.shape(labs)
+                #print utils.plot_images(imgs)
+
+
+
 
 
 """ Usage:
@@ -138,49 +229,7 @@ if __name__ =='__main__':
         folder_path = args.path_dir
         model_path = args.model_dir
     files=glob.glob(folder_path+'*.txt')
-
-    for file in files:
-        if 'test' in file:
-
-            file_name=file.split('/')[-1] #e.g glaucoma_test_paths.txt
-            imgs_name=file_name.replace('paths.txt' , 'imgs.npy') #e.g glaucoma_test_imgs.npy
-            labs_name = file_name.replace('paths.txt', 'labs.npy')  # e.g glaucoma_test_imgs.npy
-
-            paths=utils.get_paths_from_text(file)
-            if 'normal' in file_name:
-                label=0
-            else:
-                label=1
-            imgs,labs=data.make_numpy_images_labels(paths , label)
-            imgs_list,labs_list=utils.divide_images_labels_from_batch(imgs,labs,60)
-            imgs_labs_list=zip(imgs_list,labs_list)
-            acc_list=[]
-            predict_list=[]
-            for i,(imgs,labs) in enumerate(imgs_labs_list):
-                labs=labs.astype(np.int32)
-                labs=data.cls2onehot(labs,2)
-                #np.save(folder_path+imgs_name ,imgs )
-                #np.save(folder_path + labs_name, labs)
-                acc, predict = eval(model_path, imgs, labs[:len(imgs)])
-                print i,' acc :',acc
-                acc_list.append(acc)
-                predict_list.append(predict)
-            acc_list=np.asarray(acc_list)
-            predict_list= np.asarray(predict_list)
-            acc=acc_list.mean()
-            print 'accuracy', acc
-            if __debug__ ==True:
-                print ''
-                print '############debug##############'
-                print 'file name',file_name
-                print '# paths ',len(paths)
-                print 'image shape',np.shape(imgs)
-                print 'label' , label
-                print 'label shape',np.shape(labs)
-                #print utils.plot_images(imgs)
-
-
-
+    eval_from_numpy_image(path_dir=args.path_dir , model_dir=args.model_dir)
 
 
     """
