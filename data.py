@@ -484,7 +484,7 @@ def get_paths_from_file(filepath):
 
 if __name__ == '__main__':
     #fundus_299x299(folder_path='../fundus_data/cropped_original_fundus_300x300/')
-    fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/1/')
+    fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/14/')
     """
     lines=get_paths_from_file('../fundus_data/cropped_optical/paths/cataract_test_paths.txt')
     imgs,labs=make_numpy_images_labels(lines, 1)
