@@ -371,7 +371,7 @@ def fundus_299x299(folder_path='../fundus_data/cropped_original_fundus_300x300/'
     debug_flag = True
     n_classes = 2
 
-    cata, glau, retina, normal = fundus_images( folder_path,extension , reload_paths_folder)
+    cata, glau, retina, normal = fundus_images(folder_path, extension , reload_paths_folder)
     train_imgs_labs = (cata[0], glau[0], retina[0], normal[0])
     test_imgs = np.concatenate((cata[1][0], glau[1][0], retina[1][0], normal[1][0]))
     test_labs = np.concatenate((cata[1][1], glau[1][1], retina[1][1], normal[1][1]))
