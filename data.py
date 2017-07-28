@@ -256,6 +256,7 @@ def fundus_images(folder_path, extension='png', reload_paths_folder=None):
         retina_paths = make_paths(folder_path + 'retina/', '*.' + extension,folder_path + 'retina/' + 'retina_paths.txt')
         glaucoma_paths = make_paths(folder_path + 'glaucoma/', '*.' + extension,folder_path + '/glaucoma/' + 'glaucoma_paths.txt')
         normal_paths = make_paths(folder_path + 'normal/', '*.' + extension,folder_path + '/normal/' + 'normal_paths.txt')
+
         cataract_train_paths, cataract_test_paths = get_train_test_paths(cataract_test_ratio,folder_path + 'cataract/' + 'cataract_paths.txt')  # random shuffle here
         glaucoma_train_paths, glaucoma_test_paths = get_train_test_paths(glaucoma_test_ratio,folder_path + 'retina/' + 'retina_paths.txt')
         retina_train_paths, retina_test_paths = get_train_test_paths(retina_test_ratio,folder_path + '/glaucoma/' + 'glaucoma_paths.txt')
@@ -332,7 +333,7 @@ def fundus_images(folder_path, extension='png', reload_paths_folder=None):
         print '# retina train , :', len(retina_train_paths), '# retina test :', len(retina_test_paths)
         print '# normal train , :', len(normal_train_paths), '# normal test :', len(normal_test_paths)
 
-        print 'path saved here ', save_folder_path
+        #print 'path saved here ', save_folder_path
         print np.shape(cataract_train)
         print 'shape of cata_train_imgs', np.shape(cataract_train[0])
         fig = plt.figure()
