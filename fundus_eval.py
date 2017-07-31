@@ -184,7 +184,7 @@ def eval_from_numpy_image(path_dir , model_dir):
                 acc_list.append(acc)
                 predict_list.append(predict)
             acc_list=np.asarray(acc_list).reshape([-1])
-            predict_list= np.asarray(predict_list).reshape([-1])
+            predict_list= np.asarray(predict_list).reshape([-1,2])
 
             np.reshape(acc_list , [1,-1])
 
@@ -202,6 +202,7 @@ def eval_from_numpy_image(path_dir , model_dir):
             data_name=file_name.replace('_test_paths.txt' , '') #e.g glaucoma_test_paths.txt -->glaucoma
             return_dict[data_name+'_acc']=acc_list
             return_dict[data_name + '_predict'] = predict_list
+    return return_dict
 
 
 """ Usage:
