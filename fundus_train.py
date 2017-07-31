@@ -110,7 +110,6 @@ def train_with_specified_gpu(model_saved_folder_path=None , gpu_device='/gpu:0')
         utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
 
 def train(max_iter , batch_size, learning_rate , structure='inception_A',model_saved_folder_path=None):
-
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = data.fundus_299x299()
     if model_saved_folder_path == None:
@@ -123,7 +122,6 @@ def train(max_iter , batch_size, learning_rate , structure='inception_A',model_s
     x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
     y_ = tf.placeholder(dtype=tf.int32, shape=[None, n_classes], name='y_')
     phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
-    #batch_size = 60
     ##########################structure##########################
     if structure == 'inception_A':
         top_conv=inception_v4.structure_A(x_)
@@ -288,9 +286,39 @@ def train_with_redfree(max_iter, batch_size, learning_rate, structure='inception
     utils.draw_grpah(log_saved_file_path, graph_saved_folder_path, check_point)
 
 def re_train(path_saved_dir,model_dir):
-    data.fundus_299x299()
 
+    image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs = \
+        data.fundus_299x299(folder_paths='../fundus_data/cropped_original_fundus_300x300/' , extension='png' , reload_paths_folder=path_saved_dir)
 
+    sess = tf.Session()
+    saver = tf.train.import_meta_graph('./cnn_model/best_acc.ckpt.meta')
+    saver.restore(sess, './cnn_model/best_acc.ckpt')
+    tf.get_default_graph()
+    accuray = tf.get_default_graph().get_tensor_by_name('accuracy:0')
+    x_ = tf.get_default_graph().get_tensor_by_name('x_:0')
+    y_ = tf.get_default_graph().get_tensor_by_name('y_:0')
+    cam_ = tf.get_default_graph().get_tensor_by_name('classmap_reshape:0')
+    top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
+    phase_train = tf.get_default_graph().get_tensor_by_name('phase_train:0')
+    y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
+
+    graph_saved_folder_path = utils.make_folder('./graph/', 'fundus/')
+    log_saved_folder_path = utils.make_folder('./log/', 'fundus/')
+    log_saved_file_path = log_saved_folder_path + 'log.txt'
+    f = open(log_saved_file_path , 'w+' , 0)
+    saver = tf.train.Saver()
+    config = tf.ConfigProto(
+        device_count={'GPU': 1},
+        log_device_placement=True
+    )
+    sess = tf.Session(config=config)
+    init_op = tf.global_variables_initializer()
+    sess.run(init_op)
+    try:
+        saver.restore(sess, model_dir + 'best_acc.ckpt')
+        print model_dir + 'model was restored!'
+    except tf.errors.NotFoundError:
+        print 'there was no model'
 
 
 if __name__ == '__main__':

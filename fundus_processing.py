@@ -303,7 +303,6 @@ if __name__ == '__main__':
             count += 1
     """
     #########   usage : crop_reisize_fundus   #########
-
     """
     dir --- subDir_1
                 |- aaa.jpg
@@ -313,7 +312,7 @@ if __name__ == '__main__':
             subDir_2
             subDir_3
     """
-    """
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", help='folder to preprocessing')
     parser.add_argument("--save_dir", help='folder to save')
@@ -321,26 +320,10 @@ if __name__ == '__main__':
     parser.add_argument("--limit_paths" , help='limit to paths for multiprocessing')
     args = parser.parse_args()
 
-    if args.dir:
-        folder_path = args.dir
-    else:
-        folder_path = '../fundus_data/original_fundus/'
-
-    if args.save_dir:
-        save_folder = args.save_dir
-    else:
-        save_folder = '../fundus_data/cropped_original_fundus/'
-
-    if args.extension:
-        extension = args.extension
-    else:
-        extension = '*.png'
-
-    if args.limit_paths:
-        limit_paths=args.limit_paths
-    else:
-        limit_paths=3000
-
+    folder_path = args.dir
+    save_folder = args.save_dir
+    extension = args.extension
+    limit_paths=args.limit_paths
 
     folder_names = os.walk(folder_path).next()[1]
     print folder_names
@@ -376,12 +359,13 @@ if __name__ == '__main__':
             utils.show_progress(count,len(paths))
             name = path.split('/')[-1]
             save_path = os.path.join(target_save_folder_path, name)
-            reshape_img_size = (300, 300)
+            reshape_img_size = (600, 600)
+            img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
             img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
             img.save(save_path + saved_extension)
             count+=1
     print 'fundus_processing.py out'
-    """
+
 
     """usage : fundus resize"""
     """
