@@ -29,7 +29,7 @@ if __name__ == '__main__':
         #e.g ./ensemble/cropped_original_fundus_300x300/
     print 'folder name saved model',subfolder_names
     print ' args.path_dir.split('/')[-1]' , args.path_dir.split('/')[-1]
-    """"""
+    """
     sum_predict={}
     for i,subfolder_name in enumerate(subfolder_names):
         target_model_folder=os.path.join(ensemble_save_path  , subfolder_name) #subfolder_name -->/1/ ,2,3,4,
@@ -49,5 +49,4 @@ if __name__ == '__main__':
         sum_predict[key]=sum_predict[key]/len(subfolder_names) #len(subfolder_names) => the number of model paths
 
     print 'the number of model' ,len(subfolder_files)
-
-
+    """
