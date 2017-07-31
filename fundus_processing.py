@@ -361,7 +361,6 @@ if __name__ == '__main__':
             save_path = os.path.join(target_save_folder_path, name)
             reshape_img_size = (600, 600)
             img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
-            img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
             img.save(save_path + saved_extension)
             count+=1
     print 'fundus_processing.py out'

@@ -110,7 +110,7 @@ def eval(model_folder_path , images, labels=None):
         return pred
 
 
-
+"""
 def eval_from_paths(ath_dir , model_dir):
     for file in files:
         if 'test' in file:
@@ -152,7 +152,7 @@ def eval_from_paths(ath_dir , model_dir):
                 print 'label shape', np.shape(labs)
                 # print utils.plot_images(imgs)
 
-
+"""
 def eval_from_numpy_image(path_dir , model_dir):
     files=glob.glob(folder_path+'*.txt')
     for file in files:
@@ -179,7 +179,7 @@ def eval_from_numpy_image(path_dir , model_dir):
                 labs=data.cls2onehot(labs,2)
                 #np.save(folder_path+imgs_name ,imgs )
                 #np.save(folder_path + labs_name, labs)
-                acc, predict = eval(model_path, imgs, labs[:len(imgs)])
+                acc, predict = eval(model_dir, imgs, labs[:len(imgs)])
                 print i,' acc :',acc
                 acc_list.append(acc)
                 predict_list.append(predict)
