@@ -102,10 +102,12 @@ def eval(model_folder_path , images, labels=None):
     #vis_abnormal, vis_normal = cam.eval_inspect_cam(sess, cam_, top_conv, images, 1, x_, y_, y_conv)
     #NORMAL_LABEL = 0
     #ABNORMAL_LABEL = 1
-    if not labels==None:
+    if type(labels).__module__ == np.__name__ :
+        'label data type : numpy '
         acc,pred=sess.run([accuray , prediction] , feed_dict={x_:images ,y_ : labels , phase_train: False})
         return acc,pred
     else:
+        'label data not assin '
         pred=sess.run([ prediction] , feed_dict={x_:images ,y_ : labels , phase_train: False})
         return pred
 
