@@ -155,16 +155,15 @@ def eval_from_paths(ath_dir , model_dir):
 
 """
 def eval_from_numpy_image(path_dir , model_dir):
+    return_dict={}
     files=glob.glob(folder_path+'*.txt')
     for file in files:
         if 'test' in file:
-
             file_name=file.split('/')[-1] #e.g glaucoma_test_paths.txt
             image_name=file_name.replace('paths.txt' , 'images.npy') #e.g glaucoma_test_images.npy
             image_path=os.path.join(path_dir,image_name) # ./fundus/..../glaucoma_test_imgs.npy
             label_name = file_name.replace('paths.txt', 'labels.npy')  # e.g glaucoma_test_labels.npy
             label_path = os.path.join(path_dir, label_name) # ./fundus/..../glaucoma_test_labels.npy
-
             paths=utils.get_paths_from_text(file)
             if 'normal' in file_name:
                 label=0
@@ -184,8 +183,11 @@ def eval_from_numpy_image(path_dir , model_dir):
                 print i,' acc :',acc
                 acc_list.append(acc)
                 predict_list.append(predict)
-            acc_list=np.asarray(acc_list)
-            predict_list= np.asarray(predict_list)
+            acc_list=np.asarray(acc_list).reshape([-1])
+            predict_list= np.asarray(predict_list).reshape([-1])
+
+            np.reshape(acc_list , [1,-1])
+
             acc=acc_list.mean()
             print 'accuracy', acc
             if __debug__ ==True:
@@ -197,9 +199,9 @@ def eval_from_numpy_image(path_dir , model_dir):
                 print 'label' , label
                 print 'label shape',np.shape(labs)
                 #print utils.plot_images(imgs)
-
-
-
+            data_name=file_name.replace('_test_paths.txt' , '') #e.g glaucoma_test_paths.txt -->glaucoma
+            return_dict[data_name+'_acc']=acc_list
+            return_dict[data_name + '_predict'] = predict_list
 
 
 """ Usage:

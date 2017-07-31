@@ -1,4 +1,5 @@
-
+import numpy as np
+"""
 import os  , sys ,glob
 
 src_path='../fundus_data/cropped_original_fundus_300x300/'
@@ -11,3 +12,9 @@ for name in folder_names:
         print src_path
         new_path=src_path.replace('.png.png..png' , '.png')
         os.rename(src_path , new_path)
+"""
+
+
+list_=np.array([[1,2],[3,4],[5,6]])
+list_=list_.reshape(-1)
+print list_
