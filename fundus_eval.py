@@ -97,7 +97,6 @@ def eval(model_folder_path , images, labels=None):
     top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
     phase_train = tf.get_default_graph().get_tensor_by_name('phase_train:0')
     y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
-    print labels
     #cam_ = tf.get_default_graph().get_tensor_by_name('classmap_reshape:0')
     #vis_abnormal, vis_normal = cam.eval_inspect_cam(sess, cam_, top_conv, images, 1, x_, y_, y_conv)
     #NORMAL_LABEL = 0
