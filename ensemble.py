@@ -49,5 +49,5 @@ if __name__ == '__main__':
         sum_predict[key]=sum_predict[key]/len(subfolder_names) #len(subfolder_names) => the number of model paths
 
     print 'the number of model' ,len(subfolder_files)
-    """
+
 
