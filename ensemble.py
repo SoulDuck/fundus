@@ -22,7 +22,7 @@ if __name__ == '__main__':
     if not os.path.isdir('./ensemble'):
         os.mkdir('./ensemble')
         print 'ensemble folder was created'
-    ensemble_save_path=os.path.join('./ensemble', args.path_dir.split('/')[-1]) #e.g ensemble_save_path= ./ensemble/cropped_original_fundus_300x300
+    ensemble_save_path=os.path.join('./ensemble', args.path_dir.split('/')[-2]) #e.g ensemble_save_path= ./ensemble/cropped_original_fundus_300x300
     if not os.path.isdir(ensemble_save_path):
         os.mkdir(os.path.join('./ensemble', args.path_dir.split('/')[-1]))
         print 'folder created :  ',os.path.join('./cnn_models/ensemble', args.path_dir.split('/')[-1])
