@@ -21,12 +21,13 @@ if __name__ == '__main__':
     folder_path, subfolder_names , subfolder_files=os.walk(args.model_dir).next()
     if not os.path.isdir('./ensemble'):
         os.mkdir('./ensemble')
+        print 'ensemble folder was created'
     ensemble_save_path=os.path.join('./ensemble', args.path_dir.split('/')[-1]) #e.g ensemble_save_path= ./ensemble/cropped_original_fundus_300x300
     if not os.path.isdir(ensemble_save_path):
         os.mkdir(os.path.join('./ensemble', args.path_dir.split('/')[-1]))
         print 'folder created :  ',os.path.join('./cnn_models/ensemble', args.path_dir.split('/')[-1])
         # e.g ./ensemble/cropped_original_fundus_300x300/
-
+    """
     sum_predict={}
     for i,subfolder_name in enumerate(subfolder_names):
         target_model_folder=os.path.join(ensemble_save_path  , subfolder_name) #subfolder_name -->/1/ ,2,3,4,
@@ -46,5 +47,5 @@ if __name__ == '__main__':
         sum_predict[key]=sum_predict[key]/len(subfolder_names) #len(subfolder_names) => the number of model paths
 
     print 'the number of model' ,len(subfolder_files)
-
+    """
 
