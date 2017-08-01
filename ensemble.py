@@ -35,7 +35,7 @@ if __name__ == '__main__':
     sum_predict={}
     for i,subfolder_name in enumerate(subfolder_names):
         target_model_folder=os.path.join( args.model_dir  , subfolder_name+'/') ## target_model_folder = ./cnn_model/fundus/1/
-        target_save_folder = os.path.join(ensemble_save_folder , subfolder_names+'/') #./ensemble/cropped_original_fundus_300x300/1/
+        target_save_folder = os.path.join(ensemble_save_folder , subfolder_name+'/') #./ensemble/cropped_original_fundus_300x300/1/
         if not os.path.isdir(target_model_folder):
             os.mkdir(target_save_folder) #target_model_folder = ./ensemble/cropped_original_fundus_300x300/1/
             print 'folder was created!' , target_save_folder
