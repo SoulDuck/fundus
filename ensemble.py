@@ -18,7 +18,7 @@ ensemble--result_saved_folder--target_folder
 
 if __name__ == '__main__':
     parser=argparse.ArgumentParser()
-    parser.add_argument('--path_dir' , help='dir to saved data') # e.g ./paths/cropped_original_fundus_300x300/
+    parser.add_argument('--path_dir' , help='dir to saved data') # e.g ./paths/cropped_original_fundus_300x300/2/
     parser.add_argument('--model_dir', help='dir to saved data')  # e.g ./cnn_model/fundus/
     args = parser.parse_args()
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         print 'folder was created :  ',ensemble_save_folder #e.g ./ensemble/cropped_original_fundus_300x300/
     sum_predict={}
     for i,subfolder_name in enumerate(subfolder_names):
-        target_model_folder=os.path.join(ensemble_save_folder  , subfolder_name) #subfolder_name -->/1/ ,2,3,4,
+        target_model_folder=os.path.join(ensemble_save_folder  , subfolder_name+'/') #subfolder_name -->/1/ ,2,3,4,
         # target_model_folder = ./ensemble/cropped_original_fundus_300x300/1/
         if not os.path.isdir(target_model_folder):
             os.mkdir(target_model_folder) #target_model_folder = ./ensemble/cropped_original_fundus_300x300/1/
