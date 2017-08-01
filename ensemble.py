@@ -31,13 +31,14 @@ if __name__ == '__main__':
     print  args.path_dir.split('/')[-3]
     if not os.path.isdir(ensemble_save_folder):
         os.mkdir(ensemble_save_folder)
-        print 'folder created :  ',ensemble_save_folder #e.g ./ensemble/cropped_original_fundus_300x300/
+        print 'folder was created :  ',ensemble_save_folder #e.g ./ensemble/cropped_original_fundus_300x300/
     sum_predict={}
     for i,subfolder_name in enumerate(subfolder_names):
         target_model_folder=os.path.join(ensemble_save_folder  , subfolder_name) #subfolder_name -->/1/ ,2,3,4,
         # target_model_folder = ./ensemble/cropped_original_fundus_300x300/1/
         if not os.path.isdir(target_model_folder):
             os.mkdir(target_model_folder) #target_model_folder = ./ensemble/cropped_original_fundus_300x300/1/
+            print 'folder was created!' ,target_model_folder
         target_dict = fundus_eval.eval_from_numpy_image(path_dir= args.path_dir , model_dir=target_model_folder)
         f=open(os.path.join(target_model_folder , 'result.pkl'))
         pickle.dump(target_dict , f)

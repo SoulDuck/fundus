@@ -156,7 +156,7 @@ def eval_from_paths(ath_dir , model_dir):
 """
 def eval_from_numpy_image(path_dir , model_dir):
     return_dict={}
-    files=glob.glob(folder_path+'*.txt')
+    files=glob.glob(path_dir+'*.txt')
     for file in files:
         if 'test' in file:
             file_name=file.split('/')[-1] #e.g glaucoma_test_paths.txt
