@@ -36,7 +36,7 @@ if __name__ == '__main__':
     for i,subfolder_name in enumerate(subfolder_names):
         target_model_folder=os.path.join( args.model_dir  , subfolder_name+'/') ## target_model_folder = ./cnn_model/fundus/1/
         result_save_folder = os.path.join(ensemble_save_folder , subfolder_name+'/') #./ensemble/cropped_original_fundus_300x300/1/
-        if not os.path.isdir(target_model_folder):
+        if not os.path.isdir(result_save_folder):
             os.mkdir(result_save_folder ) #target_model_folder = ./ensemble/cropped_original_fundus_300x300/1/
             print 'folder was created!' , result_save_folder
         target_dict = fundus_eval.eval_from_numpy_image(path_dir= args.path_dir , model_dir=target_model_folder)
