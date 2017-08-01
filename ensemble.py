@@ -40,7 +40,7 @@ if __name__ == '__main__':
             os.mkdir(result_save_folder ) #target_model_folder = ./ensemble/cropped_original_fundus_300x300/1/
             print 'folder was created!' , result_save_folder
         target_dict = fundus_eval.eval_from_numpy_image(path_dir= args.path_dir , model_dir=target_model_folder)
-        f=open(os.path.join(result_save_folder  , 'result.pkl'))
+        f=open(os.path.join(result_save_folder  , 'result.pkl') , 'w')
         pickle.dump(target_dict , f)
         if i==0:
             sum_predict=target_dict
