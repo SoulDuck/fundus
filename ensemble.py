@@ -45,7 +45,7 @@ if __name__ == '__main__':
         if i==0:
             sum_predict=target_dict
         else:
-            for key in sum_predict.keys:
+            for key in sum_predict.keys():
                 sum_predict[key] += target_dict[key]
 
     for key in sum_predict.keys:
