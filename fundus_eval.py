@@ -237,7 +237,7 @@ def ensemble(model_root_dir, images, labels , batch=65):
             if len(images) > batch:
                 print batch
                 list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
-                list_imgs_labs = zip(list_imgs, list_labs)
+            list_imgs_labs = zip(list_imgs, list_labs)
             pred=[];acc=[]
             for images , labels in list_imgs_labs:
                 tmp_acc, tmp_pred = eval(target_model, images, labels)
