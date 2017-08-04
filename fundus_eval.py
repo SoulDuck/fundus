@@ -238,7 +238,6 @@ def ensemble(model_root_dir, images, labels , batch=65):
                 print batch
                 list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
                 list_imgs_labs = zip(list_imgs, list_labs)
-            print list_imgs_labs
             pred=[];acc=[]
             for images , labels in list_imgs_labs:
                 tmp_acc, tmp_pred = eval(target_model, images, labels)
@@ -309,10 +308,11 @@ print 'the number of cataract images',len(cataract_test_imgs)
 cataract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
 print cataract_pred
 print cataract_acc
+"""
 glaucoma_pred , glaucoma_acc =ensemble(args.model_root_dir , glaucoma_test_imgs , glaucoma_test_labs)
 retina_pred , retina_acc =ensemble(args.model_root_dir , retina_test_imgs , retina_test_labs)
 normal_pred , normal_acc =ensemble(args.model_root_dir , normal_test_imgs , normal_test_labs)
-
+"""
 
 
 
