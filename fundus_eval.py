@@ -111,6 +111,34 @@ def eval(model_folder_path , images, labels=None):
         return pred
 
 
+def ensemble(model_dir, images, labels):
+    path, names, files = os.walk(model_dir).next()
+    print 'the number of model:', len(names)
+    list_pred = []
+    list_acc = []
+    for name in names:
+        target_model = os.path.join(model_dir, name)
+        if labels == None:
+            pred = eval(target_model, images, labels)
+            list_pred.append(pred)
+        else:
+            acc, pred = eval(target_model, images, labels)
+            list_pred.append(pred)
+            list_acc.append(acc)
+    np_accs = np.asarray(list_acc)
+    acc_mean = np_accs.mean()
+
+    np_preds = np.asarray(list_pred)
+    for i, pred in enumerate(np_preds):
+        if i == 0:
+            pred_sum = pred
+        else:
+            pred_sum += pred
+    pred_mean = pred_sum / len(np_preds)
+
+    return pred_mean, acc_mean
+
+
 """
 def eval_from_paths(ath_dir , model_dir):
     for file in files:

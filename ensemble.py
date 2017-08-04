@@ -2,17 +2,20 @@ import argparse
 import os,sys
 import fundus_eval
 import pickle
+import tensorflow as tf
 """
-cnn_model --fundus-- 0
-                     |__ckpt
-                     |__meta.graph  
-                     1
-                     2
-                     3
-
-ensemble--result_saved_folder--target_folder
-    
-
+cnn_model
+    |
+    fundus <--model_dir
+        |
+        0
+         |__meta.graph
+         |__ckpt
+        1
+        2
+ensemble
+    |
+    fundus_0
 """
 
 
@@ -21,14 +24,22 @@ if __name__ == '__main__':
     parser.add_argument('--path_dir' , help='dir to saved data') # e.g ./paths/cropped_original_fundus_300x300/2/
     parser.add_argument('--model_dir', help='dir to saved data')  # e.g ./cnn_model/fundus/
     args = parser.parse_args()
+    model_dir=args.model_dir
+    path, names, files = os.walk(args.model_dir).next()
+    for name in names:
+        target_model= os.path.join(model_dir , name)
+        #model load
+        sess=tf.Session()
 
-    folder_path, subfolder_names , subfolder_files=os.walk(args.model_dir).next()
+
+
+    #ensemble_save_folder=os.path.join('./ensemble', args.path_dir.split('/')[-3]) #e.g ensemble_save_path= ./ensemble/cropped_original_fundus_300x300
+
+
     if not os.path.isdir('./ensemble'):
         os.mkdir('./ensemble')
         print 'ensemble folder was created'
-    ensemble_save_folder=os.path.join('./ensemble', args.path_dir.split('/')[-3]) #e.g ensemble_save_path= ./ensemble/cropped_original_fundus_300x300
-    print 'folder name saved model',subfolder_names
-    print  args.path_dir.split('/')[-3]
+
     if not os.path.isdir(ensemble_save_folder):
         os.mkdir(ensemble_save_folder)
         print 'folder was created :  ',ensemble_save_folder #e.g ./ensemble/cropped_original_fundus_300x300/
