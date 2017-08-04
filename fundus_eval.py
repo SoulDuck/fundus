@@ -235,13 +235,13 @@ def ensemble(model_root_dir, images, labels , batch=60):
             tot_pred=[]
             list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
             list_imgs_labs = zip(list_imgs, list_labs)
-            for images , labels in list_imgs_labs:
-                _ , tmp_pred = eval(target_model, images, labels)
+            for imgs , labs in list_imgs_labs:
+                _ , tmp_pred = eval(target_model, imgs, labs)
                 tot_pred.extend(tmp_pred)
 
 
             tot_cls=np.argmax(tot_pred , axis=1)
-            cls=np.argmax(labels, axis=1)
+            cls=np.argmax(labs, axis=1)
             print 'length of pred :',len(tot_pred)
             print 'length of cls : ',len(cls)
             acc=np.mean(np.equal(cls, tot_cls))
@@ -253,7 +253,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
             count+=1
     sum_pred=sum_pred/float(count)
     tot_cls = np.argmax(sum_pred, axis=1)
-    cls = np.argmax(labels, axis=1)
+    cls = np.argmax(labs, axis=1)
     acc = np.mean(np.equal(cls, sum_pred))
 
     print acc ,pred
