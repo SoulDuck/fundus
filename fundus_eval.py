@@ -303,6 +303,8 @@ normal_test_imgs=np.load(os.path.join(args.path_dir,'normal_test_images.npy'))
 normal_test_cls=np.load(os.path.join(args.path_dir,'normal_test_labels.npy'))
 normal_test_labs=data.cls2onehot(normal_test_cls , depth=2)
 
+
+print 'the number of cataract images',len(cataract_test_imgs)
 cataract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
 print cataract_pred
 print cataract_acc
