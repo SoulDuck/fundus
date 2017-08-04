@@ -216,8 +216,6 @@ def eval_from_numpy_image(path_dir , model_dir):
 
 
 def ensemble(model_root_dir, images, labels , batch=60):
-
-
     if  len(np.shape(labels)) ==1:
         print '***critical error***'
         print 'labels rank one , this functions need onehot-vector'
@@ -241,8 +239,10 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 list_imgs_labs = zip(list_imgs, list_labs)
                 pred=[];acc=[]
                 for images , labels in list_imgs_labs:
-                    tmp_acc, tmp_pred = eval(target_model, images, labels)
-                    pred.extend(tmp_pred);
+                    _ , tmp_pred = eval(target_model, images, labels)
+                    tmp_acc=np.argmax(tmp_pred , axis=1)
+                    print np.equal(labels, tmp_acc)
+
                     acc.extend(acc);
                     list_pred.extend(pred)
                     list_acc.append(acc)

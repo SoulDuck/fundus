@@ -150,7 +150,6 @@ def write_acc_loss(f,train_acc,train_loss,test_acc,test_loss):
     f.write(str(train_acc)+'\t'+str(train_loss)+'\t'+str(test_acc)+'\t'+str(test_loss)+'\n')
 
 def divide_images_labels_from_batch(images, labels ,batch_size):
-
     debug_flag=True
 
     batch_img_list=[]
@@ -159,7 +158,6 @@ def divide_images_labels_from_batch(images, labels ,batch_size):
     #print len(images)
     #print len(labels)
     #print 'share :',share
-
 
     for i in range(share+1):
         if i==share:
@@ -178,7 +176,6 @@ def divide_images_labels_from_batch(images, labels ,batch_size):
             batch_lab_list.append(labs)
             if __debug__ == debug_flag:
                 print 'total :', len(images) ,'batch' ,i*batch_size ,":",(i+1)*batch_size
-
     return batch_img_list , batch_lab_list
 def plot_xs_ys(title,xs_title, ys_title , folder_path,xs ,*arg_ys ):
     plt.xlabel(xs_title)
