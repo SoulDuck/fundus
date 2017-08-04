@@ -163,8 +163,8 @@ def divide_images_labels_from_batch(images, labels ,batch_size):
 
     for i in range(share+1):
         if i==share:
-            imgs = images[-batch_size:]
-            labs = labels[-batch_size:]
+            imgs = images[i*batch_size:]
+            labs = labels[i*batch_size:]
             #print i+1, len(imgs), len(labs)
             batch_img_list.append(imgs)
             batch_lab_list.append(labs)
