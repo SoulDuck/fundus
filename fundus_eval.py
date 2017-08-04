@@ -124,9 +124,6 @@ def eval(model_folder_path , images, labels=None):
 
 
 def ensemble(model_root_dir, images, labels):
-    if "DISPLAY" not in os.environ:
-        # remove Travis CI Error
-        matplotlib.use('Agg')
 
     if  len(np.shape(labels)) ==1:
         print '***critical error***'
