@@ -85,6 +85,10 @@ def get_activation_map(image , filename):
 
 
 def eval(model_folder_path , images, labels=None):
+
+
+    if not model_folder_path.endswith('/'):
+        model_folder_path=model_folder_path+'/'
     sess = tf.Session()
     saver = tf.train.import_meta_graph(model_folder_path+'best_acc.ckpt.meta')
     saver.restore(sess, model_folder_path+'best_acc.ckpt')
@@ -111,13 +115,17 @@ def eval(model_folder_path , images, labels=None):
         return pred
 
 
-def ensemble(model_dir, images, labels):
-    path, names, files = os.walk(model_dir).next()
+def ensemble(model_root_dir, images, labels):
+    if  len(np.shape(labels)) ==1:
+        print '***critical error***'
+        print 'labels rank one , this functions need onehot-vector'
+        raise ValueError
+    path, names, files = os.walk(model_root_dir).next()
     print 'the number of model:', len(names)
     list_pred = []
     list_acc = []
     for name in names:
-        target_model = os.path.join(model_dir, name)
+        target_model = os.path.join(model_root_dir, name)
         if labels == None:
             pred = eval(target_model, images, labels)
             list_pred.append(pred)
@@ -137,6 +145,8 @@ def ensemble(model_dir, images, labels):
     pred_mean = pred_sum / len(np_preds)
 
     return pred_mean, acc_mean
+
+
 
 
 """
@@ -251,8 +261,17 @@ if __name__ =='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--path_dir" , help='image folder to load')
     parser.add_argument("--model_dir" , help='model folder to load')
+    parser.add_argument("--model_root_dir", help='model root folder that saved images')
     args = parser.parse_args()
 
+
+test_imgs=np.load('./test_imgs.npy')
+test_cls=np.load('./test_labs.npy')
+test_labs=data.cls2onehot(test_cls , depth=2)
+ensemble(args.model_root_dir , test_imgs , test_labs)
+
+
+"""
     if args.model_dir==None or args.model_dir==None:
         print 'args 1 : image and label paths folder to load '
         print 'args 2 : model folder to load '
@@ -262,9 +281,10 @@ if __name__ =='__main__':
         model_path = args.model_dir
     files=glob.glob(folder_path+'*.txt')
     eval_from_numpy_image(path_dir=args.path_dir , model_dir=args.model_dir)
+"""
 
 
-    """
+"""
     imgs_list , labels_list=utils.divide_images_labels_from_batch(test_imgs ,test_labs, batch_size=60)
     list_imgs_labs=zip(imgs_list , labels_list)
     mean_acc=[]
@@ -273,15 +293,15 @@ if __name__ =='__main__':
         mean_acc.append(test_acc)
     print np.mean(mean_acc)
     ####eval Class Activation Map####
-    """
-    """
+"""
+"""
     vis_abnormal, vis_normal=cam.eval_inspect_cam(sess, cam_ ,top_conv , test_imgs[0:1] , 1 ,x_ , y_ ,y_conv )
     plt.imshow(vis_abnormal)
     plt.show()
     plt.close()
     plt.imshow(vis_normal)
     plt.show()
-    """
+"""
 
 
 
