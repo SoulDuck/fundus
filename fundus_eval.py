@@ -247,6 +247,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
             else:
                 sum_pred+=tot_pred
             count+=1
+    sum_pred=np.asarray(sum_pred)
     sum_pred=sum_pred/float(count)
     tot_cls = np.argmax(sum_pred, axis=1)
     cls = np.argmax(labels, axis=1)
