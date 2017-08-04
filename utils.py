@@ -170,15 +170,14 @@ def divide_images_labels_from_batch(images, labels ,batch_size):
             batch_lab_list.append(labs)
             if __debug__ ==debug_flag:
                 print 'total :', len(images), 'batch', len(images)-batch_size ,':',len(images)
-            continue;
-        imgs=images[i*batch_size:(i+1)*batch_size]
-        labs=labels[i * batch_size:(i + 1) * batch_size]
-       # print i , len(imgs) , len(labs)
-        batch_img_list.append(imgs)
-        batch_lab_list.append(labs)
-        if __debug__ == debug_flag:
-            print 'total :', len(images) ,'batch' ,i*batch_size ,":",(i+1)*batch_size
-
+        else:
+            imgs=images[i*batch_size:(i+1)*batch_size]
+            labs=labels[i * batch_size:(i + 1) * batch_size]
+           # print i , len(imgs) , len(labs)
+            batch_img_list.append(imgs)
+            batch_lab_list.append(labs)
+            if __debug__ == debug_flag:
+                print 'total :', len(images) ,'batch' ,i*batch_size ,":",(i+1)*batch_size
 
     return batch_img_list , batch_lab_list
 def plot_xs_ys(title,xs_title, ys_title , folder_path,xs ,*arg_ys ):
