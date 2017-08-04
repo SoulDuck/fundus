@@ -226,6 +226,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
     list_pred = []
     list_acc = []
     for name in names[:1]:
+        print 'model name : ',name
         target_model = os.path.join(model_root_dir, name)
         if labels is None:
             'not implement'
@@ -242,15 +243,13 @@ def ensemble(model_root_dir, images, labels , batch=60):
                     _ , tmp_pred = eval(target_model, images, labels)
                     tmp_cls=np.argmax(tmp_pred , axis=1)
                     cls=np.argmax(labels, axis=1)
-                    print np.equal(cls, tmp_cls)
+                    acc=np.mean(np.equal(cls, tmp_cls))
 
-                    acc.extend(acc);
-                    list_pred.extend(pred)
-                    list_acc.append(acc)
+                list_pred.extend(pred)
+                list_acc.append(acc)
 
-                np_acc = np.asarray(list_acc)
-                acc = np_acc.mean()
-                pred = np.asarray(list_pred)
+
+
             else:
                 '# images < batch'
                 acc, pred = eval(target_model, images, labels)
