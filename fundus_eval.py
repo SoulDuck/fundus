@@ -232,6 +232,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
     for name in names:
         target_model = os.path.join(model_root_dir, name)
         if labels is None:
+            'not implement'
             pred = eval(target_model, images, labels)
             list_pred.append(pred)
         else:
@@ -240,12 +241,13 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 list_imgs_labs = zip(list_imgs, list_labs)
 
             pred=[];acc=[]
-            for images , labels in list_imgs_labs
+            for images , labels in list_imgs_labs:
                 tmp_acc, tmp_pred = eval(target_model, images, labels)
                 pred.extend(tmp_pred);
                 acc.extend(acc);
             list_pred.append(pred)
             list_acc.append(acc)
+
     np_accs = np.asarray(list_acc)
     acc_mean = np_accs.mean()
     np_preds = np.asarray(list_pred)
@@ -283,28 +285,28 @@ if __name__ =='__main__':
     args = parser.parse_args()
 
 
-args.paths_dir
+args.path_dir
 
-cataract_test_imgs=np.load('./cataract_test_images.npy')
-cataract_test_cls=np.load('./cataract_test_labels.npy')
-cataract_test_lab=data.cls2onehot(cataract_test_cls , depth=2)
+cataract_test_imgs=np.load(os.path.join(args.path_dir,'cataract_test_images.npy'))
+cataract_test_cls=np.load(os.path.join(args.path_dir,'cataract_test_labels.npy'))
+cataract_test_labs=data.cls2onehot(cataract_test_cls , depth=2)
 
-glaucoma_test_imgs=np.load('./glaucoma_test_images.npy')
-glaucoma_test_cls=np.load('./glaucoma_test_labels.npy')
-glaucoma_test_lab=data.cls2onehot(glaucoma_test_cls , depth=2)
+glaucoma_test_imgs=np.load(os.path.join(args.path_dir,'glaucoma_test_images.npy'))
+glaucoma_test_cls=np.load(os.path.join(args.path_dir,'glaucoma_test_labels.npy'))
+glaucoma_test_labs=data.cls2onehot(glaucoma_test_cls , depth=2)
 
-retina_test_imgs=np.load('./retina_test_images.npy')
-retina_test_cls=np.load('./retina_test_labels.npy')
-retina_test_lab=data.cls2onehot(retina_test_cls , depth=2)
+retina_test_imgs=np.load(os.path.join(args.path_dir,'retina_test_images.npy'))
+retina_test_cls=np.load(os.path.join(args.path_dir,'retina_test_labels.npy'))
+retina_test_labs=data.cls2onehot(retina_test_cls , depth=2)
 
-normal_test_imgs=np.load('./normal_test_images.npy')
-normal_test_cls=np.load('./normal_test_labels.npy')
-normal_test_lab=data.cls2onehot(normal_test_cls , depth=2)
+normal_test_imgs=np.load(os.path.join(args.path_dir,'normal_test_images.npy'))
+normal_test_cls=np.load(os.path.join(args.path_dir,'normal_test_labels.npy'))
+normal_test_labs=data.cls2onehot(normal_test_cls , depth=2)
 
-catract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_lab , cataract_test_lab)
-glaucoma_pred , glaucoma_acc =ensemble(args.model_root_dir , glaucoma_test_lab , glaucoma_test_lab)
-retina_pred , retina_acc =ensemble(args.model_root_dir , retina_test_lab , retina_test_lab)
-normal_pred , normal_acc =ensemble(args.model_root_dir , normal_test_lab , normal_test_lab)
+catract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
+glaucoma_pred , glaucoma_acc =ensemble(args.model_root_dir , glaucoma_test_imgs , glaucoma_test_labs)
+retina_pred , retina_acc =ensemble(args.model_root_dir , retina_test_imgs , retina_test_labs)
+normal_pred , normal_acc =ensemble(args.model_root_dir , normal_test_imgs , normal_test_labs)
 
 
 
