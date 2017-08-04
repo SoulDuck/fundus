@@ -206,10 +206,6 @@ def eval_from_paths(ath_dir , model_dir):
 """
 def eval_from_numpy_image(path_dir , model_dir):
 
-    if "DISPLAY" not in os.environ:
-        # remove Travis CI Error
-        matplotlib.use('Agg')
-
     return_dict={}
     files=glob.glob(path_dir+'*.txt')
     for file in files:
