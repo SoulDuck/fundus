@@ -2,7 +2,7 @@ import glob
 import tensorflow as tf
 import numpy as np
 import matplotlib
-
+import os
 if "DISPLAY" not in os.environ:
     # remove Travis CI Error
     matplotlib.use('Agg')
@@ -14,8 +14,7 @@ import utils
 from PIL import Image
 import argparse
 import PIL
-import os
-import matplotlib
+
 """
 import Image
 
