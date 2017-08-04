@@ -257,6 +257,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
     acc = np.mean(np.equal(cls, sum_pred))
 
     print acc ,pred
+    return acc,pred
     """
     for i, pred in enumerate(np_preds):
         if i == 0:
@@ -265,7 +266,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
             pred_sum += pred
     pred_mean = pred_sum / len(np_preds)
     """
-    return pred_mean, acc_mean
+
 
 
 
