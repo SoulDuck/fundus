@@ -239,7 +239,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 _ , tmp_pred = eval(target_model, images, labels)
                 tot_pred.extend(tmp_pred)
 
-
+            print len(tot_pred)
             tot_cls=np.argmax(tot_pred , axis=1)
             cls=np.argmax(labels, axis=1)
             acc=np.mean(np.equal(cls, tot_cls))
