@@ -275,11 +275,6 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 """
 
 if __name__ =='__main__':
-
-    if "DISPLAY" not in os.environ:
-        # remove Travis CI Error
-        matplotlib.use('Agg')
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--path_dir" , help='image folder to load')
     parser.add_argument("--model_dir" , help='model folder to load')
