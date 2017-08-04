@@ -303,7 +303,9 @@ normal_test_imgs=np.load(os.path.join(args.path_dir,'normal_test_images.npy'))
 normal_test_cls=np.load(os.path.join(args.path_dir,'normal_test_labels.npy'))
 normal_test_labs=data.cls2onehot(normal_test_cls , depth=2)
 
-catract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
+cataract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
+print cataract_pred
+print cataract_acc
 glaucoma_pred , glaucoma_acc =ensemble(args.model_root_dir , glaucoma_test_imgs , glaucoma_test_labs)
 retina_pred , retina_acc =ensemble(args.model_root_dir , retina_test_imgs , retina_test_labs)
 normal_pred , normal_acc =ensemble(args.model_root_dir , normal_test_imgs , normal_test_labs)
