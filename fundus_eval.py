@@ -276,7 +276,9 @@ test_imgs=np.load('./test_imgs_.npy')
 test_cls=np.load('./test_labs_.npy')
 test_labs=data.cls2onehot(test_cls , depth=2)
 print 'a'
-ensemble(args.model_root_dir , test_imgs , test_labs)
+pred , acc =ensemble(args.model_root_dir , test_imgs , test_labs)
+print pred
+print acc
 
 
 """
