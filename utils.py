@@ -161,7 +161,7 @@ def divide_images_labels_from_batch(images, labels ,batch_size):
     #print 'share :',share
 
 
-    for i in range(share+1):
+    for i in range(share):
 
         imgs=images[i*batch_size:(i+1)*batch_size]
         labs=labels[i * batch_size:(i + 1) * batch_size]
