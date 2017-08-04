@@ -235,6 +235,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
             list_pred.append(pred)
         else:
             if len(images) > batch:
+                '# images > batch'
                 print batch
                 list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
                 list_imgs_labs = zip(list_imgs, list_labs)
@@ -250,6 +251,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 acc = np_acc.mean()
                 pred = np.asarray(list_pred)
             else:
+                '# images < batch'
                 acc, pred = eval(target_model, images, labels)
 
             print acc ,pred
