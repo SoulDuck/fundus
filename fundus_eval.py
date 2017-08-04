@@ -232,20 +232,28 @@ def ensemble(model_root_dir, images, labels , batch=60):
             count+=1
         else:
             '# images > batch'
+            tot_pred=[]
             list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
             list_imgs_labs = zip(list_imgs, list_labs)
             for images , labels in list_imgs_labs:
                 _ , tmp_pred = eval(target_model, images, labels)
-                tmp_cls=np.argmax(tmp_pred , axis=1)
-                cls=np.argmax(labels, axis=1)
-                acc=np.mean(np.equal(cls, tmp_cls))
+                tot_pred.extend(tmp_pred)
+
+
+            tot_cls=np.argmax(tot_pred , axis=1)
+            cls=np.argmax(labels, axis=1)
+            acc=np.mean(np.equal(cls, tot_cls))
             print 'model name : ', name , 'accuracy:',acc
             if count==0:
-                pred=tmp_pred
+                sum_pred=tmp_pred
             else:
-                pred+=tmp_pred
+                sum_pred+=tmp_pred
             count+=1
-    pred=pred/float(count)
+    sum_pred=sum_pred/float(count)
+    tot_cls = np.argmax(sum_pred, axis=1)
+    cls = np.argmax(labels, axis=1)
+    acc = np.mean(np.equal(cls, sum_pred))
+
     print acc ,pred
     """
     for i, pred in enumerate(np_preds):
