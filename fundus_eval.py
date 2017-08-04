@@ -215,7 +215,7 @@ def eval_from_numpy_image(path_dir , model_dir):
     return return_dict
 
 
-def ensemble(model_root_dir, images, labels , batch=60):
+def ensemble(model_root_dir, images, labels , batch=65):
 
 
     if  len(np.shape(labels)) ==1:
