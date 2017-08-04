@@ -241,8 +241,8 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 for images , labels in list_imgs_labs:
                     _ , tmp_pred = eval(target_model, images, labels)
                     tmp_cls=np.argmax(tmp_pred , axis=1)
-                    tmp_labs=data.cls2onehot(tmp_cls,depth=2)
-                    print np.equal(labels, tmp_labs)
+                    cls=np.argmax(labels, axis=1)
+                    print np.equal(cls, tmp_cls)
 
                     acc.extend(acc);
                     list_pred.extend(pred)
