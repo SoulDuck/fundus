@@ -242,19 +242,15 @@ def ensemble(model_root_dir, images, labels , batch=60):
             tot_cls=np.argmax(tot_pred , axis=1)
             cls=np.argmax(labels, axis=1)
             acc=np.mean(np.equal(cls, tot_cls))
-            print 'length of pred :',len(tot_pred)
-            print 'length of tot_cls:',len(tot_cls)
-            print 'length of cls : ',len(cls)
-            print 'model name : ', name , 'accuracy:',acc
             if count==0:
-                sum_pred=tmp_pred
+                sum_pred=tot_pred
             else:
-                sum_pred+=tmp_pred
+                sum_pred+=tot_pred
             count+=1
     sum_pred=sum_pred/float(count)
     tot_cls = np.argmax(sum_pred, axis=1)
-    cls = np.argmax(labs, axis=1)
-    acc = np.mean(np.equal(cls, sum_pred))
+    cls = np.argmax(labels, axis=1)
+    acc = np.mean(np.equal(cls, tot_cls))
 
     print acc ,pred
     return acc,pred
