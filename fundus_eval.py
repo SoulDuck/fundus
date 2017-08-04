@@ -91,9 +91,6 @@ def get_activation_map(image , filename):
 
 
 def eval(model_folder_path , images, labels=None):
-    if "DISPLAY" not in os.environ:
-        # remove Travis CI Error
-        matplotlib.use('Agg')
 
     if not model_folder_path.endswith('/'):
         model_folder_path=model_folder_path+'/'
