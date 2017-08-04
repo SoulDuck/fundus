@@ -234,6 +234,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
             '# images > batch'
             tot_pred=[]
             list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
+            print len(list_labs[0]) , len(list_labs[1])
             list_imgs_labs = zip(list_imgs, list_labs)
             for imgs , labs in list_imgs_labs:
                 _ , tmp_pred = eval(target_model, imgs, labs)
