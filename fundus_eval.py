@@ -268,6 +268,7 @@ if __name__ =='__main__':
 test_imgs=np.load('./test_imgs.npy')
 test_cls=np.load('./test_labs.npy')
 test_labs=data.cls2onehot(test_cls , depth=2)
+print 'a'
 ensemble(args.model_root_dir , test_imgs , test_labs)
 
 
