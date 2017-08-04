@@ -132,7 +132,7 @@ def ensemble(model_root_dir, images, labels):
     list_acc = []
     for name in names:
         target_model = os.path.join(model_root_dir, name)
-        if labels == None:
+        if labels is None:
             pred = eval(target_model, images, labels)
             list_pred.append(pred)
         else:
