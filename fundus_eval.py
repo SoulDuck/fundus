@@ -223,38 +223,30 @@ def ensemble(model_root_dir, images, labels , batch=60):
 
     path, names, files = os.walk(model_root_dir).next()
     print 'the number of model:', len(names)
-    list_pred = []
-    list_acc = []
+    count=0
     for name in names[:1]:
-        print 'model name : ',name
         target_model = os.path.join(model_root_dir, name)
         if labels is None:
             'not implement'
             pred = eval(target_model, images, labels)
-            list_pred.append(pred)
+            count+=1
         else:
-            if len(images) > batch:
-                '# images > batch'
-                print batch
-                list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
-                list_imgs_labs = zip(list_imgs, list_labs)
-                pred=[];acc=[]
-                for images , labels in list_imgs_labs:
-                    _ , tmp_pred = eval(target_model, images, labels)
-                    tmp_cls=np.argmax(tmp_pred , axis=1)
-                    cls=np.argmax(labels, axis=1)
-                    acc=np.mean(np.equal(cls, tmp_cls))
-
-                list_pred.extend(pred)
-                list_acc.append(acc)
-
-
-
+            '# images > batch'
+            list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
+            list_imgs_labs = zip(list_imgs, list_labs)
+            for images , labels in list_imgs_labs:
+                _ , tmp_pred = eval(target_model, images, labels)
+                tmp_cls=np.argmax(tmp_pred , axis=1)
+                cls=np.argmax(labels, axis=1)
+                acc=np.mean(np.equal(cls, tmp_cls))
+            print 'model name : ', name , 'accuracy:',acc
+            if count==0:
+                pred=tmp_pred
             else:
-                '# images < batch'
-                acc, pred = eval(target_model, images, labels)
-
-            print acc ,pred
+                pred+=tmp_pred
+            count+=1
+    pred=pred/float(count)
+    print acc ,pred
     """
     for i, pred in enumerate(np_preds):
         if i == 0:
