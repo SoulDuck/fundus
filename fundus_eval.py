@@ -235,6 +235,7 @@ def ensemble(model_root_dir, images, labels , batch=65):
             list_pred.append(pred)
         else:
             if len(images) > batch:
+                print batch
                 list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
                 list_imgs_labs = zip(list_imgs, list_labs)
             print list_imgs_labs
