@@ -227,7 +227,7 @@ def ensemble(model_root_dir, images, labels , batch=65):
     print 'the number of model:', len(names)
     list_pred = []
     list_acc = []
-    for name in names:
+    for name in names[:1]:
         target_model = os.path.join(model_root_dir, name)
         if labels is None:
             'not implement'
@@ -237,26 +237,30 @@ def ensemble(model_root_dir, images, labels , batch=65):
             if len(images) > batch:
                 print batch
                 list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
-            list_imgs_labs = zip(list_imgs, list_labs)
-            pred=[];acc=[]
-            for images , labels in list_imgs_labs:
-                tmp_acc, tmp_pred = eval(target_model, images, labels)
-                pred.extend(tmp_pred);
-                acc.extend(acc);
-            list_pred.append(pred)
-            list_acc.append(acc)
+                list_imgs_labs = zip(list_imgs, list_labs)
+                pred=[];acc=[]
+                for images , labels in list_imgs_labs:
+                    tmp_acc, tmp_pred = eval(target_model, images, labels)
+                    pred.extend(tmp_pred);
+                    acc.extend(acc);
+                    list_pred.extend(pred)
+                    list_acc.append(acc)
 
-    print list_acc
-    np_accs = np.asarray(list_acc)
-    acc_mean = np_accs.mean()
-    np_preds = np.asarray(list_pred)
+                np_acc = np.asarray(list_acc)
+                acc = np_acc.mean()
+                pred = np.asarray(list_pred)
+            else:
+                acc, pred = eval(target_model, images, labels)
+
+            print acc ,pred
+    """
     for i, pred in enumerate(np_preds):
         if i == 0:
             pred_sum = pred
         else:
             pred_sum += pred
     pred_mean = pred_sum / len(np_preds)
-
+    """
     return pred_mean, acc_mean
 
 
