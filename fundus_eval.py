@@ -253,7 +253,6 @@ def ensemble(model_root_dir, images, labels , batch=60):
     cls = np.argmax(labels, axis=1)
     acc = np.mean(np.equal(cls, tot_cls))
 
-    print acc ,mean_pred
     return acc,mean_pred
     """
     for i, pred in enumerate(np_preds):
