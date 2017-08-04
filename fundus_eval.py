@@ -248,13 +248,13 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 sum_pred+=tot_pred
             count+=1
     sum_pred=np.asarray(sum_pred)
-    sum_pred=sum_pred/float(count)
+    mean_pred=sum_pred/float(count)
     tot_cls = np.argmax(sum_pred, axis=1)
     cls = np.argmax(labels, axis=1)
     acc = np.mean(np.equal(cls, tot_cls))
 
-    print acc ,pred
-    return acc,pred
+    print acc ,mean_pred
+    return acc,mean_pred
     """
     for i, pred in enumerate(np_preds):
         if i == 0:
