@@ -239,12 +239,11 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 _ , tmp_pred = eval(target_model, imgs, labs)
                 tot_pred.extend(tmp_pred)
 
-
             tot_cls=np.argmax(tot_pred , axis=1)
             cls=np.argmax(labs, axis=1)
+            acc=np.mean(np.equal(cls, tot_cls))
             print 'length of pred :',len(tot_pred)
             print 'length of cls : ',len(cls)
-            acc=np.mean(np.equal(cls, tot_cls))
             print 'model name : ', name , 'accuracy:',acc
             if count==0:
                 sum_pred=tmp_pred
