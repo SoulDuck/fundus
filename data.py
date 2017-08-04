@@ -15,12 +15,13 @@ def save_paths(src_paths, f_path):
 
 
 def cls2onehot(cls, depth):
+    debug_flag=False
     if not type(cls).__module__ == np.__name__:
         cls=np.asarray(cls)
-
     cls=cls.astype(np.int32)
+    print cls
     debug_flag = False
-    labels = np.zeros([len(cls), 2] , dtype=np.int32)
+    labels = np.zeros([len(cls), depth] , dtype=np.int32)
     for i, ind in enumerate(cls):
         labels[i][ind:ind + 1] = 1
     if __debug__ == debug_flag:
