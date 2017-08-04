@@ -86,7 +86,9 @@ def get_activation_map(image , filename):
 
 
 def eval(model_folder_path , images, labels=None):
-
+    if "DISPLAY" not in os.environ:
+        # remove Travis CI Error
+        matplotlib.use('Agg')
 
     if not model_folder_path.endswith('/'):
         model_folder_path=model_folder_path+'/'
@@ -117,6 +119,10 @@ def eval(model_folder_path , images, labels=None):
 
 
 def ensemble(model_root_dir, images, labels):
+    if "DISPLAY" not in os.environ:
+        # remove Travis CI Error
+        matplotlib.use('Agg')
+
     if  len(np.shape(labels)) ==1:
         print '***critical error***'
         print 'labels rank one , this functions need onehot-vector'
@@ -194,6 +200,11 @@ def eval_from_paths(ath_dir , model_dir):
 
 """
 def eval_from_numpy_image(path_dir , model_dir):
+
+    if "DISPLAY" not in os.environ:
+        # remove Travis CI Error
+        matplotlib.use('Agg')
+
     return_dict={}
     files=glob.glob(path_dir+'*.txt')
     for file in files:
