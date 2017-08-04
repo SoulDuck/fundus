@@ -120,41 +120,6 @@ def eval(model_folder_path , images, labels=None):
         return pred
 
 
-def ensemble(model_root_dir, images, labels):
-
-    if  len(np.shape(labels)) ==1:
-        print '***critical error***'
-        print 'labels rank one , this functions need onehot-vector'
-        raise ValueError
-    path, names, files = os.walk(model_root_dir).next()
-    print 'the number of model:', len(names)
-    list_pred = []
-    list_acc = []
-    for name in names:
-        target_model = os.path.join(model_root_dir, name)
-        if labels is None:
-            pred = eval(target_model, images, labels)
-            list_pred.append(pred)
-        else:
-            acc, pred = eval(target_model, images, labels)
-            list_pred.append(pred)
-            list_acc.append(acc)
-    np_accs = np.asarray(list_acc)
-    acc_mean = np_accs.mean()
-
-    np_preds = np.asarray(list_pred)
-    for i, pred in enumerate(np_preds):
-        if i == 0:
-            pred_sum = pred
-        else:
-            pred_sum += pred
-    pred_mean = pred_sum / len(np_preds)
-
-    return pred_mean, acc_mean
-
-
-
-
 """
 def eval_from_paths(ath_dir , model_dir):
     for file in files:
@@ -250,6 +215,52 @@ def eval_from_numpy_image(path_dir , model_dir):
     return return_dict
 
 
+def ensemble(model_root_dir, images, labels , batch=60):
+
+
+    if  len(np.shape(labels)) ==1:
+        print '***critical error***'
+        print 'labels rank one , this functions need onehot-vector'
+        raise ValueError
+
+
+
+    path, names, files = os.walk(model_root_dir).next()
+    print 'the number of model:', len(names)
+    list_pred = []
+    list_acc = []
+    for name in names:
+        target_model = os.path.join(model_root_dir, name)
+        if labels is None:
+            pred = eval(target_model, images, labels)
+            list_pred.append(pred)
+        else:
+            if len(images) > batch:
+                list_imgs, list_labs = utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
+                list_imgs_labs = zip(list_imgs, list_labs)
+
+            pred=[];acc=[]
+            for images , labels in list_imgs_labs
+                tmp_acc, tmp_pred = eval(target_model, images, labels)
+                pred.extend(tmp_pred);
+                acc.extend(acc);
+            list_pred.append(pred)
+            list_acc.append(acc)
+    np_accs = np.asarray(list_acc)
+    acc_mean = np_accs.mean()
+    np_preds = np.asarray(list_pred)
+    for i, pred in enumerate(np_preds):
+        if i == 0:
+            pred_sum = pred
+        else:
+            pred_sum += pred
+    pred_mean = pred_sum / len(np_preds)
+
+    return pred_mean, acc_mean
+
+
+
+
 """ Usage:
 sess=tf.Session()
 saver=tf.train.import_meta_graph('./cnn_model/best_acc.ckpt.meta')
@@ -272,13 +283,31 @@ if __name__ =='__main__':
     args = parser.parse_args()
 
 
-test_imgs=np.load('./test_imgs_.npy')
-test_cls=np.load('./test_labs_.npy')
-test_labs=data.cls2onehot(test_cls , depth=2)
-print 'a'
-pred , acc =ensemble(args.model_root_dir , test_imgs , test_labs)
-print pred
-print acc
+args.paths_dir
+
+cataract_test_imgs=np.load('./cataract_test_images.npy')
+cataract_test_cls=np.load('./cataract_test_labels.npy')
+cataract_test_lab=data.cls2onehot(cataract_test_cls , depth=2)
+
+glaucoma_test_imgs=np.load('./glaucoma_test_images.npy')
+glaucoma_test_cls=np.load('./glaucoma_test_labels.npy')
+glaucoma_test_lab=data.cls2onehot(glaucoma_test_cls , depth=2)
+
+retina_test_imgs=np.load('./retina_test_images.npy')
+retina_test_cls=np.load('./retina_test_labels.npy')
+retina_test_lab=data.cls2onehot(retina_test_cls , depth=2)
+
+normal_test_imgs=np.load('./normal_test_images.npy')
+normal_test_cls=np.load('./normal_test_labels.npy')
+normal_test_lab=data.cls2onehot(normal_test_cls , depth=2)
+
+catract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_lab , cataract_test_lab)
+glaucoma_pred , glaucoma_acc =ensemble(args.model_root_dir , glaucoma_test_lab , glaucoma_test_lab)
+retina_pred , retina_acc =ensemble(args.model_root_dir , retina_test_lab , retina_test_lab)
+normal_pred , normal_acc =ensemble(args.model_root_dir , normal_test_lab , normal_test_lab)
+
+
+
 
 
 """
