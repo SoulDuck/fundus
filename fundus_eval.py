@@ -240,12 +240,12 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 tot_pred.extend(tmp_pred)
 
 
-            print 'length of pred :',len(pred)
-            print 'length of cls : ',len(cls)
-            print 'model name : ', name , 'accuracy:',acc
             tot_cls=np.argmax(tot_pred , axis=1)
             cls=np.argmax(labels, axis=1)
+            print 'length of pred :',len(pred)
+            print 'length of cls : ',len(cls)
             acc=np.mean(np.equal(cls, tot_cls))
+            print 'model name : ', name , 'accuracy:',acc
             if count==0:
                 sum_pred=tmp_pred
             else:
