@@ -223,8 +223,6 @@ def ensemble(model_root_dir, images, labels , batch=60):
         print 'labels rank one , this functions need onehot-vector'
         raise ValueError
 
-
-
     path, names, files = os.walk(model_root_dir).next()
     print 'the number of model:', len(names)
     list_pred = []
@@ -248,6 +246,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
             list_pred.append(pred)
             list_acc.append(acc)
 
+    print list_acc
     np_accs = np.asarray(list_acc)
     acc_mean = np_accs.mean()
     np_preds = np.asarray(list_pred)
