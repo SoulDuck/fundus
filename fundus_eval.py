@@ -94,9 +94,15 @@ def eval(model_folder_path , images, labels=None):
 
     if not model_folder_path.endswith('/'):
         model_folder_path=model_folder_path+'/'
+
     sess = tf.Session()
-    saver = tf.train.import_meta_graph(model_folder_path+'best_acc.ckpt.meta')
-    saver.restore(sess, model_folder_path+'best_acc.ckpt')
+    try:
+        saver = tf.train.import_meta_graph(model_folder_path+'best_acc.ckpt.meta')
+        saver.restore(sess, model_folder_path+'best_acc.ckpt')
+    except IOError as ioe:
+        print 'in model folder path , there is no best_acc.ckpt or best_acc.ckpt.meta files'
+        break
+
     tf.get_default_graph()
     accuray = tf.get_default_graph().get_tensor_by_name('accuracy:0')
     prediction = tf.get_default_graph().get_tensor_by_name('softmax:0')
@@ -216,7 +222,8 @@ def eval_from_numpy_image(path_dir , model_dir):
 
 
 def ensemble(model_root_dir, images, labels , batch=60):
-    if  len(np.shape(labels)) ==1:
+
+    if len(np.shape(labels)) == 1:
         print '***critical error***'
         print 'labels rank one , this functions need onehot-vector'
         raise ValueError
