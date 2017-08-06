@@ -260,7 +260,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 sum_pred+=np.asarray(tot_pred)
             count+=1
     mean_pred=sum_pred/float(count)
-    mean_pred.astype(np.float32)
+    mean_pred=mean_pred.astype(np.float32)
 
     tot_cls = np.argmax(sum_pred, axis=1)
     cls = np.argmax(labels, axis=1)
