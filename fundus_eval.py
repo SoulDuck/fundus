@@ -101,7 +101,7 @@ def eval(model_folder_path , images, labels=None):
         saver.restore(sess, model_folder_path+'best_acc.ckpt')
     except IOError as ioe:
         print 'in model folder path , there is no best_acc.ckpt or best_acc.ckpt.meta files'
-        break
+        return
 
     tf.get_default_graph()
     accuray = tf.get_default_graph().get_tensor_by_name('accuracy:0')
