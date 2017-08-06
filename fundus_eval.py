@@ -260,6 +260,8 @@ def ensemble(model_root_dir, images, labels , batch=60):
                 sum_pred+=np.asarray(tot_pred)
             count+=1
     mean_pred=sum_pred/float(count)
+    mean_pred.astype(np.float32)
+
     tot_cls = np.argmax(sum_pred, axis=1)
     cls = np.argmax(labels, axis=1)
     acc = np.mean(np.equal(cls, tot_cls))
@@ -294,6 +296,9 @@ y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
 """
 
 if __name__ =='__main__':
+    debug_flag=True
+    if __debug__ == debug_flag:
+        print '#####  main func start!  #####'
     parser = argparse.ArgumentParser()
     parser.add_argument("--path_dir" , help='image folder to load')
     parser.add_argument("--model_dir" , help='model folder to load')
@@ -301,73 +306,75 @@ if __name__ =='__main__':
     args = parser.parse_args()
 
 
-args.path_dir
+    args.path_dir
 
-cataract_test_imgs=np.load(os.path.join(args.path_dir,'cataract_test_images.npy'))
-cataract_test_cls=np.load(os.path.join(args.path_dir,'cataract_test_labels.npy'))
-cataract_test_labs=data.cls2onehot(cataract_test_cls , depth=2)
+    cataract_test_imgs=np.load(os.path.join(args.path_dir,'cataract_test_images.npy'))
+    cataract_test_cls=np.load(os.path.join(args.path_dir,'cataract_test_labels.npy'))
+    cataract_test_labs=data.cls2onehot(cataract_test_cls , depth=2)
 
-print len(cataract_test_imgs)
-print len(cataract_test_cls)
+    print len(cataract_test_imgs)
+    print len(cataract_test_cls)
 
-"""
-glaucoma_test_imgs=np.load(os.path.join(args.path_dir,'glaucoma_test_images.npy'))
-glaucoma_test_cls=np.load(os.path.join(args.path_dir,'glaucoma_test_labels.npy'))
-glaucoma_test_labs=data.cls2onehot(glaucoma_test_cls , depth=2)
+    """
+    glaucoma_test_imgs=np.load(os.path.join(args.path_dir,'glaucoma_test_images.npy'))
+    glaucoma_test_cls=np.load(os.path.join(args.path_dir,'glaucoma_test_labels.npy'))
+    glaucoma_test_labs=data.cls2onehot(glaucoma_test_cls , depth=2)
+    
+    retina_test_imgs=np.load(os.path.join(args.path_dir,'retina_test_images.npy'))
+    retina_test_cls=np.load(os.path.join(args.path_dir,'retina_test_labels.npy'))
+    retina_test_labs=data.cls2onehot(retina_test_cls , depth=2)
+    
+    normal_test_imgs=np.load(os.path.join(args.path_dir,'normal_test_images.npy'))
+    normal_test_cls=np.load(os.path.join(args.path_dir,'normal_test_labels.npy'))
+    normal_test_labs=data.cls2onehot(normal_test_cls , depth=2)
+    """
 
-retina_test_imgs=np.load(os.path.join(args.path_dir,'retina_test_images.npy'))
-retina_test_cls=np.load(os.path.join(args.path_dir,'retina_test_labels.npy'))
-retina_test_labs=data.cls2onehot(retina_test_cls , depth=2)
-
-normal_test_imgs=np.load(os.path.join(args.path_dir,'normal_test_images.npy'))
-normal_test_cls=np.load(os.path.join(args.path_dir,'normal_test_labels.npy'))
-normal_test_labs=data.cls2onehot(normal_test_cls , depth=2)
-"""
-
-print 'the number of cataract images',len(cataract_test_imgs)
-cataract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
-print cataract_pred
-print cataract_acc
-"""
-glaucoma_pred , glaucoma_acc =ensemble(args.model_root_dir , glaucoma_test_imgs , glaucoma_test_labs)
-retina_pred , retina_acc =ensemble(args.model_root_dir , retina_test_imgs , retina_test_labs)
-normal_pred , normal_acc =ensemble(args.model_root_dir , normal_test_imgs , normal_test_labs)
-"""
-
-
+    print 'the number of cataract images',len(cataract_test_imgs)
+    cataract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
+    print cataract_pred
+    print cataract_acc
+    """
+    glaucoma_pred , glaucoma_acc =ensemble(args.model_root_dir , glaucoma_test_imgs , glaucoma_test_labs)
+    retina_pred , retina_acc =ensemble(args.model_root_dir , retina_test_imgs , retina_test_labs)
+    normal_pred , normal_acc =ensemble(args.model_root_dir , normal_test_imgs , normal_test_labs)
+    """
 
 
-"""
-    if args.model_dir==None or args.model_dir==None:
-        print 'args 1 : image and label paths folder to load '
-        print 'args 2 : model folder to load '
-        exit()
-    else:
-        folder_path = args.path_dir
-        model_path = args.model_dir
-    files=glob.glob(folder_path+'*.txt')
-    eval_from_numpy_image(path_dir=args.path_dir , model_dir=args.model_dir)
-"""
 
 
-"""
-    imgs_list , labels_list=utils.divide_images_labels_from_batch(test_imgs ,test_labs, batch_size=60)
-    list_imgs_labs=zip(imgs_list , labels_list)
-    mean_acc=[]
-    for img,lab in list_imgs_labs:
-        test_acc=sess.run([accuray] , feed_dict={x_:img , y_:lab ,phase_train:False})
-        mean_acc.append(test_acc)
-    print np.mean(mean_acc)
-    ####eval Class Activation Map####
-"""
-"""
-    vis_abnormal, vis_normal=cam.eval_inspect_cam(sess, cam_ ,top_conv , test_imgs[0:1] , 1 ,x_ , y_ ,y_conv )
-    plt.imshow(vis_abnormal)
-    plt.show()
-    plt.close()
-    plt.imshow(vis_normal)
-    plt.show()
-"""
+    """
+        if args.model_dir==None or args.model_dir==None:
+            print 'args 1 : image and label paths folder to load '
+            print 'args 2 : model folder to load '
+            exit()
+        else:
+            folder_path = args.path_dir
+            model_path = args.model_dir
+        files=glob.glob(folder_path+'*.txt')
+        eval_from_numpy_image(path_dir=args.path_dir , model_dir=args.model_dir)
+    """
 
+
+    """
+        imgs_list , labels_list=utils.divide_images_labels_from_batch(test_imgs ,test_labs, batch_size=60)
+        list_imgs_labs=zip(imgs_list , labels_list)
+        mean_acc=[]
+        for img,lab in list_imgs_labs:
+            test_acc=sess.run([accuray] , feed_dict={x_:img , y_:lab ,phase_train:False})
+            mean_acc.append(test_acc)
+        print np.mean(mean_acc)
+        ####eval Class Activation Map####
+    """
+    """
+        vis_abnormal, vis_normal=cam.eval_inspect_cam(sess, cam_ ,top_conv , test_imgs[0:1] , 1 ,x_ , y_ ,y_conv )
+        plt.imshow(vis_abnormal)
+        plt.show()
+        plt.close()
+        plt.imshow(vis_normal)
+        plt.show()
+    """
+
+    if __debug__ == debug_flag:
+        print '#####  main function end!  #####'
 
 
