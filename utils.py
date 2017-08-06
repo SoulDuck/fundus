@@ -168,7 +168,7 @@ def divide_images_labels_from_batch(images, labels ,batch_size):
             batch_lab_list.append(labs)
             if __debug__ ==debug_flag:
                 print "######utils.py: divide_images_labels_from_batch debug mode#####"
-                print 'total :', len(images), 'batch', len(images)-batch_size ,':',len(images)
+                print 'total :', len(images), 'batch', i*batch_size ,'-',len(images)
         else:
             imgs=images[i*batch_size:(i+1)*batch_size]
             labs=labels[i * batch_size:(i + 1) * batch_size]
