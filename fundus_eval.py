@@ -224,7 +224,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
     path, names, files = os.walk(model_root_dir).next()
     print 'the number of model:', len(names)
     count=0
-    for name in names[:1]:
+    for name in names[:]:
         target_model = os.path.join(model_root_dir, name)
         if labels is None:
             'not implement'
