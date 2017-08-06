@@ -250,16 +250,15 @@ def ensemble(model_root_dir, images, labels , batch=60):
             for imgs , labs in list_imgs_labs:
                 _ , tmp_pred = eval(target_model, imgs, labs)
                 tot_pred.extend(tmp_pred)
-
             tot_cls=np.argmax(tot_pred , axis=1)
             cls=np.argmax(labels, axis=1)
             acc=np.mean(np.equal(cls, tot_cls))
+
             if count==0:
-                sum_pred=tot_pred
+                sum_pred=np.asarray(tot_pred)
             else:
-                sum_pred+=tot_pred
+                sum_pred+=np.asarray(tot_pred)
             count+=1
-    sum_pred=np.asarray(sum_pred)
     mean_pred=sum_pred/float(count)
     tot_cls = np.argmax(sum_pred, axis=1)
     cls = np.argmax(labels, axis=1)
