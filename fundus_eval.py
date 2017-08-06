@@ -223,6 +223,9 @@ def eval_from_numpy_image(path_dir , model_dir):
 
 
 def ensemble(model_root_dir, images, labels , batch=60):
+    debug_flag = True
+    if __debug__ == debug_flag:
+        '### debug mode | fundus_eval.py : ensemble | start ###'
 
     if len(np.shape(labels)) == 1:
         print '***critical error***'
@@ -261,7 +264,8 @@ def ensemble(model_root_dir, images, labels , batch=60):
     tot_cls = np.argmax(sum_pred, axis=1)
     cls = np.argmax(labels, axis=1)
     acc = np.mean(np.equal(cls, tot_cls))
-
+    if __debug__ == debug_flag:
+        '### debug mode | fundus_eval.py : ensemble | end ###'
     return acc,mean_pred
     """
     for i, pred in enumerate(np_preds):
