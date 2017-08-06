@@ -175,6 +175,7 @@ def eval_from_numpy_image(path_dir , model_dir):
     files=glob.glob(path_dir+'*.txt')
     for file in files:
         if 'test' in file:
+
             file_name=file.split('/')[-1] #e.g glaucoma_test_paths.txt
             image_name=file_name.replace('paths.txt' , 'images.npy') #e.g glaucoma_test_images.npy
             image_path=os.path.join(path_dir,image_name) # ./fundus/..../glaucoma_test_imgs.npy
@@ -232,6 +233,7 @@ def ensemble(model_root_dir, images, labels , batch=60):
     print 'the number of model:', len(names)
     count=0
     for name in names[:]:
+        print 'model name:' , name
         target_model = os.path.join(model_root_dir, name)
         if labels is None:
             'not implement'
