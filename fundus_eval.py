@@ -308,6 +308,9 @@ cataract_test_imgs=np.load(os.path.join(args.path_dir,'cataract_test_images.npy'
 cataract_test_cls=np.load(os.path.join(args.path_dir,'cataract_test_labels.npy'))
 cataract_test_labs=data.cls2onehot(cataract_test_cls , depth=2)
 
+print len(cataract_test_imgs)
+print len(cataract_test_cls)
+
 """
 glaucoma_test_imgs=np.load(os.path.join(args.path_dir,'glaucoma_test_images.npy'))
 glaucoma_test_cls=np.load(os.path.join(args.path_dir,'glaucoma_test_labels.npy'))
