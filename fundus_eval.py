@@ -314,6 +314,8 @@ if __name__ =='__main__':
             pred, acc = ensemble(args.model_root_dir, imgs, labs)
             assert len(imgs) == len(labs) == len(cls)
             print 'data :',name , '# image length',len(imgs)
+            print name+' predictions:', pred, name+' accuracy', acc
+
 
     fn(args.path_dir , 'cataract' , 'glaucoma' , 'retina' , 'normal')
 
