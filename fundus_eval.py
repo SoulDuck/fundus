@@ -311,9 +311,9 @@ if __name__ =='__main__':
             imgs = np.load(os.path.join(args.path_dir, name+('_test_images.npy')))
             cls= np.load (os.path.join(args.path_dir ,  name+('_test_labels.npy')))
             labs = data.cls2onehot(cls, depth=2)
+            print 'data :',name , '# image length',len(imgs)
             pred, acc = ensemble(args.model_root_dir, imgs, labs)
             assert len(imgs) == len(labs) == len(cls)
-            print 'data :',name , '# image length',len(imgs)
             print name+' predictions:', pred, '\n'+name+' accuracy', acc
 
 
