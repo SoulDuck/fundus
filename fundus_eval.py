@@ -299,34 +299,47 @@ if __name__ =='__main__':
     debug_flag=True
     if __debug__ == debug_flag:
         print '#####  main func start!  #####'
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--path_dir" , help='image folder to load')
     parser.add_argument("--model_dir" , help='model folder to load')
     parser.add_argument("--model_root_dir", help='model root folder that saved images')
     args = parser.parse_args()
 
+    def fn(paths , *names):
+        for name in names:
+            imgs = np.load(os.path.join(args.path_dir, name+('_test_images.npy')))
+            cls= np.load (os.path.join(args.path_dir ,  name+('_test_labels.npy')))
+            labs = data.cls2onehot(cls, depth=2)
+            assert len(imgs) == len(labs) == len(cls)
+            print 'data :',name , '# image length',len(imgs)
 
-    args.path_dir
+    fn(args.path_dir , 'cataract' , 'glaucoma' , 'retina' , 'normal')
+
+
+
+    """
 
     cataract_test_imgs=np.load(os.path.join(args.path_dir,'cataract_test_images.npy'))
     cataract_test_cls=np.load(os.path.join(args.path_dir,'cataract_test_labels.npy'))
     cataract_test_labs=data.cls2onehot(cataract_test_cls , depth=2)
+    cataract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
+    print 'cataract image length :',len(cataract_test_imgs), 'cataract label length',len(cataract_test_cls)
 
-    print len(cataract_test_imgs)
-    print len(cataract_test_cls)
-
-    """
     glaucoma_test_imgs=np.load(os.path.join(args.path_dir,'glaucoma_test_images.npy'))
     glaucoma_test_cls=np.load(os.path.join(args.path_dir,'glaucoma_test_labels.npy'))
     glaucoma_test_labs=data.cls2onehot(glaucoma_test_cls , depth=2)
-    
+    print 'glaucoma image length :',len(glaucoma_test_imgs), 'glaucoma label length',len(glaucoma_test_cls)
+
     retina_test_imgs=np.load(os.path.join(args.path_dir,'retina_test_images.npy'))
     retina_test_cls=np.load(os.path.join(args.path_dir,'retina_test_labels.npy'))
     retina_test_labs=data.cls2onehot(retina_test_cls , depth=2)
-    
+    print 'retina image length :', len(retina_test_imgs), 'retina label length', len(retina_test_cls)
+
     normal_test_imgs=np.load(os.path.join(args.path_dir,'normal_test_images.npy'))
     normal_test_cls=np.load(os.path.join(args.path_dir,'normal_test_labels.npy'))
     normal_test_labs=data.cls2onehot(normal_test_cls , depth=2)
+    print 'normal image length :', len(normal_test_imgs), 'normal label length', len(normal_test_cls)
     """
 
     print 'the number of cataract images',len(cataract_test_imgs)
