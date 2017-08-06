@@ -311,6 +311,7 @@ if __name__ =='__main__':
             imgs = np.load(os.path.join(args.path_dir, name+('_test_images.npy')))
             cls= np.load (os.path.join(args.path_dir ,  name+('_test_labels.npy')))
             labs = data.cls2onehot(cls, depth=2)
+            pred, acc = ensemble(args.model_root_dir, imgs, labs)
             assert len(imgs) == len(labs) == len(cls)
             print 'data :',name , '# image length',len(imgs)
 
@@ -342,10 +343,6 @@ if __name__ =='__main__':
     print 'normal image length :', len(normal_test_imgs), 'normal label length', len(normal_test_cls)
     """
 
-    print 'the number of cataract images',len(cataract_test_imgs)
-    cataract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
-    print cataract_pred
-    print cataract_acc
     """
     glaucoma_pred , glaucoma_acc =ensemble(args.model_root_dir , glaucoma_test_imgs , glaucoma_test_labs)
     retina_pred , retina_acc =ensemble(args.model_root_dir , retina_test_imgs , retina_test_labs)
