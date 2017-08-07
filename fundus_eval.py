@@ -45,6 +45,7 @@ def get_activation_map(model_dir,image , filename):
     except AssertionError as ae :
         h,w,ch=np.shape(image)
         image = image.reshape([1, h, w, ch])
+
     save_dir , save_name =os.path.split(filename)
     save_name , extension=os.path.splitext(save_name)
     sess = tf.Session()
@@ -68,16 +69,20 @@ def get_activation_map(model_dir,image , filename):
     ABNORMAL_LABEL = 1
 
     #save Image
+
     image=np.squeeze(image)
+    image=np.uint8(image)
     image=Image.fromarray(image)
     image.save(os.path.join(save_dir,save_name+'_original_image'+extension)) # e.g) extension = '.jpg'
     cmap=plt.get_cmap('jet')
     vis_abnormal=cmap(vis_abnormal)
     plt.imsave(os.path.join(save_dir,save_name+'_actmap_abnormal'+extension), vis_abnormal)
+
     #open Image
     vis_abnormal=Image.open(os.path.join(save_dir,save_name+'_actmap_abnormal'+extension))
     plt.imshow(vis_abnormal)
     plt.show()
+
     original_img=Image.open(os.path.join(save_dir,save_name+'_original_image'+extension))
     plt.imshow(original_img)
     plt.show()
@@ -103,16 +108,15 @@ def get_activation_map(model_dir,image , filename):
 
 def get_actmap_using_all_model(model_root_dir , images , save_root_folder , extension='jpg'):
 
-
     print """ fundus_eval.py : def get_actmap_using_all_model """
     path,sub_dirs ,files=os.walk(model_root_dir).next()
     utils.make_dir(save_root_folder)
     for dir in sub_dirs:
-        count=0
+
         target_model_dir=os.path.join(model_root_dir , dir)
         target_save_dir=os.path.join(save_root_folder , dir)
         utils.make_dir(target_save_dir)
-        for image in images:
+        for count,image in enumerate(images):
             save_file_path=os.path.join( target_save_dir, str(count)+'.'+extension)
             get_activation_map( target_model_dir , image , save_file_path )
 
@@ -124,32 +128,25 @@ def get_actmap_using_all_model(model_root_dir , images , save_root_folder , exte
         for dir in sub_dirs:
             target_dir = os.path.join(save_root_folder, dir)
             img=Image.open(os.path.join(target_dir,str(i)+'_actmap_abnormal'+'.'+extension))
+            img=img.convert('RGB')
+            print np.shape(img)
+
             np_img=np.asarray(img)
             if i==0:
                 merged_img=np_img
             else:
                 merged_img+=np_img
 
-        merged_img=merged_img/float(n_images)
-        merged_img=np.uint8(merged_img)
+
+
+        print np.shape(merged_img)
+        merged_img=merged_img/n_images
+        #merged_img=np.uint8(merged_img)
         merged_img=Image.fromarray(merged_img)
         target_filename='merged_'+str(i)+'.'+extension
         target_filepath=os.path.join(target_save_dir , target_filename)
         print np.shape(merged_img)
         plt.imsave(target_filepath , merged_img)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def eval(model_folder_path , images, labels=None):
@@ -340,11 +337,11 @@ def ensemble(model_root_dir, images, labels , batch=60):
     """
 
 
-def ensemble_all(paths ,model_root_dir, *names):
+def ensemble_all(path_dir ,model_root_dir, *names):
     #usage : ensemble_all(args.path_dir , args.model_root_dir , 'cataract' , 'glaucoma' , 'retina' , 'normal')
     for name in names:
-        imgs = np.load(os.path.join(args.path_dir, name+('_test_images.npy')))
-        cls= np.load (os.path.join(args.path_dir ,  name+('_test_labels.npy')))
+        imgs = np.load(os.path.join(path_dir, name+('_test_images.npy')))
+        cls= np.load (os.path.join(path_dir ,  name+('_test_labels.npy')))
         labs = data.cls2onehot(cls, depth=2)
         print 'data :',name , '# image length',len(imgs)
         acc, pred = ensemble(model_root_dir, imgs, labs)
@@ -382,8 +379,8 @@ if __name__ =='__main__':
     #ensemble_all(args.path_dir , args.model_root_dir , 'cataract' , 'glaucoma' , 'retina' , 'normal')
 
     """ usage : get_activation_map"""
-    imgs=np.load('test_imgs_.npy')
-    get_actmap_using_all_model(args.model_root_dir , imgs[0:1] , './sample_actmap')
+    imgs=np.load('./FD_300.npy')
+    get_actmap_using_all_model(args.model_root_dir , imgs , './FD_300_actmap' )
     #get_activation_map(args.model_dir , imgs[0]  , './sample_actmap.jpg')
 
 
