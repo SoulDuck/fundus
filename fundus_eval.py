@@ -48,7 +48,6 @@ def get_activation_map(model_dir,image , filename):
 
     save_dir , save_name =os.path.split(filename)
     save_name , extension=os.path.splitext(save_name)
-    extension='.png'
     sess = tf.Session()
 
     saver = tf.train.import_meta_graph(os.path.join(model_dir , 'best_acc.ckpt.meta'))
@@ -107,7 +106,7 @@ def get_activation_map(model_dir,image , filename):
     return vis_normal
 
 
-def get_actmap_using_all_model(model_root_dir , images , save_root_folder , extension='jpg'):
+def get_actmap_using_all_model(model_root_dir , images , save_root_folder , extension='png'):
 
     print """ fundus_eval.py : def get_actmap_using_all_model """
     path,sub_dirs ,files=os.walk(model_root_dir).next()
