@@ -30,7 +30,11 @@ new_img.save("new.png","PNG")
 NORMAL_LABEL = 0
 ABNORMAL_LABEL = 1
 
-def get_activation_map(image , filename):
+def get_activation_map(model_dir,image , filename):
+    debug_flag=True
+    if __debug__ == debug_flag:
+        print "debug : fundus_eval.py | get_activation_map"
+
     try:### error contor
         assert type(image).__module__ == np.__name__##check type if not image
     except AssertionError as ae:
@@ -41,36 +45,43 @@ def get_activation_map(image , filename):
     except AssertionError as ae :
         h,w,ch=np.shape(image)
         image = image.reshape([1, h, w, ch])
-
+    save_dir , save_name =os.path.split(filename)
+    save_name , extension=os.path.splitext(save_name)
     sess = tf.Session()
-    saver = tf.train.import_meta_graph('./cnn_model/best_acc.ckpt.meta')
-    saver.restore(sess, './cnn_model/best_acc.ckpt')
+
+    saver = tf.train.import_meta_graph(os.path.join(model_dir , 'best_acc.ckpt.meta'))
+    saver.restore(sess, os.path.join(model_dir , 'best_acc.ckpt'))
     tf.get_default_graph()
+
     accuray = tf.get_default_graph().get_tensor_by_name('accuracy:0')
+
     x_ = tf.get_default_graph().get_tensor_by_name('x_:0')
     y_ = tf.get_default_graph().get_tensor_by_name('y_:0')
     cam_ = tf.get_default_graph().get_tensor_by_name('classmap_reshape:0')
     top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
     phase_train = tf.get_default_graph().get_tensor_by_name('phase_train:0')
     y_conv = tf.get_default_graph().get_tensor_by_name('y_conv:0')
-    vis_abnormal, vis_normal=cam.eval_inspect_cam(sess, cam_ ,top_conv , image , 1 ,x_ , y_ ,y_conv )
+
+    vis_abnormal, vis_normal=cam.eval_inspect_cam(sess, cam_ ,top_conv , image , 1 ,x_ , y_ , phase_train , y_conv )
+
     NORMAL_LABEL = 0
     ABNORMAL_LABEL = 1
+
+    #save Image
     image=np.squeeze(image)
     image=Image.fromarray(image)
-    image.save('original_image.png')
-
+    image.save(os.path.join(save_dir,save_name+'_original_image'+extension)) # e.g) extension = '.jpg'
     cmap=plt.get_cmap('jet')
-
     vis_abnormal=cmap(vis_abnormal)
-    plt.imsave('actmap_abnormal.png', vis_abnormal)
-
-    vis_abnormal=Image.open('./actmap_abnormal.png')
+    plt.imsave(os.path.join(save_dir,save_name+'_actmap_abnormal'+extension), vis_abnormal)
+    #open Image
+    vis_abnormal=Image.open(os.path.join(save_dir,save_name+'_actmap_abnormal'+extension))
     plt.imshow(vis_abnormal)
     plt.show()
-    original_img=Image.open('./original_image.png')
+    original_img=Image.open(os.path.join(save_dir,save_name+'_original_image'+extension))
     plt.imshow(original_img)
     plt.show()
+
     background = original_img.convert("RGBA")
     overlay = vis_abnormal.convert("RGBA")
 
@@ -88,6 +99,57 @@ def get_activation_map(image , filename):
         plt.imshow(vis_normal)
         plt.show()
     return vis_normal
+
+
+def get_actmap_using_all_model(model_root_dir , images , save_root_folder , extension='jpg'):
+
+
+    print """ fundus_eval.py : def get_actmap_using_all_model """
+    path,sub_dirs ,files=os.walk(model_root_dir).next()
+    utils.make_dir(save_root_folder)
+    for dir in sub_dirs:
+        count=0
+        target_model_dir=os.path.join(model_root_dir , dir)
+        target_save_dir=os.path.join(save_root_folder , dir)
+        utils.make_dir(target_save_dir)
+        for image in images:
+            save_file_path=os.path.join( target_save_dir, str(count)+'.'+extension)
+            get_activation_map( target_model_dir , image , save_file_path )
+
+    utils.make_dir(os.path.join(save_root_folder , 'merge'))#create save_root_folder/merge folder
+    n_images=len(images)
+
+    target_save_dir=os.path.join(save_root_folder,'merge')
+    for i in range(n_images):
+        for dir in sub_dirs:
+            target_dir = os.path.join(save_root_folder, dir)
+            img=Image.open(os.path.join(target_dir,str(i)+'_actmap_abnormal'+'.'+extension))
+            np_img=np.asarray(img)
+            if i==0:
+                merged_img=np_img
+            else:
+                merged_img+=np_img
+
+        merged_img=merged_img/float(n_images)
+        merged_img=np.uint8(merged_img)
+        merged_img=Image.fromarray(merged_img)
+        target_filename='merged_'+str(i)+'.'+extension
+        target_filepath=os.path.join(target_save_dir , target_filename)
+        print np.shape(merged_img)
+        plt.imsave(target_filepath , merged_img)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def eval(model_folder_path , images, labels=None):
@@ -278,6 +340,16 @@ def ensemble(model_root_dir, images, labels , batch=60):
     """
 
 
+def ensemble_all(paths ,model_root_dir, *names):
+    #usage : ensemble_all(args.path_dir , args.model_root_dir , 'cataract' , 'glaucoma' , 'retina' , 'normal')
+    for name in names:
+        imgs = np.load(os.path.join(args.path_dir, name+('_test_images.npy')))
+        cls= np.load (os.path.join(args.path_dir ,  name+('_test_labels.npy')))
+        labs = data.cls2onehot(cls, depth=2)
+        print 'data :',name , '# image length',len(imgs)
+        acc, pred = ensemble(model_root_dir, imgs, labs)
+        assert len(imgs) == len(labs) == len(cls)
+        print name+' predictions:', pred, '\n'+name+' accuracy', acc
 
 
 
@@ -306,50 +378,14 @@ if __name__ =='__main__':
     parser.add_argument("--model_root_dir", help='model root folder that saved images')
     args = parser.parse_args()
 
-    def fn(paths , *names):
-        for name in names:
-            imgs = np.load(os.path.join(args.path_dir, name+('_test_images.npy')))
-            cls= np.load (os.path.join(args.path_dir ,  name+('_test_labels.npy')))
-            labs = data.cls2onehot(cls, depth=2)
-            print 'data :',name , '# image length',len(imgs)
-            acc, pred = ensemble(args.model_root_dir, imgs, labs)
-            assert len(imgs) == len(labs) == len(cls)
-            print name+' predictions:', pred, '\n'+name+' accuracy', acc
+    """ usage : ensemble_all """
+    #ensemble_all(args.path_dir , args.model_root_dir , 'cataract' , 'glaucoma' , 'retina' , 'normal')
 
+    """ usage : get_activation_map"""
+    imgs=np.load('test_imgs_.npy')
+    get_actmap_using_all_model(args.model_root_dir , imgs[0:1] , './sample_actmap')
+    #get_activation_map(args.model_dir , imgs[0]  , './sample_actmap.jpg')
 
-    fn(args.path_dir , 'cataract' , 'glaucoma' , 'retina' , 'normal')
-
-
-
-    """
-
-    cataract_test_imgs=np.load(os.path.join(args.path_dir,'cataract_test_images.npy'))
-    cataract_test_cls=np.load(os.path.join(args.path_dir,'cataract_test_labels.npy'))
-    cataract_test_labs=data.cls2onehot(cataract_test_cls , depth=2)
-    cataract_pred , cataract_acc =ensemble(args.model_root_dir , cataract_test_imgs , cataract_test_labs)
-    print 'cataract image length :',len(cataract_test_imgs), 'cataract label length',len(cataract_test_cls)
-
-    glaucoma_test_imgs=np.load(os.path.join(args.path_dir,'glaucoma_test_images.npy'))
-    glaucoma_test_cls=np.load(os.path.join(args.path_dir,'glaucoma_test_labels.npy'))
-    glaucoma_test_labs=data.cls2onehot(glaucoma_test_cls , depth=2)
-    print 'glaucoma image length :',len(glaucoma_test_imgs), 'glaucoma label length',len(glaucoma_test_cls)
-
-    retina_test_imgs=np.load(os.path.join(args.path_dir,'retina_test_images.npy'))
-    retina_test_cls=np.load(os.path.join(args.path_dir,'retina_test_labels.npy'))
-    retina_test_labs=data.cls2onehot(retina_test_cls , depth=2)
-    print 'retina image length :', len(retina_test_imgs), 'retina label length', len(retina_test_cls)
-
-    normal_test_imgs=np.load(os.path.join(args.path_dir,'normal_test_images.npy'))
-    normal_test_cls=np.load(os.path.join(args.path_dir,'normal_test_labels.npy'))
-    normal_test_labs=data.cls2onehot(normal_test_cls , depth=2)
-    print 'normal image length :', len(normal_test_imgs), 'normal label length', len(normal_test_cls)
-    """
-
-    """
-    glaucoma_pred , glaucoma_acc =ensemble(args.model_root_dir , glaucoma_test_imgs , glaucoma_test_labs)
-    retina_pred , retina_acc =ensemble(args.model_root_dir , retina_test_imgs , retina_test_labs)
-    normal_pred , normal_acc =ensemble(args.model_root_dir , normal_test_imgs , normal_test_labs)
-    """
 
 
 

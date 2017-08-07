@@ -1,1 +1,3 @@
-print range(1)
+import os
+
+print os.path.splitext('sample.txt')

@@ -15,7 +15,7 @@ def get_class_map(name,x , label , im_width):
     classmap = tf.reshape(classmap ,[-1 , im_width , im_width] ,name='classmap_reshape')
     return classmap
 
-def inspect_cam(sess, cam , top_conv ,test_imgs, test_labs, global_step , num_images , x, y_ , y):
+def inspect_cam(sess, cam , top_conv ,test_imgs, test_labs, global_step , num_images , x_ , y_ , phase_train , y ):
     debug_flag=False
     try:
         os.mkdir('./out');
@@ -34,7 +34,7 @@ def inspect_cam(sess, cam , top_conv ,test_imgs, test_labs, global_step , num_im
             plt.imsave('{}/image_test.png'.format(save_dir), test_imgs[s])
         img = test_imgs[s:s+1]
         label = test_labs[s:s+1]
-        conv_val , output_val =sess.run([top_conv , y] , feed_dict={x:img})
+        conv_val , output_val =sess.run([top_conv , y] , feed_dict={x_:img , phase_train:False})
         cam_ans= sess.run( cam ,  feed_dict={ y_:label , top_conv:conv_val })
         cam_vis=list(map(lambda x: (x-x.min())/(x.max()-x.min()) , cam_ans))
         for vis , ori in zip(cam_vis , img):
@@ -47,7 +47,7 @@ def inspect_cam(sess, cam , top_conv ,test_imgs, test_labs, global_step , num_im
             plt.close();
 
 
-def eval_inspect_cam(sess, cam , top_conv ,test_imgs, num_images , x, y_ , y):
+def eval_inspect_cam(sess, cam , top_conv ,test_imgs, num_images , x, y_ ,phase_train, y):
     ABNORMAL_LABEL =np.asarray([[0,1]])
     NORMAL_LABEL = np.asarray([[1,0]])
 
@@ -67,9 +67,9 @@ def eval_inspect_cam(sess, cam , top_conv ,test_imgs, num_images , x, y_ , y):
         else :
             plt.imsave('{}/image_test.png'.format(save_dir), test_imgs[s])
         img=test_imgs
-        conv_val , output_val =sess.run([top_conv , y] , feed_dict={x:img})
-        cam_ans_abnormal= sess.run( cam ,  feed_dict={ y_:ABNORMAL_LABEL , top_conv:conv_val })
-        cam_ans_normal = sess.run(cam, feed_dict={y_: NORMAL_LABEL, top_conv: conv_val})
+        conv_val , output_val =sess.run([top_conv , y] , feed_dict={x:img , phase_train:False})
+        cam_ans_abnormal= sess.run( cam ,  feed_dict={ y_:ABNORMAL_LABEL , top_conv:conv_val ,phase_train:False })
+        cam_ans_normal = sess.run(cam, feed_dict={y_: NORMAL_LABEL, top_conv: conv_val , phase_train:False})
 
         cam_vis_abnormal=list(map(lambda x: (x-x.min())/(x.max()-x.min()) , cam_ans_abnormal))
         cam_vis_normal=list(map(lambda x: (x-x.min())/(x.max()-x.min()) , cam_ans_normal))

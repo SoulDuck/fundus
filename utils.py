@@ -17,6 +17,19 @@ overlay = overlay.convert("RGBA")
 new_img = Image.blend(background, overlay, 0.5)
 new_img.save("new.png","PNG")
 """
+
+def make_dir(path_dir):
+    debug_flag=True
+
+    if __debug__ ==True:
+        print "debug mode : utils.py | make_dir "
+
+    if not os.path.isdir(path_dir):
+        os.mkdir(path_dir)
+        print path_dir, 'was created!'
+    else:
+        print path_dir,' is existed!'
+
 def get_name(path):
     name = path.split('/')[-1].split('.')[0]
     return name
