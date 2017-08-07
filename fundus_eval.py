@@ -48,6 +48,7 @@ def get_activation_map(model_dir,image , filename):
 
     save_dir , save_name =os.path.split(filename)
     save_name , extension=os.path.splitext(save_name)
+    extension='.png'
     sess = tf.Session()
 
     saver = tf.train.import_meta_graph(os.path.join(model_dir , 'best_acc.ckpt.meta'))
