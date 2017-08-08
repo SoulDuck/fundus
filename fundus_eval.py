@@ -117,6 +117,10 @@ def get_actmap_using_all_model(model_root_dir , images , save_root_folder , exte
         target_save_dir=os.path.join(save_root_folder , dir)
         utils.make_dir(target_save_dir)
         for count,image in enumerate(images):
+            print '####'
+            print count
+            print '####'
+
             save_file_path=os.path.join( target_save_dir, str(count)+'.'+extension)
             get_activation_map( target_model_dir , image , save_file_path )
 
