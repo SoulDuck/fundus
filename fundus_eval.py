@@ -380,7 +380,8 @@ if __name__ =='__main__':
 
     """ usage : get_activation_map"""
     imgs=np.load('./FD_300.npy')
-    get_actmap_using_all_model(args.model_root_dir , imgs[:] , './FD_300_actmap' )
+    print np.shape(imgs)
+    get_actmap_using_all_model(args.model_root_dir , imgs , './FD_300_actmap' )
     #get_activation_map(args.model_dir , imgs[0]  , './sample_actmap.jpg')
 
 
