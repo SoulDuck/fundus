@@ -134,14 +134,11 @@ def get_actmap_using_all_model(model_root_dir , images , save_root_folder , exte
             img=Image.open(os.path.join(target_dir,str(i)+'_actmap_abnormal'+'.'+extension))
             img=img.convert('RGB')
             print np.shape(img)
-
             np_img=np.asarray(img)
             if i==0:
                 merged_img=np_img
             else:
                 merged_img+=np_img
-
-
 
         print np.shape(merged_img)
         merged_img=merged_img/n_images
