@@ -3,25 +3,11 @@ import numpy as np
 from PIL import Image
 import PIL
 
-paths=glob.glob('/Users/seongjungkim/Downloads/FP300/*.jpg')
-img=Image.open(paths[0])
 
-h,w,ch=np.shape(img)
-np_images=np.zeros([len(paths) , 300 ,300, ch])
-
-
-
-f=open('./path.txt' , 'w')
-for i,path in enumerate(paths):
-    f.write(path+'\n')
-    img=Image.open(path)
-    img=img.resize([300,300] , PIL.Image.ANTIALIAS)
-    img=np.asarray(img)
-    np_images[i]=img
+path,names,files=os.walk('../fundus_data/cropped_original_fundus_300x300/').next()
+paths=map(lambda name : os.path.join(path , name) , names)
+list_paths=map(lambda path : glob.glob(path+'/*.png.png..png') ,paths)
+for paths in list_paths:
+    paths=map(lambda path : os.rename(path , path.replace('.png.png..png', '.png') ) , paths)
 
 
-np.save('./FD_300.npy',np_images)
-f.close()
-
-images=np.load('./FD_300.npy')
-print np.shape(images)
