@@ -263,7 +263,6 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
                 f_test_paths = open(os.path.join(reload_folder_path, name + '_test_paths.txt'))
                 train_lines=f_train_paths.readlines()
                 test_lines = f_test_paths.readlines()
-                print train_lines
 
                 train_file_paths=map(lambda line: line.replace('\n','') , train_lines)
                 test_file_paths = map(lambda line: line.replace('\n', ''), test_lines)
@@ -273,7 +272,7 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
                 train_list_file_paths.append(train_file_paths)
                 test_list_imgs.append(test_imgs)
                 train_list_imgs.append(train_imgs)
-
+                print 'names:', name, 'sample paths', train_lines[:10]
                 print len(train_lines)
                 print len(test_lines)
             except IOError as ioe:
@@ -284,10 +283,6 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
         print train_list_file_paths[0]
 
     return train_list_imgs, test_list_imgs, train_list_file_paths, test_list_file_paths, names
-
-
-
-
 
 
 
