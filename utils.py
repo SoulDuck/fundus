@@ -18,6 +18,16 @@ new_img = Image.blend(background, overlay, 0.5)
 new_img.save("new.png","PNG")
 """
 
+def concat_all(images , axis):
+    for i,image in enumerate(images):
+        image=np.asarray(image)
+        print np.shape(image)
+        if i==0:
+            merged_images=image
+        else:
+            merged_images=np.concatenate([merged_images , image] , axis=axis)
+    return merged_images
+
 def make_dir(path_dir):
     debug_flag=True
 

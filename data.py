@@ -97,7 +97,7 @@ def multiproc_make_numpy_images_labels(paths, label_num):
     images = []
 
     for img, path in pool.imap(open_Image, paths):
-        if img == 'None':
+        if img is 'None':
             continue
         utils.show_progress(count, len(paths))
         images.append(img)
@@ -206,6 +206,91 @@ def get_train_test_images_labels(normal_images, abnormal_images, train_ratio=0.9
     return train_images, train_labels, test_images, test_labels
 
 
+
+
+def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
+                  names=['cataract','glaucoma','retina','retina_glaucoma','retina_cataract','cataract_glaucoma','normal'],\
+                  n_tests=[100,100,100,5,5,5,330]
+                  ,labels=[0,0,0,0,0,0,1]):
+
+    """
+    usage:
+    :param folder_path: e.g) ../fundus_data/cropped_optical/
+    :reload_paths_folder: glaucoma_test_images.npy saved!
+    :return:
+
+    have to read!!
+    ** paths will save here --> '/fundus/paths/0'
+    """
+    debug_flag_lv0 = True
+    debug_flag_lv1=True
+    if __debug__ ==debug_flag_lv0:
+        print 'start : fundus | data | fundus_images'
+
+    assert len(names)==len(n_tests)==len(labels)
+
+    if extension.startswith('.'):
+        extension=extension.replace('.','')
+
+    test_list_file_paths = []
+    train_list_file_paths = []
+    test_list_imgs = [];
+    train_list_imgs = []
+    if reload_folder_path is None:
+        path,names_,files=os.walk(folder_path).next()
+        folder_paths=map(lambda name : os.path.join(path, name), names) # ./cropped_300x300/cataract
+        list_file_paths=map(lambda folder_path : glob.glob(os.path.join(folder_path , '*.'+extension)) , folder_paths)
+
+        for file_paths in list_file_paths:
+            print file_paths[:10]
+        for i in range(len(names)): #len(names) ==> 7
+            if __debug__ == debug_flag_lv1:
+                print names[i]
+                print 'the # of list of train file paths', len(file_paths[n_tests[i]:])
+                print 'the # of list of test file paths', len(file_paths[:n_tests[i]])
+            file_paths=list_file_paths[i]
+            test_list_file_paths.append(file_paths[:n_tests[i]])
+            train_list_file_paths.append(file_paths[n_tests[i]:])
+            test_imgs=multiproc_make_numpy_images_labels(file_paths[:n_tests[i]], label_num=labels[i])
+            train_imgs = multiproc_make_numpy_images_labels(file_paths[:n_tests[i]], label_num=labels[i])
+            test_list_imgs.append(test_imgs)
+            train_list_imgs.append(train_imgs)
+    else:
+
+        for i,name in enumerate(names):
+            try:
+                f_train_paths=open(os.path.join(reload_folder_path,name+'_train_paths.txt'))
+                f_test_paths = open(os.path.join(reload_folder_path, name + '_test_paths.txt'))
+                train_lines=f_train_paths.readlines()
+                test_lines = f_test_paths.readlines()
+                print train_lines
+
+                train_file_paths=map(lambda line: line.replace('\n','') , train_lines)
+                test_file_paths = map(lambda line: line.replace('\n', ''), test_lines)
+                train_imgs = multiproc_make_numpy_images_labels(train_file_paths, label_num=labels[i])
+                test_imgs = multiproc_make_numpy_images_labels(test_file_paths, label_num=labels[i])
+                test_list_file_paths.append(test_file_paths)
+                train_list_file_paths.append(train_file_paths)
+                test_list_imgs.append(test_imgs)
+                train_list_imgs.append(train_imgs)
+
+                print len(train_lines)
+                print len(test_lines)
+            except IOError as ioe:
+                print 'cannot find folder or files'
+                break;
+    if __debug__ == debug_flag_lv1:
+        print len(train_list_file_paths[0])
+        print train_list_file_paths[0]
+
+    return train_list_imgs, test_list_imgs, train_list_file_paths, test_list_file_paths, names
+
+
+
+
+
+
+
 def eye_299x299():
     image_height = 299
     image_width = 299
@@ -240,123 +325,10 @@ def eye_299x299():
     return image_height, image_width, image_color_ch, n_classes, train_imgs, train_labs, test_imgs, test_labs
 
 
-def fundus_images(folder_path, extension='png', reload_paths_folder=None):
-    """
-    usage:
-    :param folder_path: e.g) ../fundus_data/cropped_optical/
-    :reload_paths_folder: glaucoma_test_images.npy saved!
-    :return:
 
-    have to read!!
-    ** paths will save here --> '/fundus/paths/0'
-    """
-    debug_flag = True
-
-    cataract_test_ratio = 0.05
-    glaucoma_test_ratio = 0.05
-    retina_test_ratio = 0.05
-    normal_test_ratio = 0.05
-    if reload_paths_folder == None:
-        cataract_paths = make_paths(folder_path + 'cataract/', '*.' + extension,folder_path + 'cataract/' + 'cataract_paths.txt')  # no random shuffle
-        retina_paths = make_paths(folder_path + 'retina/', '*.' + extension,folder_path + 'retina/' + 'retina_paths.txt')
-        glaucoma_paths = make_paths(folder_path + 'glaucoma/', '*.' + extension,folder_path + '/glaucoma/' + 'glaucoma_paths.txt')
-        normal_paths = make_paths(folder_path + 'normal/', '*.' + extension,folder_path + '/normal/' + 'normal_paths.txt')
-
-        cataract_train_paths, cataract_test_paths = get_train_test_paths(cataract_test_ratio,folder_path + 'cataract/' + 'cataract_paths.txt')  # random shuffle here
-        glaucoma_train_paths, glaucoma_test_paths = get_train_test_paths(glaucoma_test_ratio,folder_path + 'retina/' + 'retina_paths.txt')
-        retina_train_paths, retina_test_paths = get_train_test_paths(retina_test_ratio,folder_path + '/glaucoma/' + 'glaucoma_paths.txt')
-        normal_train_paths, normal_test_paths = get_train_test_paths(normal_test_ratio,folder_path + '/normal/' + 'normal_paths.txt')
-
-        foler_name = folder_path.split('/')[-2]
-        save_folder_path = utils.make_folder(os.path.join('./paths/'), foler_name + '/')
-        save_paths(cataract_train_paths, save_folder_path + 'cataract_train_paths.txt');
-        save_paths(cataract_test_paths, save_folder_path + 'cataract_test_paths.txt')
-        save_paths(glaucoma_train_paths, save_folder_path + 'glaucoma_train_paths.txt');
-        save_paths(glaucoma_test_paths, save_folder_path + 'glaucoma_test_paths.txt')
-        save_paths(retina_train_paths, save_folder_path + 'retina_train_paths.txt');
-        save_paths(retina_test_paths, save_folder_path + 'retina_test_paths.txt')
-        save_paths(normal_train_paths, save_folder_path + 'normal_train_paths.txt');
-        save_paths(normal_test_paths, save_folder_path + 'normal_test_paths.txt')
-
-        ########################################  setting here ###############################################
-        ####################################################################################################
-        print 'Image Loading ....'
-
-        """warning! read first!"""
-        """cata_train = (cata_train_images , cata_train_labels) """
-        cataract_train = multiproc_make_numpy_images_labels(cataract_train_paths, label_num=1)
-        glaucoma_train = multiproc_make_numpy_images_labels(glaucoma_train_paths, label_num=1)
-        retina_train = multiproc_make_numpy_images_labels(retina_train_paths, label_num=1)
-        normal_train = multiproc_make_numpy_images_labels(normal_train_paths, label_num=0)
-
-        cataract_test = multiproc_make_numpy_images_labels(cataract_test_paths, label_num=1)
-        glaucoma_test = multiproc_make_numpy_images_labels(glaucoma_test_paths, label_num=1)
-        retina_test = multiproc_make_numpy_images_labels(retina_test_paths, label_num=1)
-        normal_test = multiproc_make_numpy_images_labels(normal_test_paths, label_num=0)
-
-        np.save(save_folder_path + 'cataract_test_images.npy', cataract_test[0])
-        np.save(save_folder_path + 'glaucoma_test_images.npy', glaucoma_test[0])
-        np.save(save_folder_path + 'retina_test_images.npy', retina_test[0])
-        np.save(save_folder_path + 'normal_test_images_.npy', normal_test[0])
-        np.save(save_folder_path + 'cataract_test_labels_.npy', cataract_test[1])
-        np.save(save_folder_path + 'glaucoma_test_labels.npy', glaucoma_test[1])
-        np.save(save_folder_path + 'retina_test_labels_.npy', retina_test[1])
-        np.save(save_folder_path + 'normal_test_labels.npy', normal_test[1])
-    else:
-        print '#################  image load from reload-folder   ##################'
-
-        cataract_test_paths=utils.get_paths_from_text(os.path.join(reload_paths_folder, 'cataract_test_paths.txt'))
-        glaucoma_test_paths=utils.get_paths_from_text(os.path.join(reload_paths_folder, 'glaucoma_test_paths.txt'))
-        retina_test_paths=utils.get_paths_from_text(os.path.join(reload_paths_folder, 'retina_test_paths.txt'))
-        normal_test_paths=utils.get_paths_from_text(os.path.join(reload_paths_folder, 'normal_test_paths.txt'))
-
-        cataract_train_paths=utils.get_paths_from_text(os.path.join(reload_paths_folder, 'cataract_train_paths.txt'))
-        glaucoma_train_paths=utils.get_paths_from_text(os.path.join(reload_paths_folder, 'glaucoma_train_paths.txt'))
-        retina_train_paths=utils.get_paths_from_text(os.path.join(reload_paths_folder, 'retina_train_paths.txt'))
-        normal_train_paths=utils.get_paths_from_text(os.path.join(reload_paths_folder, 'normal_train_paths.txt'))
-
-        cataract_train = multiproc_make_numpy_images_labels(cataract_train_paths, label_num=1)
-        glaucoma_train = multiproc_make_numpy_images_labels(glaucoma_train_paths, label_num=1)
-        retina_train = multiproc_make_numpy_images_labels(retina_train_paths, label_num=1)
-        normal_train = multiproc_make_numpy_images_labels(normal_train_paths, label_num=0)
-
-        cataract_test = multiproc_make_numpy_images_labels(cataract_test_paths, label_num=1)
-        glaucoma_test = multiproc_make_numpy_images_labels(glaucoma_test_paths, label_num=1)
-        retina_test = multiproc_make_numpy_images_labels(retina_test_paths, label_num=1)
-        normal_test = multiproc_make_numpy_images_labels(normal_test_paths, label_num=0)
-
-
-    if __debug__ == debug_flag:
-        print ''
-        print '# cataract :', len(cataract_train_paths)+len(cataract_test_paths)
-        print '# glaucoma :', len(glaucoma_train_paths)+len(glaucoma_test_paths)
-        print '# retina :', len(retina_train_paths)+len(retina_test_paths)
-        print '# normal :', len(normal_train_paths)+len(normal_test_paths)
-
-        print '# cataract train , :', len(cataract_train_paths), '# cataract test :', len(cataract_test_paths)
-        print '# glaucoma train , :', len(glaucoma_train_paths), '# glaucoma test :', len(glaucoma_test_paths)
-        print '# retina train , :', len(retina_train_paths), '# retina test :', len(retina_test_paths)
-        print '# normal train , :', len(normal_train_paths), '# normal test :', len(normal_test_paths)
-
-        #print 'path saved here ', save_folder_path
-        print np.shape(cataract_train)
-        print 'shape of cata_train_imgs', np.shape(cataract_train[0])
-        fig = plt.figure()
-        a = fig.add_subplot(1, 2, 1)
-        a.set_xlabel('')
-        plt.imshow(cataract_train[0][0])
-        a = fig.add_subplot(1, 2, 2)
-        a.set_xlabel('')
-        plt.imshow(cataract_train[0][1])
-        plt.show()
-
-    return [cataract_train, cataract_test, cataract_train_paths, cataract_test_paths], \
-           [glaucoma_train, glaucoma_test, glaucoma_train_paths, glaucoma_test_paths], \
-           [retina_train, retina_test, retina_train_paths, retina_test_paths], \
-           [normal_train, normal_test, normal_train_paths, normal_test_paths]
-
-
-def fundus_299x299(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/0/'):
+def fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path=None,extension='png',\
+    names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal'], \
+    n_tests = [100, 100, 100, 5, 5, 5, 330], labels = [0, 0, 0, 0, 0, 0, 1]):
     """
     dir tree
         fundus_data
@@ -365,34 +337,30 @@ def fundus_299x299(folder_path='../fundus_data/cropped_original_fundus_300x300/'
             |
             cropped_macula #299x299
             cropped_optical #299x299
-            resized_fundus #299x299
-    fundus_images
-    cata=[cata_train  , cata_test , cata_train_paths , cata_test_paths] ,\
-    glau=[glau_train , glau_test , glau_train_paths , glau_test_paths],\
-    retina=[retina_train , retina_test , retina_train_paths , retina_test_paths],\
-    normal=[normal_train , normal_test , normal_train_paths , normal_test_paths]
-    :return:
+            cropped_original_fundus_300x300 #300x300
+    :return:  image_height, image_width, image_color_ch, n_classes, train_list_imgs_labs, test_list_imgs_labs,train_list_file_paths, test_list_file_paths
+
     """
-
     debug_flag = True
-    n_classes = 2
+    train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths, names=\
+            fundus_images(folder_path,reload_folder_path ,extension,names,n_tests,labels)
+    n,h,w,ch=np.shape(train_list_imgs_labs[0][0])
 
-    cata, glau, retina, normal = fundus_images(folder_path, extension , reload_paths_folder)
-    train_imgs_labs = (cata[0], glau[0], retina[0], normal[0])
-    test_imgs = np.concatenate((cata[1][0], glau[1][0], retina[1][0], normal[1][0]))
-    test_labs = np.concatenate((cata[1][1], glau[1][1], retina[1][1], normal[1][1]))
-    test_labs = test_labs.astype(np.int32)
-    test_labs = cls2onehot(test_labs, 2)
-    image_height, image_width, image_color_ch = np.shape(train_imgs_labs[0][0][0])
+    n_classes = 2
+    image_height=h
+    image_width=w
+    image_color_ch=ch
+
+    assert image_height==300 and image_height==300
+
 
     if __debug__ == debug_flag:
         print 'image_height', image_height
         print 'image_weight', image_height
         print 'image_color_ch', image_color_ch
         print 'n classes', n_classes
-        print 'test_imgs shape', test_imgs.shape
-        print 'test_labs shape', test_labs.shape
-    return image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs
+    return image_height, image_width, image_color_ch, n_classes, \
+               train_list_imgs_labs, test_list_imgs_labs,train_list_file_paths, test_list_file_paths,names
 
 
 def macula_299x299():
@@ -439,39 +407,44 @@ def optical_299x299():
 
     return image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs
 
-
-def make_train_batch(cata_train, glau_train, retina_train, normal_train):
+def make_batch(list_imgs_labs ,  nx , names ):
     """
-
     :param cata_train = (cata_train_imgs , cata_train_labs)
     :param glau_train: = (glau_train_imgs , glau_train_labs)
     :param retina_train =  (retina_train_imgs , retina_train_labs)
     :param normal_train: =  (normal_train_imgs , normal_train_labs)
     :return:
     """
-    debug_flag = False
-    cata_batch = 7
-    glau_batch = 13
-    retina_batch = 10
-    normal_batch = 30
-    n_batch = cata_batch + glau_batch + retina_batch + normal_batch
-    cata_xs, cata_ys = next_batch(cata_train[0], cata_train[1], cata_batch)
-    glau_xs, glau_ys = next_batch(glau_train[0], glau_train[1], glau_batch)
-    retina_xs, retina_ys = next_batch(retina_train[0], retina_train[1], retina_batch)
-    normal_xs, normal_ys = next_batch(normal_train[0], normal_train[1], normal_batch)
+    debug_flag_lv0=True
+    if __debug__ == debug_flag_lv0:
+        print 'start : data.py | make_train_batch '
+    try:
+        assert len(list_imgs_labs) == len(nx) == len(names)
+    except AssertionError:
+        print 'the number of params ard different!'
+        print len(list_imgs_labs)
+        print len(nx)
+        print len(names)
 
-    batch_xs = np.concatenate((cata_xs, glau_xs, retina_xs, normal_xs), axis=0)
-    batch_ys = np.concatenate((cata_ys, glau_ys, retina_ys, normal_ys), axis=0)
-    random_indices = random.sample(range(n_batch), n_batch)
-    batch_xs = batch_xs[random_indices]
-    batch_ys = batch_ys[random_indices]
+    for i,name in enumerate(names):
+        train_imgs , train_labs = list_imgs_labs[i]
+        train_imgs=np.asarray(train_imgs)
+        train_labs=np.asarray(train_labs)
+        indices=random.sample(range(len(train_imgs)) , nx[i] )
+        print indices
+        if i ==0:
+            batch_xs=train_imgs[indices]
+            batch_ys=train_labs[indices]
+        else:
+            batch_xs=np.concatenate([batch_xs , train_imgs[indices]] , axis=0)
+            batch_ys=np.concatenate([batch_ys , train_labs[indices]] , axis=0)
 
     np.asarray(batch_ys)
     batch_ys = batch_ys.astype(np.int32)
     batch_ys = cls2onehot(batch_ys, 2)
-    if __debug__ == debug_flag:
+    if __debug__ == debug_flag_lv0:
         print '**** make_train_batch ****'
-        print 'the number of batch', n_batch
+        print 'the number of batch', len(batch_xs)
         print 'the shape of batch xs ', batch_xs.shape
         print 'the shape of batch ys ', batch_ys.shape
 
@@ -489,8 +462,8 @@ def get_paths_from_file(filepath):
 
 
 if __name__ == '__main__':
-    fundus_299x299(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/14/')
-    fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/14/')
+    fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path=None,extension='png')
+    #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/14/')
     """
     lines=get_paths_from_file('../fundus_data/cropped_optical/paths/cataract_test_paths.txt')
     imgs,labs=make_numpy_images_labels(lines, 1)
