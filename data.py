@@ -228,7 +228,6 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
         print 'start : fundus | data | fundus_images'
 
     assert len(names)==len(n_tests)==len(labels)
-
     if extension.startswith('.'):
         extension=extension.replace('.','')
 
@@ -237,12 +236,9 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
     test_list_imgs = [];
     train_list_imgs = []
     if reload_folder_path is None:
-        path,names_,files=os.walk(folder_path).next()
+        path,_,files=os.walk(folder_path).next() #e.g)cataract
         folder_paths=map(lambda name : os.path.join(path, name), names) # ./cropped_300x300/cataract
-        list_file_paths=map(lambda folder_path : glob.glob(os.path.join(folder_path , '*.'+extension)) , folder_paths)
-
-        for file_paths in list_file_paths:
-            print file_paths[:10]
+        list_file_paths=map(lambda folder_path : glob.glob(os.path.join(folder_path , '*.'+extension)) , folder_paths)# ./cropped_300x300/cataract/*.png
         for i in range(len(names)): #len(names) ==> 7
             if __debug__ == debug_flag_lv1:
                 print names[i]

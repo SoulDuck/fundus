@@ -13,7 +13,7 @@ import argparse
 import os
 
 
-def train(max_iter ,  learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], structure='inception_A',model_saved_folder_path=None , path_saved_folder_path=None):
+def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], structure='inception_A',model_saved_folder_path=None , path_saved_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, \
     train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths,names = data.fundus_300x300(reload_folder_path=path_saved_folder_path)
@@ -71,7 +71,7 @@ def train(max_iter ,  learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], structure='i
     except tf.errors.NotFoundError:
         print 'there was no model'
     ########################training##############################
-    batch_size=np.sum(nx)
+
     max_val = 0
     check_point = 100
     train_acc = 0;
@@ -99,7 +99,7 @@ def train(max_iter ,  learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], structure='i
                 print 'model was saved!'
                 max_val = val_acc
         # names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal']
-        batch_xs, batch_ys = data.make_train_batch(train_list_file_paths,nx=[10,10,10,5,5,5,35] , names=names)
+        batch_xs, batch_ys = data.make_batch(test_list_imgs_labs,nx=[10,10,10,5,5,5,35] , names=names)
         batch_xs = aug.aug_level_1(batch_xs)
         train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],
                                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True})
@@ -109,7 +109,7 @@ def train(max_iter ,  learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], structure='i
 
 
 
-def train_with_specified_gpu(max_iter , batch_size, learning_rate,model_saved_folder_path=None , gpu_device='/gpu:0'):
+def train_with_specified_gpu(max_iter , batch_size , learning_rate,model_saved_folder_path=None , gpu_device='/gpu:0'):
     with tf.device(gpu_device):
         train(max_iter , batch_size, learning_rate)
 
@@ -137,4 +137,4 @@ if __name__ == '__main__':
     """
     #train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , model_saved_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
-    train(max_iter=10 , learning_rate = 0.01)
+    train(max_iter=10 , batch_size=60 ,learning_rate = 0.01)
