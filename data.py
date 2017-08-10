@@ -271,6 +271,7 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
                 if __debug__ == debug_flag_lv1:
                     print 'name :', names[i],', the # of list of train file paths :', len(train_file_paths)
                     print 'name :', names[i],', the # of list of test file paths :', len(test_file_paths)
+
             except IOError as ioe:
                 print 'cannot find folder or files'
                 break;
@@ -280,6 +281,7 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
             print 'name',name , '#train' , len(train_list_file_paths[i]) ,'#test :' , len(test_list_file_paths[i])
             train_imgs , train_labs=train_list_imgs_labs[i]
             print 'name',name, ' #train image shape', np.shape(train_imgs), '#test image shape :',np.shape(train_labs)
+            utils.np2images(train_imgs,'./debug_'+name)
 
 
         print 'end : fundus | data | fundus_images'

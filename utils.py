@@ -123,6 +123,9 @@ def np2img(image):
         print 'input value isnt numpy type '
         return image
 def np2images(images, save_folder=None , paths = None  , extension='png'):
+    debug_flag_lv0=True
+    if __debug__ == debug_flag_lv0:
+        print 'start debug |data.py| np2images '
     if len(images)==3:
         h,w,ch=np.shape(images)
         images=images.reshape([1,h,w,ch])
@@ -139,9 +142,8 @@ def np2images(images, save_folder=None , paths = None  , extension='png'):
                 plt.imsave(os.path.join(save_folder,str(i)+'.png') , image)
             else:
                 plt.imsave(paths[i],image)
-
-
-
+    if __debug__ == debug_flag_lv0:
+        print 'end debug |data.py| np2images '
 
 
 def delete_char_from_paths(folder_path , del_char):
