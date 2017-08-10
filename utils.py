@@ -121,7 +121,28 @@ def np2img(image):
         return image
     except:
         print 'input value isnt numpy type '
-        return Image
+        return image
+def np2images(images, save_folder=None , paths = None  , extension='png'):
+    if len(images)==3:
+        h,w,ch=np.shape(images)
+        images=images.reshape([1,h,w,ch])
+    if save_folder is None:
+        images=map(np2img,images)
+        plot_images(images)
+    else:
+        if not os.path.isdir(save_folder):
+            os.mkdir(save_folder)
+
+        for i,image in enumerate(images):
+            plt.imshow(image)
+            if paths is None:
+                plt.imsave(os.path.join(save_folder,str(i)+'.png') , image)
+            else:
+                plt.imsave(paths[i],image)
+
+
+
+
 
 def delete_char_from_paths(folder_path , del_char):
     folder_names=os.walk(folder_path).next()[1]
@@ -267,6 +288,8 @@ def make_folder(root_folder_path , folder_name):
 
 
 if __name__=='__main__':
+    images=np.load('./FD_300.npy')
+    np2images(images,'./debug')
     #make_log_txt()
     #delete_char_from_paths(folder_path='../fundus_data/cropped_macula/', del_char='*')
     """

@@ -212,7 +212,6 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
                   names=['cataract','glaucoma','retina','retina_glaucoma','retina_cataract','cataract_glaucoma','normal'],\
                   n_tests=[100,100,100,5,5,5,330]
                   ,labels=[0,0,0,0,0,0,1]):
-
     """
     usage:
     :param folder_path: e.g) ../fundus_data/cropped_optical/
@@ -220,7 +219,6 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
     :return:
 
     have to read!!
-    ** paths will save here --> '/fundus/paths/0'
     """
     debug_flag_lv0 = True
     debug_flag_lv1=True
@@ -233,24 +231,25 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
 
     test_list_file_paths = []
     train_list_file_paths = []
-    test_list_imgs = [];
-    train_list_imgs = []
+    test_list_imgs_labs = [];
+    train_list_imgs_labs = []
     if reload_folder_path is None:
         path,_,files=os.walk(folder_path).next() #e.g)cataract
         folder_paths=map(lambda name : os.path.join(path, name), names) # ./cropped_300x300/cataract
         list_file_paths=map(lambda folder_path : glob.glob(os.path.join(folder_path , '*.'+extension)) , folder_paths)# ./cropped_300x300/cataract/*.png
         for i in range(len(names)): #len(names) ==> 7
-            if __debug__ == debug_flag_lv1:
-                print names[i]
-                print 'the # of list of train file paths', len(file_paths[n_tests[i]:])
-                print 'the # of list of test file paths', len(file_paths[:n_tests[i]])
+
             file_paths=list_file_paths[i]
             test_list_file_paths.append(file_paths[:n_tests[i]])
             train_list_file_paths.append(file_paths[n_tests[i]:])
-            test_imgs=multiproc_make_numpy_images_labels(file_paths[:n_tests[i]], label_num=labels[i])
-            train_imgs = multiproc_make_numpy_images_labels(file_paths[:n_tests[i]], label_num=labels[i])
-            test_list_imgs.append(test_imgs)
-            train_list_imgs.append(train_imgs)
+            test_imgs_labs=multiproc_make_numpy_images_labels(file_paths[:n_tests[i]], label_num=labels[i])
+            train_imgs_labs = multiproc_make_numpy_images_labels(file_paths[n_tests[i]:], label_num=labels[i])
+            test_list_imgs_labs.append(test_imgs_labs)
+            train_list_imgs_labs.append(train_imgs_labs)
+            if __debug__ == debug_flag_lv1:
+
+                print 'name :',names[i],'the # of list of train file paths', len(file_paths[n_tests[i]:])
+                print 'name :',names[i],'the # of list of test file paths' , len(file_paths[:n_tests[i]])
     else:
 
         for i,name in enumerate(names):
@@ -262,23 +261,31 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
 
                 train_file_paths=map(lambda line: line.replace('\n','') , train_lines)
                 test_file_paths = map(lambda line: line.replace('\n', ''), test_lines)
-                train_imgs = multiproc_make_numpy_images_labels(train_file_paths, label_num=labels[i])
-                test_imgs = multiproc_make_numpy_images_labels(test_file_paths, label_num=labels[i])
+                train_imgs_labs = multiproc_make_numpy_images_labels(train_file_paths, label_num=labels[i])
+                test_imgs_labs = multiproc_make_numpy_images_labels(test_file_paths, label_num=labels[i])
                 test_list_file_paths.append(test_file_paths)
                 train_list_file_paths.append(train_file_paths)
-                test_list_imgs.append(test_imgs)
-                train_list_imgs.append(train_imgs)
-                print 'names:', name, 'sample paths', train_lines[:10]
-                print len(train_lines)
-                print len(test_lines)
+                test_list_imgs_labs.append(test_imgs_labs)
+                train_list_imgs_labs.append(train_imgs_labs)
+
+                if __debug__ == debug_flag_lv1:
+                    print 'name :', names[i],', the # of list of train file paths :', len(train_file_paths)
+                    print 'name :', names[i],', the # of list of test file paths :', len(test_file_paths)
             except IOError as ioe:
                 print 'cannot find folder or files'
                 break;
     if __debug__ == debug_flag_lv1:
-        print len(train_list_file_paths[0])
-        print train_list_file_paths[0]
+        print '# data type :',len(train_list_file_paths)
+        for i,name in enumerate(names):
+            print 'name',name , '#train' , len(train_list_file_paths[i]) ,'#test :' , len(test_list_file_paths[i])
+            train_imgs , train_labs=train_list_imgs_labs[i]
+            print 'name',name, ' #train image shape', np.shape(train_imgs), '#test image shape :',np.shape(train_labs)
 
-    return train_list_imgs, test_list_imgs, train_list_file_paths, test_list_file_paths, names
+
+        print 'end : fundus | data | fundus_images'
+
+
+    return train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths, names
 
 
 
