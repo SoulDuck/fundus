@@ -13,7 +13,7 @@ import argparse
 import os
 
 
-def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], structure='inception_A', restored_model_folder_path=None , restored_path_folder_path=None):
+def train(max_iter ,  batch_size ,learning_rate , check_point, nx=[30, 30, 30, 5, 5, 5, 70], structure='inception_A', restored_model_folder_path=None , restored_path_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, \
     train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths,names = data.fundus_300x300(reload_folder_path=restored_path_folder_path)
@@ -71,7 +71,6 @@ def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], 
     ########################training##############################
 
     max_val = 0
-    check_point = 100
     train_acc = 0;
     train_loss = 0;
     val_imgs, val_labs = data.make_batch(test_list_imgs_labs, nx, names=names)
@@ -126,7 +125,7 @@ if __name__ == '__main__':
     parser.add_argument("--learning_rate" , help='learning rate ')
     parser.add_argument("--structure" , help = 'what structrue you need')
     parser.add_argument("--gpu",help='used gpu')
-
+    parser.add_argument("--check_point" , help='')
     args = parser.parse_args()
     #args.iter=int(args.iter)
     #args.batch_size = int(args.batch_size)
@@ -140,4 +139,4 @@ if __name__ == '__main__':
     """
     #train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , restored_model_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
-    train(max_iter=200 , batch_size=60 ,learning_rate = 0.01)
+    train(max_iter=args.iter , batch_size=args.batch_size ,learning_rate = args.learning_rate , check_point=args.check_point)
