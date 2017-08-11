@@ -11,6 +11,7 @@ import aug
 import random
 import argparse
 import os
+import time
 
 
 def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structure='inception_A', restored_model_folder_path=None , restored_path_folder_path=None):
@@ -76,12 +77,13 @@ def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structu
     val_nx=[30,30,30,5,5,5,105]
     batch_size=np.sum(nx)
     val_imgs, val_labs = data.make_batch(test_list_imgs_labs, val_nx, names=names)
-
+    start_time=time.time()
     try:
         print type(max_iter)
         for step in range(max_iter):
             utils.show_progress(step, max_iter)
             if step % check_point == 0:
+                end_time=time.time()
                 # cam.inspect_cam(sess, cam_ , top_conv,test_imgs, test_labs, step , 50 , x_,y_ , y_conv  )
                 imgs, labs = utils.divide_images_labels_from_batch(val_imgs, val_labs, batch_size)
                 list_imgs_labs = zip(imgs, labs)
@@ -100,6 +102,10 @@ def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structu
                     saver.save(sess, restored_model_folder_path + '/best_acc.ckpt')
                     print 'model was saved!'
                     max_val = val_acc
+
+                print end_time- start_time
+                start_time=time.time()
+
             # names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal']
             batch_xs, batch_ys = data.make_batch(test_list_imgs_labs, nx ,names=names)
             batch_xs = aug.aug_level_1(batch_xs)
@@ -144,4 +150,4 @@ if __name__ == '__main__':
     #train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , restored_model_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
 
-    train(max_iter=args.iter ,learning_rate = args.learning_rate , check_point=args.check_point)
+    train(max_iter=args.iter ,learning_rate = args.learning_rate , check_point=args.check_point , structure=args.structure )
