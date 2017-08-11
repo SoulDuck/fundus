@@ -464,7 +464,7 @@ def get_paths_from_file(filepath):
 
 
 if __name__ == '__main__':
-    paths=utils.get_paths_from_text('retina_glaucoma_test_paths.txt')
+    paths=utils.get_paths_from_text('./paths/fundus/0/retina_glaucoma_test_paths.txt')
     np_imgs,_=multiproc_make_numpy_images_labels(paths , 0)
     np.save('np_imgs')
 
