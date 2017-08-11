@@ -13,7 +13,7 @@ import argparse
 import os
 
 
-def train(max_iter ,  batch_size ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structure='inception_A', restored_model_folder_path=None , restored_path_folder_path=None):
+def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structure='inception_A', restored_model_folder_path=None , restored_path_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, \
     train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths,names = data.fundus_300x300(reload_folder_path=restored_path_folder_path)
@@ -73,7 +73,8 @@ def train(max_iter ,  batch_size ,learning_rate , check_point, nx=[10,10,10,5,5,
     max_val = 0
     train_acc = 0;
     train_loss = 0;
-    batch_size=np.sum(nx)
+    val_nx=[30,30,30,5,5,5,105]
+    batch_size=np.sum(val_nx)
     val_imgs, val_labs = data.make_batch(test_list_imgs_labs, nx*3, names=names)
 
     try:
@@ -141,4 +142,4 @@ if __name__ == '__main__':
     """
     #train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , restored_model_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
-    train(max_iter=args.iter , batch_size=args.batch_size ,learning_rate = args.learning_rate , check_point=args.check_point)
+    train(max_iter=args.iter ,learning_rate = args.learning_rate , check_point=args.check_point)
