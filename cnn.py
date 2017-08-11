@@ -86,22 +86,27 @@ def gap(name,x , n_classes ):
     y_conv=tf.matmul(gap_x, gap_w , name='y_conv')
     return y_conv
 
-def algorithm(y_conv , y_ , learning_rate):
+def algorithm(y_conv , y_ , learning_rate , optimizer='GradientDescentOptimizer'):
     """
 
     :param y_conv: logits
     :param y_: labels
     :param learning_rate: learning rate
     :return:  pred,pred_cls , cost , correct_pred ,accuracy
+
     """
     if __debug__ ==True:
+        print 'debug start : cnn.py | algorithm'
+        print 'optimizer option : GradientDescentOptimizer(default) | AdamOptimizer | moment | '
+        print 'selected optimizer : ',optimizer
         print y_conv.get_shape()
         print y_.get_shape()
+    optimizer_dic={'GradientDescentOptimizer' : tf.train.GradientDescentOptimizer , 'AdamOptimizer':tf.train.AdamOptimizer}
 
     pred=tf.nn.softmax(y_conv , name='softmax')
     pred_cls=tf.argmax(pred , axis=1 , name='pred_cls')
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y_conv , labels=y_) , name='cost')
-    train_op = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
+    train_op = optimizer_dic[optimizer](learning_rate).minimize(cost)
     correct_pred=tf.equal(tf.argmax(y_conv , 1) , tf.argmax(y_ , 1) , name='correct_pred')
     accuracy =  tf.reduce_mean(tf.cast(correct_pred , dtype=tf.float32) , name='accuracy')
     return pred,pred_cls , cost , train_op,correct_pred ,accuracy
