@@ -105,7 +105,10 @@ def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], 
             f.flush()
         f.close()
         utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
-    except:
+    except KeyboardInterrupt as kbi:
+        print 'keyboard Interrupted all log was saved and tensorflow session closed'
+        f.close()
+        utils.draw_grpah(log_saved_file_path, graph_saved_folder_path, check_point)
 
 
 

@@ -418,7 +418,7 @@ def make_batch(list_imgs_labs ,  nx , names ):
     """
     debug_flag_lv0=True
     if __debug__ == debug_flag_lv0:
-        print 'start : data.py | make_train_batch '
+        print 'start : data.py | make_batch '
     try:
         assert len(list_imgs_labs) == len(nx) == len(names)
     except AssertionError:
