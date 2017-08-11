@@ -150,4 +150,4 @@ if __name__ == '__main__':
     #train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , restored_model_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
 
-    train(max_iter=args.iter ,learning_rate = args.learning_rate , check_point=args.check_point , structure=args.structure )
+    train(max_iter=args.iter ,learning_rate = args.learning_rate , check_point=args.check_point , structure=args.structure , optimizer=args.optimizer )
