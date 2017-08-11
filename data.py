@@ -464,9 +464,18 @@ def get_paths_from_file(filepath):
 
 
 if __name__ == '__main__':
-    paths=utils.get_paths_from_text('./paths/fundus/0/retina_glaucoma_test_paths.txt')
+    paths=utils.get_paths_from_text('./paths/fundus/0/normal_test_paths.txt')
     np_imgs,_=multiproc_make_numpy_images_labels(paths , 0)
-    np.save('np_imgs' ,np_imgs)
+    np.save('normal_test_0' ,np_imgs)
+    paths = utils.get_paths_from_text('./paths/fundus/0/glaucoma_test_paths.txt')
+    np_imgs, _ = multiproc_make_numpy_images_labels(paths, 0)
+    np.save('glaucoma_test_0', np_imgs)
+    paths = utils.get_paths_from_text('./paths/fundus/0/retina_test_paths.txt')
+    np_imgs, _ = multiproc_make_numpy_images_labels(paths, 0)
+    np.save('retina_test_0', np_imgs)
+    paths = utils.get_paths_from_text('./paths/fundus/0/cataract_test_paths.txt')
+    np_imgs, _ = multiproc_make_numpy_images_labels(paths, 0)
+    np.save('cataract_test_0', np_imgs)
 
     #fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path=None,extension='png')
     #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/14/')
