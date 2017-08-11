@@ -78,6 +78,7 @@ def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structu
     val_imgs, val_labs = data.make_batch(test_list_imgs_labs, val_nx, names=names)
 
     try:
+        print type(max_iter)
         for step in range(max_iter):
             utils.show_progress(step, max_iter)
             if step % check_point == 0:
@@ -100,7 +101,7 @@ def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structu
                     print 'model was saved!'
                     max_val = val_acc
             # names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal']
-            batch_xs, batch_ys = data.make_batch(test_list_imgs_labs,nx=[10,10,10,5,5,5,35] , names=names)
+            batch_xs, batch_ys = data.make_batch(test_list_imgs_labs, nx ,names=names)
             batch_xs = aug.aug_level_1(batch_xs)
             train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],
                                                 feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True})
@@ -123,12 +124,12 @@ def train_with_specified_gpu(max_iter , batch_size , learning_rate,restored_mode
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--iter", help='iteration')
-    parser.add_argument("--batch_size" ,help='batch size ')
-    parser.add_argument("--learning_rate" , help='learning rate ')
+    parser.add_argument("--iter", help='iteration',type=int)
+    parser.add_argument("--batch_size" ,help='batch size ' ,type=int)
+    parser.add_argument("--learning_rate" , help='learning rate ',type=float)
     parser.add_argument("--structure" , help = 'what structrue you need')
     parser.add_argument("--gpu",help='used gpu')
-    parser.add_argument("--check_point" , help='')
+    parser.add_argument("--check_point" , help='' , type=int)
     args = parser.parse_args()
     #args.iter=int(args.iter)
     #args.batch_size = int(args.batch_size)
@@ -142,4 +143,5 @@ if __name__ == '__main__':
     """
     #train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , restored_model_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
+
     train(max_iter=args.iter ,learning_rate = args.learning_rate , check_point=args.check_point)
