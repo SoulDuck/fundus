@@ -417,6 +417,7 @@ def make_batch(list_imgs_labs ,  nx , names ):
     :return:
     """
     debug_flag_lv0=True
+    debug_flag_lv1=False
     if __debug__ == debug_flag_lv0:
         print 'start : data.py | make_batch '
     try:
@@ -432,7 +433,7 @@ def make_batch(list_imgs_labs ,  nx , names ):
         train_imgs=np.asarray(train_imgs)
         train_labs=np.asarray(train_labs)
         indices=random.sample(range(len(train_imgs)) , nx[i] )
-        print indices
+        #print indices
         if i ==0:
             batch_xs=train_imgs[indices]
             batch_ys=train_labs[indices]
@@ -443,7 +444,7 @@ def make_batch(list_imgs_labs ,  nx , names ):
     np.asarray(batch_ys)
     batch_ys = batch_ys.astype(np.int32)
     batch_ys = cls2onehot(batch_ys, 2)
-    if __debug__ == debug_flag_lv0:
+    if __debug__ == debug_flag_lv1:
         print '**** make_train_batch ****'
         print 'the number of batch', len(batch_xs)
         print 'the shape of batch xs ', batch_xs.shape
