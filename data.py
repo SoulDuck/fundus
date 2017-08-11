@@ -416,7 +416,7 @@ def make_batch(list_imgs_labs ,  nx , names ):
     :param normal_train: =  (normal_train_imgs , normal_train_labs)
     :return:
     """
-    debug_flag_lv0=True
+    debug_flag_lv0=False
     debug_flag_lv1=False
     if __debug__ == debug_flag_lv0:
         print 'start : data.py | make_batch '
