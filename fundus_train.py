@@ -75,6 +75,7 @@ def train(max_iter ,  batch_size ,learning_rate , check_point, nx=[10,10,10,5,5,
     train_loss = 0;
     batch_size=np.sum(nx)
     val_imgs, val_labs = data.make_batch(test_list_imgs_labs, nx*3, names=names)
+
     try:
         for step in range(max_iter):
             utils.show_progress(step, max_iter)
