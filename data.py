@@ -468,7 +468,7 @@ if __name__ == '__main__':
     np_imgs,_=multiproc_make_numpy_images_labels(paths , 0)
     np.save('np_imgs' ,np_imgs)
 
-    fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path=None,extension='png')
+    #fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path=None,extension='png')
     #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/14/')
     """
     lines=get_paths_from_file('../fundus_data/cropped_optical/paths/cataract_test_paths.txt')
