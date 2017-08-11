@@ -280,8 +280,9 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
         for i,name in enumerate(names):
             print 'name',name , '#train' , len(train_list_file_paths[i]) ,'#test :' , len(test_list_file_paths[i])
             train_imgs , train_labs=train_list_imgs_labs[i]
-            print 'name',name, ' #train image shape', np.shape(train_imgs), '#test image shape :',np.shape(train_labs)
-            utils.np2images(train_imgs,'./debug_'+name)
+            test_imgs, test_labs = test_list_imgs_labs[i]
+            print 'name',name,  ' #train image shape', np.shape(train_imgs), '#test image shape :',np.shape(train_labs)
+            print 'name', name, ' #train image shape', np.shape(test_imgs), '#test image shape :', np.shape(test_labs)
 
 
         print 'end : fundus | data | fundus_images'

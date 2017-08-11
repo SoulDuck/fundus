@@ -13,26 +13,25 @@ import argparse
 import os
 
 
-def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], structure='inception_A',model_saved_folder_path=None , path_saved_folder_path=None):
+def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], structure='inception_A', restored_model_folder_path=None , restored_path_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, \
-    train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths,names = data.fundus_300x300(reload_folder_path=path_saved_folder_path)
+    train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths,names = data.fundus_300x300(reload_folder_path=restored_path_folder_path)
 
-    if model_saved_folder_path is None:
-        model_saved_folder_path = utils.make_folder('./cnn_model/', 'fundus/')
-    if path_saved_folder_path is None:
-        path_saved_folder_path= utils.make_folder('./paths/' , 'fundus/')
+    if restored_model_folder_path is None:
+        restored_model_folder_path = utils.make_folder('./cnn_model/', 'fundus/')
+    if restored_path_folder_path is None:
+        restored_path_folder_path= utils.make_folder('./paths/' , 'fundus/')
     graph_saved_folder_path = utils.make_folder('./graph/', 'fundus/')
     log_saved_folder_path = utils.make_folder('./log/', 'fundus/')
     log_saved_file_path = log_saved_folder_path + 'log.txt'
     f = open(log_saved_file_path , 'w+' , 0)
 
-    test_save_folder_paths=map(lambda name :os.path.join(path_saved_folder_path  , name+'_test_paths.txt'),names )
-    train_save_folder_paths = map(lambda name: os.path.join(path_saved_folder_path, name + '_train_paths.txt'),names)
+    test_save_folder_paths=map(lambda name :os.path.join(restored_path_folder_path  , name+'_test_paths.txt'),names )
+    train_save_folder_paths = map(lambda name: os.path.join(restored_path_folder_path, name + '_train_paths.txt'),names)
     map(data.save_paths ,test_list_file_paths ,test_save_folder_paths )
     map(data.save_paths, train_list_file_paths, train_save_folder_paths)
     #save paths
-
 
 
     x_ = tf.placeholder(dtype=tf.float32, shape=[None, image_height, image_width, image_color_ch], name='x_')
@@ -46,7 +45,6 @@ def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], 
 
     y_conv = gap('gap', top_conv, 2)
     cam_ = cam.get_class_map('gap', top_conv, 0, image_height)
-
     #################fully connected#############################
     """
     layer=tf.contrib.layers.flatten(layer)
@@ -66,10 +64,10 @@ def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], 
     init_op = tf.global_variables_initializer()
     sess.run(init_op)
     try:
-        saver.restore(sess, model_saved_folder_path + 'best_acc.ckpt')
-        print model_saved_folder_path+'model was restored!'
+        saver.restore(sess, restored_model_folder_path + 'best_acc.ckpt')
+        print restored_model_folder_path+'model was restored!'
     except tf.errors.NotFoundError:
-        print 'there was no model'
+        print 'there was no model , make new model'
     ########################training##############################
 
     max_val = 0
@@ -95,7 +93,7 @@ def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], 
             utils.write_acc_loss(f, train_acc, train_loss, val_acc, val_loss)
             print '\n', val_acc, val_loss
             if val_acc > max_val:
-                saver.save(sess, model_saved_folder_path + '/best_acc.ckpt')
+                saver.save(sess, restored_model_folder_path + '/best_acc.ckpt')
                 print 'model was saved!'
                 max_val = val_acc
         # names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal']
@@ -108,8 +106,7 @@ def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], 
     utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
 
 
-
-def train_with_specified_gpu(max_iter , batch_size , learning_rate,model_saved_folder_path=None , gpu_device='/gpu:0'):
+def train_with_specified_gpu(max_iter , batch_size , learning_rate,restored_model_folder_path=None , gpu_device='/gpu:0'):
     with tf.device(gpu_device):
         train(max_iter , batch_size, learning_rate)
 
@@ -135,6 +132,6 @@ if __name__ == '__main__':
     args.learning_rate=0.001
     args.structure='inception_A'
     """
-    #train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , model_saved_folder_path=None)
+    #train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , restored_model_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
     train(max_iter=10 , batch_size=60 ,learning_rate = 0.01)
