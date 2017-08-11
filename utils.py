@@ -256,7 +256,7 @@ def draw_grpah(file_pointer,save_folder ,check_point=50):
     plot_xs_ys('Normal Vs Abnormal','Step','Train Accuracy',save_folder,step_list , train_acc_list)
     plot_xs_ys('Normal Vs Abnormal', 'Step', 'Train Loss', save_folder,step_list, train_loss_list )
     plot_xs_ys('Normal Vs Abnormal', 'Step', 'Validation Accuracy', save_folder,step_list, val_acc_list)
-    plot_xs_ys('Normal Vs Abnormal', 'Step', 'Validation Loss', save_folder,step_list, val_acc_list)
+    plot_xs_ys('Normal Vs Abnormal', 'Step', 'Validation Loss', save_folder,step_list, val_loss_list)
     plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Accuracy ',save_folder,step_list, train_acc_list, val_acc_list)
     plot_xs_ys('Normal Vs Abnormal','Step','Train_Validation Loss ',save_folder,step_list, train_loss_list, val_loss_list)
     if __debug__==True:

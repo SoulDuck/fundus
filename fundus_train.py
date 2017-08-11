@@ -75,35 +75,38 @@ def train(max_iter ,  batch_size ,learning_rate , nx=[30, 30, 30, 5, 5, 5, 70], 
     train_acc = 0;
     train_loss = 0;
     val_imgs, val_labs = data.make_batch(test_list_imgs_labs, nx, names=names)
-    for step in range(max_iter):
-        utils.show_progress(step, max_iter)
-        if step % check_point == 0:
-            # cam.inspect_cam(sess, cam_ , top_conv,test_imgs, test_labs, step , 50 , x_,y_ , y_conv  )
-            imgs, labs = utils.divide_images_labels_from_batch(val_imgs, val_labs, batch_size)
-            list_imgs_labs = zip(imgs, labs)
-            val_acc_mean = [];
-            val_loss_mean = []
-            for val_imgs_, val_labs_ in list_imgs_labs:
-                val_acc, val_loss = sess.run([accuracy, cost],
-                                             feed_dict={x_: val_imgs_, y_: val_labs_, phase_train: False})
-                val_acc_mean.append(val_acc);
-                val_loss_mean.append(val_loss);
-            val_acc = np.mean(np.asarray(val_acc_mean));
-            val_loss = np.mean(np.asarray(val_loss_mean))
-            utils.write_acc_loss(f, train_acc, train_loss, val_acc, val_loss)
-            print '\n', val_acc, val_loss
-            if val_acc > max_val:
-                saver.save(sess, restored_model_folder_path + '/best_acc.ckpt')
-                print 'model was saved!'
-                max_val = val_acc
-        # names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal']
-        batch_xs, batch_ys = data.make_batch(test_list_imgs_labs,nx=[10,10,10,5,5,5,35] , names=names)
-        batch_xs = aug.aug_level_1(batch_xs)
-        train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],
-                                            feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True})
-        f.flush()
-    f.close()
-    utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
+    try:
+        for step in range(max_iter):
+            utils.show_progress(step, max_iter)
+            if step % check_point == 0:
+                # cam.inspect_cam(sess, cam_ , top_conv,test_imgs, test_labs, step , 50 , x_,y_ , y_conv  )
+                imgs, labs = utils.divide_images_labels_from_batch(val_imgs, val_labs, batch_size)
+                list_imgs_labs = zip(imgs, labs)
+                val_acc_mean = [];
+                val_loss_mean = []
+                for val_imgs_, val_labs_ in list_imgs_labs:
+                    val_acc, val_loss = sess.run([accuracy, cost],
+                                                 feed_dict={x_: val_imgs_, y_: val_labs_, phase_train: False})
+                    val_acc_mean.append(val_acc);
+                    val_loss_mean.append(val_loss);
+                val_acc = np.mean(np.asarray(val_acc_mean));
+                val_loss = np.mean(np.asarray(val_loss_mean))
+                utils.write_acc_loss(f, train_acc, train_loss, val_acc, val_loss)
+                print '\n', val_acc, val_loss
+                if val_acc > max_val:
+                    saver.save(sess, restored_model_folder_path + '/best_acc.ckpt')
+                    print 'model was saved!'
+                    max_val = val_acc
+            # names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal']
+            batch_xs, batch_ys = data.make_batch(test_list_imgs_labs,nx=[10,10,10,5,5,5,35] , names=names)
+            batch_xs = aug.aug_level_1(batch_xs)
+            train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],
+                                                feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True})
+            f.flush()
+        f.close()
+        utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
+    except:
+
 
 
 def train_with_specified_gpu(max_iter , batch_size , learning_rate,restored_model_folder_path=None , gpu_device='/gpu:0'):
