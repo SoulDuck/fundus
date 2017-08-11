@@ -310,5 +310,5 @@ if __name__=='__main__':
     #draw_grpah('./log/79%_top_of_batch_STEM_REDUCTION_A_B_ABNORMAL_NORMAL.txt')
 
 
-    f=open('./log/fundus/adam.txt')
-    draw_grpah(f,'./graph/fundus/adam',100)
+    f=open('./log/fundus/gradientoptimizer.txt')
+    draw_grpah(f,'./graph/fundus/gradientoptimizer',100)
