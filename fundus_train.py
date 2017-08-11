@@ -75,7 +75,7 @@ def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structu
     train_loss = 0;
     val_nx=[30,30,30,5,5,5,105]
     batch_size=np.sum(val_nx)
-    val_imgs, val_labs = data.make_batch(test_list_imgs_labs, nx*3, names=names)
+    val_imgs, val_labs = data.make_batch(test_list_imgs_labs, val_nx, names=names)
 
     try:
         for step in range(max_iter):
