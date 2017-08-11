@@ -290,8 +290,8 @@ def make_folder(root_folder_path , folder_name):
 
 
 if __name__=='__main__':
-    images=np.load('./FD_300.npy')
-    np2images(images,'./debug')
+    #images=np.load('./FD_300.npy')
+    #np2images(images,'./debug')
     #make_log_txt()
     #delete_char_from_paths(folder_path='../fundus_data/cropped_macula/', del_char='*')
     """
@@ -308,3 +308,7 @@ if __name__=='__main__':
     print labs[8]
     """
     #draw_grpah('./log/79%_top_of_batch_STEM_REDUCTION_A_B_ABNORMAL_NORMAL.txt')
+
+
+    f=open('./log/fundus/adam.txt')
+    draw_grpah(f,'./graph/fundus/adam',100)

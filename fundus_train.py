@@ -12,7 +12,8 @@ import random
 import argparse
 import os
 import time
-def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structure='inception_A', optimizer='AdamOptimizer',restored_model_folder_path=None , restored_path_folder_path=None):
+
+def train(max_iter ,learning_rate , check_point,nx=[10,10,10,5,5,5,35], structure='inception_A', optimizer='AdamOptimizer',restored_model_folder_path=None , restored_path_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, \
     train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths,names = data.fundus_300x300(reload_folder_path=restored_path_folder_path)
@@ -108,6 +109,7 @@ def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structu
             # names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal']
             batch_xs, batch_ys = data.make_batch(test_list_imgs_labs, nx ,names=names)
             batch_xs = aug.aug_level_1(batch_xs)
+            utils.np2images(batch_xs , './debug')
             train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],
                                                 feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True})
             f.flush()
