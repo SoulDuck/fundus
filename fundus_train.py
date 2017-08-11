@@ -12,8 +12,7 @@ import random
 import argparse
 import os
 import time
-
-def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structure='inception_A', restored_model_folder_path=None , restored_path_folder_path=None):
+def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structure='inception_A', optimizer='AdamOptimizer',restored_model_folder_path=None , restored_path_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, \
     train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths,names = data.fundus_300x300(reload_folder_path=restored_path_folder_path)
@@ -54,7 +53,7 @@ def train(max_iter ,learning_rate , check_point, nx=[10,10,10,5,5,5,35], structu
     """
     #############################################################
     # cam = get_class_map('gap', top_conv, 0, im_width=image_width)
-    pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, learning_rate)
+    pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(y_conv, y_, learning_rate , optimizer)
     saver = tf.train.Saver()
     config = tf.ConfigProto(
         device_count={'GPU': 1},
@@ -136,6 +135,7 @@ if __name__ == '__main__':
     parser.add_argument("--structure" , help = 'what structrue you need')
     parser.add_argument("--gpu",help='used gpu')
     parser.add_argument("--check_point" , help='' , type=int)
+    parser.add_argument("--optimizer",help='')
     args = parser.parse_args()
     #args.iter=int(args.iter)
     #args.batch_size = int(args.batch_size)
