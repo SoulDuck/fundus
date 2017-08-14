@@ -107,7 +107,7 @@ def train(max_iter ,learning_rate , check_point,nx=[10,10,10,5,5,5,35], structur
                 start_time=time.time()
 
             # names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal']
-            batch_xs, batch_ys = data.make_batch(test_list_imgs_labs, nx ,names=names)
+            batch_xs, batch_ys = data.make_batch(train_list_imgs_labs, nx ,names=names)
             batch_xs = aug.aug_level_1(batch_xs)
             utils.np2images(batch_xs , './debug')
             train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],

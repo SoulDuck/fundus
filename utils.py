@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import math
 import glob
 from PIL import Image
+import data
 import random
 """
 import Image
@@ -195,6 +196,36 @@ def make_log_txt(folder_path):
 def write_acc_loss(f,train_acc,train_loss,test_acc,test_loss):
     f.write(str(train_acc)+'\t'+str(train_loss)+'\t'+str(test_acc)+'\t'+str(test_loss)+'\n')
 
+
+def divide_images(images , batch_size):
+    debug_flag_lv0=True
+    debug_flag_lv1=True
+    if __debug__ == debug_flag_lv0:
+        print 'debug start | utils.py | divide_images'
+    batch_img_list = []
+    share = len(images) / batch_size
+    # print len(images)
+    # print len(labels)
+    # print 'share :',share
+
+    for i in range(share + 1):
+        if i == share:
+            imgs = images[i * batch_size:]
+            # print i+1, len(imgs), len(labs)
+            batch_img_list.append(imgs)
+            if __debug__ == debug_flag_lv1:
+                print "######utils.py: divide_images_from_batch debug mode#####"
+                print 'total :', len(images), 'batch', i * batch_size, '-', len(images)
+        else:
+            imgs = images[i * batch_size:(i + 1) * batch_size]
+            # print i , len(imgs) , len(labs)
+            batch_img_list.append(imgs)
+            if __debug__ == debug_flag_lv1:
+                print "######utils.py: divide_images_from_batch debug mode######"
+                print 'total :', len(images), 'batch', i * batch_size, ":", (i + 1) * batch_size
+    return batch_img_list
+
+
 def divide_images_labels_from_batch(images, labels ,batch_size):
     debug_flag=True
 
@@ -287,6 +318,26 @@ def make_folder(root_folder_path , folder_name):
            count+=1
     return root_folder_path+folder_name+str(count)+'/'
 
+def get_acc(pred , labels ):
+
+    try:
+        assert np.ndim(pred) == np.ndim(labels)
+        assert np.shape(pred) == np.shape(labels)
+    except AssertionError:
+        print 'pred shape : ',np.shape(pred)
+        print 'labels shape : ',np.shape(labels)
+    if np.ndim(pred)==1:
+        pred=np.asarray(pred)
+        cls=np.asarray(labels)
+    else:
+        pred=np.round(pred) # if pred is not one hot vetcor ...change pred to onehot vector
+        pred=np.argmax(pred,axis=0)
+        cls = np.argmax(labels , axis=0)
+    acc=np.sum(pred == cls)/float(len(pred))
+    return acc
+
+
+
 
 
 if __name__=='__main__':
@@ -309,6 +360,18 @@ if __name__=='__main__':
     """
     #draw_grpah('./log/79%_top_of_batch_STEM_REDUCTION_A_B_ABNORMAL_NORMAL.txt')
 
-
+    """
     f=open('./log/fundus/gradientoptimizer.txt')
     draw_grpah(f,'./graph/fundus/gradientoptimizer',100)
+    """
+    """
+    imgs=np.load('./normal_test_0.npy')
+    list_imgs=divide_images(imgs , batch_size=60)
+    for imgs in list_imgs:
+        print np.shape(imgs)
+    """
+    pred=[0,0,0,1]
+    labels=[0,0,0,1]
+    pred=np.array([[0.7 , 0.5],[0.7 , 0]])
+    labels=np.array([[1. , 0 ],[1, 0 ]])
+    print get_acc(pred,labels)
