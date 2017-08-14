@@ -185,14 +185,15 @@ def eval(model_folder_path , images, labels=None):
         pred=sess.run([prediction] , feed_dict={x_:images ,phase_train: False})
         return pred
 
-def eval_multiple_images(model_folder_path , images, labels=None , batch = 60):
+def eval_multiple_images(model_folder_path , images, labels=None , batch_size= 60):
     debug_flag_lv0=True
     if __debug__ ==debug_flag_lv0:
         print 'debug start | fundus_eval.py | eval_multiple_images '
-
+        print 'input image shape :',np.shape(images)
+        print 'input labels', labels
+        print 'batch size:',batch_size
         merged_pred=[]
-        merged_acc=[]
-        list_imgs = utils.divide_images(images)
+        list_imgs = utils.divide_images(images , batch_size = batch_size)
         for i, imgs in enumerate(list_imgs):
             pred = eval(model_folder_path, imgs)
             merged_pred.extend(pred)
@@ -201,17 +202,9 @@ def eval_multiple_images(model_folder_path , images, labels=None , batch = 60):
         if labels is None:
             return merged_pred
         else:
-
-            list_imgs=utils.divide_images(images)
-            for i,imgs in enumerate(list_imgs):
-                pred=eval(model_folder_path,imgs)
-                merged_pred.extend(pred)
-            return merged_pred
-
-        else:
-            list_imgs, list_labs=utils.divide_images_labels_from_batch(images, labels, batch_size=batch)
-                =eval(model_folder_path, imgs_)
-
+            cls=np.argmax(labels , axis=0 )
+            mean_acc=np.sum(cls==onehot_pred)/float(len(cls))
+            return merged_pred , mean_acc
 
 
 
