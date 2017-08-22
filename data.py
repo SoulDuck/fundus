@@ -212,7 +212,7 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
                   names=['cataract','glaucoma','retina','retina_glaucoma','retina_cataract','cataract_glaucoma','normal'],\
                   n_tests=[100,100,100,5,5,5,330]
                   ,labels=[0,0,0,0,0,0,1],
-                  n_limits=[None , None ,None , None , None ,None ,None]):
+                  n_trains=[None , None ,None , None , None ,None ,None]):
     """
     usage:
     :param
@@ -231,7 +231,7 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
     if __debug__ ==debug_flag_lv0:
         print 'start : fundus | data | fundus_images'
 
-    assert len(names)==len(n_tests)==len(labels) == len(n_limits)
+    assert len(names)==len(n_tests)==len(labels) == len(n_trains)
     if extension.startswith('.'):
         extension=extension.replace('.','')
 
@@ -251,8 +251,8 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
             test_list_file_paths.append(test_file_paths)
             train_list_file_paths.append(train_file_paths)
 
-            if not n_limits[i] == None:
-                indices = random.sample(range(len(train_file_paths)), n_limits[i])
+            if not n_trains[i] == None:
+                indices = random.sample(range(len(train_file_paths)), n_trains[i])
                 tmp_lines = []
                 for ind in indices:
                     line = train_file_paths[ind]
@@ -277,8 +277,8 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
                 train_lines=f_train_paths.readlines()
                 test_lines = f_test_paths.readlines()
 
-                if not n_limits[i] == None:
-                    indices=random.sample(range(len(train_lines)) , n_limits[i] )
+                if not n_trains[i] == None:
+                    indices=random.sample(range(len(train_lines)) , n_trains[i] )
                     tmp_lines=[]
                     for ind in indices:
                         line=train_lines[ind]
@@ -356,7 +356,7 @@ def eye_299x299():
 
 def fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/' ,reload_folder_path=None,extension='png',\
     names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal'], \
-    n_tests = [100, 100, 100, 5, 5, 5, 330], labels = [0, 0, 0, 0, 0, 0, 1]):
+    n_tests = [100, 100, 100, 5, 5, 5, 330], labels = [0, 0, 0, 0, 0, 0, 1] , n_trains=[None, None , None , None ,None, None,None] ):
 
     """
     dir tree
@@ -372,7 +372,7 @@ def fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/'
     """
     debug_flag = True
     train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths, names=\
-            fundus_images(folder_path,reload_folder_path ,extension,names,n_tests,labels)
+            fundus_images(folder_path,reload_folder_path ,extension,names,n_tests,labels , n_trains=n_trains)
     n,h,w,ch=np.shape(train_list_imgs_labs[0][0])
 
     n_classes = 2
@@ -492,7 +492,8 @@ def get_paths_from_file(filepath):
 
 
 if __name__ == '__main__':
-    fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path='./paths/fundus/2' , n_tests=[5,5,5,5,5,5,5] , n_limits=[10,10,10,10,10,10,10])
+    #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path='./paths/fundus/2' , n_tests=[5,5,5,5,5,5,5] , n_trains=[10,10,10,10,10,10,10])
+    fundus_300x300(n_trains=[5,5,5,5,5,5,5])
     #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/', n_tests=[5, 5, 5, 5, 5, 5, 5])
 
     """
