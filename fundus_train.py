@@ -124,7 +124,6 @@ def train(max_iter ,learning_rate , check_point,nx=[10,10,10,5,5,5,35], structur
 
 if __name__ == '__main__':
 
-    """    
     parser = argparse.ArgumentParser()
     parser.add_argument("--max_iter", help='iteration',type=int)
     parser.add_argument("--batch_size" ,help='batch size ' ,type=int)
@@ -143,4 +142,3 @@ if __name__ == '__main__':
     train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths, names =\
         data.fundus_300x300(reload_folder_path=restored_path_folder_path)
     train(max_iter=args.max_iter ,learning_rate = args.learning_rate , check_point=args.check_point , structure=args.structure , optimizer=args.optimizer ,restored_model_folder_path=restore_model_folder_path)
-    """
