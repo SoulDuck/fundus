@@ -308,8 +308,8 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
             print 'name',name , '#train' , len(train_list_file_paths[i]) ,'#test :' , len(test_list_file_paths[i])
             train_imgs , train_labs=train_list_imgs_labs[i]
             test_imgs, test_labs = test_list_imgs_labs[i]
-            print 'name',name,  ' #train image shape', np.shape(train_imgs), '#test image shape :',np.shape(train_labs)
-            print 'name', name, ' #train image shape', np.shape(test_imgs), '#test image shape :', np.shape(test_labs)
+            print 'name',name,  ' #train image shape', np.shape(train_imgs), '#train label shape :',np.shape(train_labs)
+            print 'name', name, ' #train image shape', np.shape(test_imgs), '#test label shape :', np.shape(test_labs)
 
 
         print 'end : fundus | data | fundus_images'
@@ -493,7 +493,7 @@ def get_paths_from_file(filepath):
 
 if __name__ == '__main__':
     #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path='./paths/fundus/2' , n_tests=[5,5,5,5,5,5,5] , n_trains=[10,10,10,10,10,10,10])
-    fundus_300x300(n_trains=[5,5,5,5,5,5,5])
+    fundus_300x300(n_trains=[None ,None ,None , None ,None ,None , 5])
     #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/', n_tests=[5, 5, 5, 5, 5, 5, 5])
 
     """
