@@ -327,7 +327,7 @@ def eye_299x299():
 
 
 
-def fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path=None,extension='png',\
+def fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/' ,reload_folder_path=None,extension='png',\
     names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal'], \
     n_tests = [100, 100, 100, 5, 5, 5, 330], labels = [0, 0, 0, 0, 0, 0, 1]):
     """

@@ -19,6 +19,8 @@ new_img = Image.blend(background, overlay, 0.5)
 new_img.save("new.png","PNG")
 """
 
+
+
 def concat_all(images , axis):
     for i,image in enumerate(images):
         image=np.asarray(image)
@@ -318,23 +320,6 @@ def make_folder(root_folder_path , folder_name):
            count+=1
     return root_folder_path+folder_name+str(count)+'/'
 
-def get_acc(pred , labels ):
-
-    try:
-        assert np.ndim(pred) == np.ndim(labels)
-        assert np.shape(pred) == np.shape(labels)
-    except AssertionError:
-        print 'pred shape : ',np.shape(pred)
-        print 'labels shape : ',np.shape(labels)
-    if np.ndim(pred)==1:
-        pred=np.asarray(pred)
-        cls=np.asarray(labels)
-    else:
-        pred=np.round(pred) # if pred is not one hot vetcor ...change pred to onehot vector
-        pred=np.argmax(pred,axis=0)
-        cls = np.argmax(labels , axis=0)
-    acc=np.sum(pred == cls)/float(len(pred))
-    return acc
 
 
 
