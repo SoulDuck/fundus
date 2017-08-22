@@ -8,6 +8,8 @@ from multiprocessing import Pool
 import aug
 
 
+
+
 def save_paths(src_paths, f_path):
     f = open(f_path, 'w')
     for path in src_paths:
@@ -206,26 +208,30 @@ def get_train_test_images_labels(normal_images, abnormal_images, train_ratio=0.9
     return train_images, train_labels, test_images, test_labels
 
 
-
-
 def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
                   names=['cataract','glaucoma','retina','retina_glaucoma','retina_cataract','cataract_glaucoma','normal'],\
                   n_tests=[100,100,100,5,5,5,330]
-                  ,labels=[0,0,0,0,0,0,1]):
+                  ,labels=[0,0,0,0,0,0,1],
+                  n_limits=[None , None ,None , None , None ,None ,None]):
     """
     usage:
-    :param folder_path: e.g) ../fundus_data/cropped_optical/
+    :param
+    :folder_path: e.g) ../fundus_data/cropped_optical/
     :reload_paths_folder: glaucoma_test_images.npy saved!
+    :extension:
+    :n_tests:
+    :labels:
+
     :return:
 
-    have to read!!
+    :have to read!!
     """
     debug_flag_lv0 = True
     debug_flag_lv1=True
     if __debug__ ==debug_flag_lv0:
         print 'start : fundus | data | fundus_images'
 
-    assert len(names)==len(n_tests)==len(labels)
+    assert len(names)==len(n_tests)==len(labels) == len(n_limits)
     if extension.startswith('.'):
         extension=extension.replace('.','')
 
@@ -240,16 +246,28 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
         for i in range(len(names)): #len(names) ==> 7
 
             file_paths=list_file_paths[i]
-            test_list_file_paths.append(file_paths[:n_tests[i]])
-            train_list_file_paths.append(file_paths[n_tests[i]:])
-            test_imgs_labs=multiproc_make_numpy_images_labels(file_paths[:n_tests[i]], label_num=labels[i])
-            train_imgs_labs = multiproc_make_numpy_images_labels(file_paths[n_tests[i]:], label_num=labels[i])
+            train_file_paths=file_paths[n_tests[i]:]
+            test_file_paths=file_paths[:n_tests[i]]
+            test_list_file_paths.append(test_file_paths)
+            train_list_file_paths.append(train_file_paths)
+
+            if not n_limits[i] == None:
+                indices = random.sample(range(len(train_file_paths)), n_limits[i])
+                tmp_lines = []
+                for ind in indices:
+                    line = train_file_paths[ind]
+                    tmp_lines.append(line)
+                train_file_paths= tmp_lines
+
+
+            test_imgs_labs=multiproc_make_numpy_images_labels(test_file_paths, label_num=labels[i])
+            train_imgs_labs = multiproc_make_numpy_images_labels(train_file_paths, label_num=labels[i])
             test_list_imgs_labs.append(test_imgs_labs)
             train_list_imgs_labs.append(train_imgs_labs)
             if __debug__ == debug_flag_lv1:
 
-                print 'name :',names[i],'the # of list of train file paths', len(file_paths[n_tests[i]:])
-                print 'name :',names[i],'the # of list of test file paths' , len(file_paths[:n_tests[i]])
+                print 'name :',names[i],'the # of list of train file paths', len(train_file_paths)
+                print 'name :',names[i],'the # of list of test file paths' , len(test_file_paths)
     else:
 
         for i,name in enumerate(names):
@@ -258,6 +276,15 @@ def fundus_images(folder_path, reload_folder_path=None ,extension='png',\
                 f_test_paths = open(os.path.join(reload_folder_path, name + '_test_paths.txt'))
                 train_lines=f_train_paths.readlines()
                 test_lines = f_test_paths.readlines()
+
+                if not n_limits[i] == None:
+                    indices=random.sample(range(len(train_lines)) , n_limits[i] )
+                    tmp_lines=[]
+                    for ind in indices:
+                        line=train_lines[ind]
+                        tmp_lines.append(line)
+                    train_lines=tmp_lines
+
 
                 train_file_paths=map(lambda line: line.replace('\n','') , train_lines)
                 test_file_paths = map(lambda line: line.replace('\n', ''), test_lines)
@@ -330,6 +357,7 @@ def eye_299x299():
 def fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/' ,reload_folder_path=None,extension='png',\
     names = ['cataract', 'glaucoma', 'retina', 'retina_glaucoma','retina_cataract', 'cataract_glaucoma', 'normal'], \
     n_tests = [100, 100, 100, 5, 5, 5, 330], labels = [0, 0, 0, 0, 0, 0, 1]):
+
     """
     dir tree
         fundus_data
@@ -464,6 +492,10 @@ def get_paths_from_file(filepath):
 
 
 if __name__ == '__main__':
+    fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path='./paths/fundus/2' , n_tests=[5,5,5,5,5,5,5] , n_limits=[10,10,10,10,10,10,10])
+    #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/', n_tests=[5, 5, 5, 5, 5, 5, 5])
+
+    """
     paths=utils.get_paths_from_text('./paths/fundus/0/normal_test_paths.txt')
     np_imgs,_=multiproc_make_numpy_images_labels(paths , 0)
     np.save('normal_test_0' ,np_imgs)
@@ -476,7 +508,7 @@ if __name__ == '__main__':
     paths = utils.get_paths_from_text('./paths/fundus/0/cataract_test_paths.txt')
     np_imgs, _ = multiproc_make_numpy_images_labels(paths, 0)
     np.save('cataract_test_0', np_imgs)
-
+    """
     #fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path=None,extension='png')
     #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/14/')
     """

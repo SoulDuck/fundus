@@ -169,6 +169,11 @@ def get_paths_from_text(text_locate):
 
     return lines
 
+def save_paths(paths , save_path):
+    f=open(save_path)
+    for path in paths:
+        f.write(path+'\n')
+    f.close()
 
 
 

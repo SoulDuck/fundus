@@ -1,12 +1,9 @@
-import numpy as np
+def a(ab , bc, de , fg =1 , gh =2 ):
+    print 'work well'
 
-a=np.asarray([[0.5 , 0.6],[ 0.4 , 0.7]])
-b=[0,0,1]
-c=[0,0,1]
-b=np.asarray(b)
-c=np.asarray(c)
-print np.round(a)
-print np.ndim(a)
-print np.ndim(b)
-print np.sum(b==c)
 
+
+a(1,2,3,gh=3)
+a=[1,2,3,4,5]
+a[2]=8
+print a
