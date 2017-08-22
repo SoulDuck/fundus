@@ -62,6 +62,7 @@ def train(max_iter ,learning_rate , check_point,nx=[10,10,10,5,5,5,35], structur
         device_count={'GPU': 1},
         log_device_placement=True
     )
+    config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
     init_op = tf.global_variables_initializer()
     sess.run(init_op)
