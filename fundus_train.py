@@ -79,7 +79,6 @@ def train(max_iter ,learning_rate , check_point,nx=[10,10,10,5,5,5,35], structur
     val_imgs, val_labs = data.make_batch(test_list_imgs_labs, val_nx, names=names)
     start_time=time.time()
     try:
-        print type(max_iter)
         for step in range(max_iter):
             utils.show_progress(step, max_iter)
             if step % check_point == 0:
@@ -131,7 +130,7 @@ def train_with_specified_gpu(max_iter , batch_size , learning_rate,restored_mode
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--iter", help='iteration',type=int)
+    parser.add_argument("--max_iter", help='iteration',type=int)
     parser.add_argument("--batch_size" ,help='batch size ' ,type=int)
     parser.add_argument("--learning_rate" , help='learning rate ',type=float)
     parser.add_argument("--structure" , help = 'what structrue you need')
@@ -139,9 +138,6 @@ if __name__ == '__main__':
     parser.add_argument("--check_point" , help='' , type=int)
     parser.add_argument("--optimizer",help='')
     args = parser.parse_args()
-    #args.iter=int(args.iter)
-    #args.batch_size = int(args.batch_size)
-    #args.learning_rate =float(args.learning_rate)
     """
     debugging
     args.iter=100
@@ -149,7 +145,13 @@ if __name__ == '__main__':
     args.learning_rate=0.001
     args.structure='inception_A'
     """
+
     #train_with_redfree(args.iter , args.batch_size , args.learning_rate , args.structure , restored_model_folder_path=None)
     #train_with_specified_gpu(gpu_device='/gpu:1')
+    restore_model_folder_path='./cnn_model/fundus/0/'
+    restored_path_folder_path='./paths/fundus/26'
+    image_height, image_width, image_color_ch, n_classes, \
+    train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths, names =\
+        data.fundus_300x300(reload_folder_path=restored_path_folder_path)
+    train(max_iter=args.max_iter ,learning_rate = args.learning_rate , check_point=args.check_point , structure=args.structure , optimizer=args.optimizer ,restored_model_folder_path=restore_model_folder_path)
 
-    train(max_iter=args.iter ,learning_rate = args.learning_rate , check_point=args.check_point , structure=args.structure , optimizer=args.optimizer )
