@@ -63,7 +63,8 @@ def train(max_iter ,learning_rate , check_point,nx=[5,10,5,5,5,5,25], structure=
         log_device_placement=True
     )
     #config.gpu_options.allow_growth = True
-    sess = tf.Session(config=config)
+
+    sess = tf.Session()
     init_op = tf.global_variables_initializer()
     sess.run(init_op)
     try:
