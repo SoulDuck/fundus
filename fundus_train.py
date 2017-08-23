@@ -15,7 +15,7 @@ import time
 
 
 
-def train(max_iter ,learning_rate , check_point,nx=[5,10,5,5,5,5,35], structure='inception_A', optimizer='AdamOptimizer',restored_model_folder_path=None , restored_path_folder_path=None):
+def train(max_iter ,learning_rate , check_point,nx=[5,10,5,5,5,5,25], structure='inception_A', optimizer='AdamOptimizer',restored_model_folder_path=None , restored_path_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, \
     train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths, names = data.fundus_300x300(reload_folder_path=restored_path_folder_path , n_trains=[None , None , None ,None ,None ,None , 13000])
