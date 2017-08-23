@@ -15,7 +15,7 @@ import time
 
 
 
-def train(max_iter ,learning_rate , check_point,nx=[1,1,1,1,1,1,10], structure='inception_A', optimizer='AdamOptimizer',restored_model_folder_path=None , restored_path_folder_path=None):
+def train(max_iter ,learning_rate , check_point,nx=[5,510,5,5,5,5,35], structure='inception_A', optimizer='AdamOptimizer',restored_model_folder_path=None , restored_path_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, \
     train_list_imgs_labs, test_list_imgs_labs, train_list_file_paths, test_list_file_paths, names = data.fundus_300x300(reload_folder_path=restored_path_folder_path , n_trains=[None , None , None ,None ,None ,None , 13000])
@@ -62,7 +62,7 @@ def train(max_iter ,learning_rate , check_point,nx=[1,1,1,1,1,1,10], structure='
         device_count={'GPU': 1},
         log_device_placement=True
     )
-    config.gpu_options.allow_growth = True
+    #config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
     init_op = tf.global_variables_initializer()
     sess.run(init_op)
