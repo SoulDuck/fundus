@@ -263,7 +263,7 @@ def divide_images_labels_from_batch(images, labels ,batch_size):
                 print "######utils.py: divide_images_labels_from_batch debug mode######"
                 print 'total :', len(images) ,'batch' ,i*batch_size ,":",(i+1)*batch_size
     return batch_img_list , batch_lab_list
-def plot_xs_ys(title,xs_title, ys_title , folder_path,xs ,*arg_ys ):
+def plot_xs_ys(title,xs_title, ys_title , folder_path, xs ,*arg_ys ):
     plt.xlabel(xs_title)
     plt.ylabel(ys_title)
     plt.title(title)
@@ -280,17 +280,19 @@ def draw_grpah(file_pointer,save_folder ,check_point=50):
     if isinstance(file_pointer , str):
         file_path=file_pointer
         f=open(file_path,'r')
+
     else:
         f=file_pointer
-
     lines=f.readlines()
     train_acc_list=[];train_loss_list=[];val_acc_list=[];val_loss_list=[];step_list=[]
+
     for i,line in enumerate(lines):
         step=i*check_point
         step_list.append(step)
         train_acc, train_loss , val_acc , val_loss=line.split('\t')
         train_acc_list.append(train_acc);train_loss_list.append(train_loss);val_acc_list.append(val_acc);val_loss_list.append(val_loss)
     #folder_path = './graph/' + file_path.split('/')[-1].split('.')[0] #
+
     plot_xs_ys('Normal Vs Abnormal','Step','Train Accuracy',save_folder,step_list , train_acc_list)
     plot_xs_ys('Normal Vs Abnormal', 'Step', 'Train Loss', save_folder,step_list, train_loss_list )
     plot_xs_ys('Normal Vs Abnormal', 'Step', 'Validation Accuracy', save_folder,step_list, val_acc_list)
@@ -302,15 +304,14 @@ def draw_grpah(file_pointer,save_folder ,check_point=50):
         print 'the number of train accuracy , loss',len(train_acc_list),len(train_loss_list)
         print 'the number of validation accuracy and loss',len(val_acc_list) , len(val_loss_list)
         print 'all graph was saved here',save_folder
+
 def make_folder(root_folder_path , folder_name):
     """
     usage:
-
     :param root_folder_path:
     :param folder_name:
     :return:
     """
-
     if not os.path.isdir(root_folder_path+folder_name):
         os.mkdir(root_folder_path+folder_name)
         print root_folder_path+folder_name ,'is made'

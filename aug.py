@@ -143,9 +143,9 @@ def random_blur(image):
 
     return blurred_image
 def aug_level_1(imgs):
-    #simgs = map(aug.random_blur , imgs)
-    imgs = map(aug.random_flip , imgs)
-    imgs = map(aug.random_rotate, imgs)
+    imgs = map(random_blur , imgs)
+    imgs = map(random_flip , imgs)
+    imgs = map(random_rotate, imgs)
     return imgs
 
 def get_redfree_images(images):

@@ -14,7 +14,9 @@ import os
 import time
 
 
-
+def input_pipeline():
+    data=3
+    return data
 def train(max_iter ,learning_rate , check_point,nx=[5,10,5,5,5,5,25], structure='inception_A', optimizer='AdamOptimizer',restored_model_folder_path=None , restored_path_folder_path=None):
     ##########################setting############################
     image_height, image_width, image_color_ch, n_classes, \
@@ -74,7 +76,7 @@ def train(max_iter ,learning_rate , check_point,nx=[5,10,5,5,5,5,25], structure=
         print 'there was no model , make new model'
     ########################training##############################
 
-    max_val = 0
+    max_val = 0;
     train_acc = 0;
     train_loss = 0;
     val_nx=[30,30,30,5,5,5,105]
@@ -115,13 +117,17 @@ def train(max_iter ,learning_rate , check_point,nx=[5,10,5,5,5,5,25], structure=
             utils.np2images(batch_xs , './debug')
             train_acc, train_loss, _ = sess.run([accuracy, cost, train_op],
                                                 feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True})
+
             f.flush()
         f.close()
         utils.draw_grpah(log_saved_file_path , graph_saved_folder_path , check_point)
+
     except KeyboardInterrupt as kbi:
         print 'keyboard Interrupted all log was saved and tensorflow session closed'
         f.close()
         utils.draw_grpah(log_saved_file_path, graph_saved_folder_path, check_point)
+
+
 
 
 if __name__ == '__main__':
