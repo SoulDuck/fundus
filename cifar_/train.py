@@ -16,7 +16,7 @@ y_ = tf.placeholder(dtype = tf.float32 , shape=[None , n_classes] )
 phase_train = tf.placeholder(dtype = tf.bool , name = 'phase_train')
 aug_x_=aug.aug_tensor_images(x_ , phase_train ,  img_size_cropped=28 )
 n_filters_per_box = [8, 16, 32, 64]
-n_blocks_per_box = [5, 5, 5, 5]
+n_blocks_per_box = [2, 2, 2, 2]
 stride_per_box = [1, 2, 2, 2]
 use_bottlenect = False
 
