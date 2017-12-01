@@ -332,6 +332,7 @@ def get_acc(true , pred):
     if np.ndim(true) ==2:
         true_cls =np.argmax(true , axis =1)
         pred_cls = np.argmax(pred, axis=1)
+
     print np.shape(true_cls)
     print np.shape(pred_cls)
     print true_cls[:100]
