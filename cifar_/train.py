@@ -45,7 +45,6 @@ for i in range(60000):
     _ , loss, acc = sess.run(fetches=[train_op , cost ,accuracy ] , feed_dict= {x_ : batch_xs, y_ : batch_ys, phase_train : True })
 
     if i % 100 == 0:
-        print '{} {} '.format(loss, acc)
         # Get Validation Accuracy and Loss
         pred_list, cost_list = [], []
         for batch_xs , batch_ys in test_imgs_labs:
