@@ -325,7 +325,7 @@ if __name__ ==  '__main__':
         sess.run(init)
         _ , cost , preds =sess.run(fetches = [model.train_op,model.cost ,model.predictions ] ,  feed_dict= {x_ : batch_xs  ,\
                                                            y_cls : batch_ys } )
-        if i%1000 ==0 :
+        if i%10 ==0 :
             print cost
             print preds[:10]
     # eval
