@@ -22,7 +22,7 @@ use_bottlenect = False
 model = resnet.Resnet(aug_x_, phase_train, n_filters_per_box, n_blocks_per_box, stride_per_box, \
                        use_bottlenect, n_classes=10, activation=tf.nn.relu, logit_type='gap')
 logit=model.logit
-pred,pred_cls , cost , train_op,correct_pred ,accuracy=cnn.algorithm( logit , y_ , learning_rate=0.001 , optimizer='AdamOptimizer')
+pred,pred_cls , cost , train_op,correct_pred ,accuracy=cnn.algorithm( logit , y_ , learning_rate=0.01 , optimizer='AdamOptimizer')
 
 
 ### session start ###
