@@ -44,7 +44,7 @@ for i in range(60000):
         print '{} {} '.format(loss, acc)
         for batch_xs , batch_ys in test_imgs_labs:
             pred_list.extend(sess.run(fetches=pred, feed_dict={x_: batch_xs, y_: batch_ys, phase_train: False}))
-        acc=utils.get_acc(pred_ , test_labs)
+        acc=utils.get_acc(pred_list , test_labs)
         print acc
         exit()
 
