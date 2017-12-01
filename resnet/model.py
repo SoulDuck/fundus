@@ -4,7 +4,7 @@ import six
 from collections import namedtuple
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirnaem(__file__))))
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 import data
 
