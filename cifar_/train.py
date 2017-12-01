@@ -29,8 +29,10 @@ pred,pred_cls , cost , train_op,correct_pred ,accuracy=cnn.algorithm( logit , y_
 
 
 ### session start ###
+config = tf.ConfigProto()
+config.gpu_options.allow_growth= True
+sess=tf.Session(config=config)
 
-sess=tf.Session()
 init = tf.group( tf.global_variables_initializer() , tf.local_variables_initializer())
 sess.run(init)
 
@@ -52,7 +54,7 @@ for i in range(60000):
         val_acc = utils.get_acc(pred_list , test_labs)
         val_cost =  np.sum(cost_list)/float(len(cost_list))
         print val_acc , val_cost
-        exit()
+
 
 
 
