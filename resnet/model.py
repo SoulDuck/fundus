@@ -2,8 +2,11 @@ import tensorflow as tf
 from tensorflow.python.training import moving_averages
 import six
 from collections import namedtuple
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.diranem(__file__))))
+
 import data
-import numpy as np
 
 HParams = namedtuple('HParams',
                      'batch_size, num_classes, min_lrn_rate, lrn_rate, '
