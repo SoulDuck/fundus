@@ -32,7 +32,7 @@ init = tf.group( tf.global_variables_initializer() , tf.local_variables_initiali
 sess.run(init)
 
 
-for i in range(100):
+for i in range(60000):
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=60)
     _ , loss = sess.run(fetches=[train_op , cost ] , feed_dict= {x_ : batch_xs, y_ : batch_ys, phase_train : True })
     print loss
