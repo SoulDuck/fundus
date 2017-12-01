@@ -323,8 +323,8 @@ if __name__ ==  '__main__':
 
         batch_xs , batch_ys=data.next_batch(train_imgs , train_labs , batch_size)
         sess.run(init)
-        _ , cost , preds =sess.run(fetches = [model.train_op,model.cost ,model.predictions ] ,  feed_dict= {x_ : train_imgs[:batch_xs]  ,\
-                                                           y_cls : train_labs[:batch_ys] } )
+        _ , cost , preds =sess.run(fetches = [model.train_op,model.cost ,model.predictions ] ,  feed_dict= {x_ : batch_xs  ,\
+                                                           y_cls : batch_ys } )
         if i%1000 ==0 :
             print cost
             print preds[:10]
