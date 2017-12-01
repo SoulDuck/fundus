@@ -9,6 +9,7 @@ import data
 import numpy as np
 
 train_imgs ,train_labs , test_imgs ,test_labs=input.get_cifar_images_labels(onehot=True)
+train_imgs=train_imgs/255.
 n_classes = 10
 x_ = tf.placeholder(dtype = tf.float32 , shape=[None ,32 ,32 ,3 ])
 y_ = tf.placeholder(dtype = tf.float32 , shape=[None , n_classes] )
