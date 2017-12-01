@@ -1,3 +1,5 @@
+#-*- coding:utf-8 -*-
+
 import glob, os, sys
 import numpy as np
 import utils
@@ -491,82 +493,256 @@ def get_paths_from_file(filepath):
     return newlines
 
 
+# -*- coding:utf-8 -*-
+import tensorflow as tf
+import numpy as np
+import input
+import random
+import os
+
+def reconstruct_tfrecord_rawdata(tfrecord_path, resize=(299, 299)):
+    print 'now Reconstruct Image Data please wait a second'
+    reconstruct_image = []
+    # caution record_iter is generator
+
+    record_iter = tf.python_io.tf_record_iterator(path=tfrecord_path)
+
+    ret_img_list = []
+    ret_lab_list = []
+    ret_fnames = []
+    for i, str_record in enumerate(record_iter):
+        example = tf.train.Example()
+        example.ParseFromString(str_record)
+
+        height = int(example.features.feature['height'].int64_list.value[0])
+        width = int(example.features.feature['width'].int64_list.value[0])
+
+        raw_image = (example.features.feature['raw_image'].bytes_list.value[0])
+        label = int(example.features.feature['label'].int64_list.value[0])
+        filename = example.features.feature['filename'].bytes_list.value[0]
+        filename = filename.decode('utf-8')
+        image = np.fromstring(raw_image, dtype=np.uint8)
+        image = image.reshape((height, width, -1))
+        ret_img_list.append(image)
+        ret_lab_list.append(label)
+        ret_fnames.append(filename)
+    ret_imgs = np.asarray(ret_img_list)
+
+    if np.ndim(ret_imgs) == 3:  # for black image or single image ?
+        b, h, w = np.shape(ret_imgs)
+        h_diff = h - resize[0]
+        w_diff = w - resize[1]
+        ret_imgs = ret_imgs[h_diff / 2: h_diff / 2 + resize[0], w_diff / 2: w_diff / 2 + resize[1], :]
+    elif np.ndim(ret_imgs) == 4:  # Image Up sacle(x) image Down Scale (O)
+        b, h, w, ch = np.shape(ret_imgs)
+        h_diff = h - resize[0]
+        w_diff = w - resize[1]
+        ret_imgs = ret_imgs[:, h_diff / 2: h_diff / 2 + resize[0], w_diff / 2: w_diff / 2 + resize[1], :]
+    ret_labs = np.asarray(ret_lab_list)
+    ret_imgs = np.asarray(ret_imgs)
+    ret_fnames = np.asarray(ret_fnames)
+    return ret_imgs, ret_labs, ret_fnames
+
+def type1(tfrecords_dir, onehot=True, resize=(299, 299)):
+    """type1  데이터 확인 완료 함 """
+    # type1 은 cataract_glaucoma , retina_catarct  , retina_glaucoma을 각각의 카테고리에 맞는 곳에 넣었다
+    # 늑 cataract_glacucoma 는 cataract , glaucoma 에 넣었다
+
+    images, labels, filenames = [], [], []
+    names = ['normal_0', 'glaucoma', 'cataract', 'retina', 'cataract_glaucoma', 'retina_cataract', 'retina_glaucoma']
+    for name in names:
+        for type in ['train', 'test']:
+            imgs, labs, fnames = reconstruct_tfrecord_rawdata(
+                tfrecord_path=tfrecords_dir + '/' + name + '_' + type + '.tfrecord', resize=resize)
+            print type, ' ', name
+            print 'image shape', np.shape(imgs)
+            print 'label shape', np.shape(labs)
+            images.append(imgs);
+            labels.append(labs), filenames.append(fnames)
+
+    n = len(names)
+    train_images, train_labels, train_filenames = [], [], []
+    test_images, test_labels, test_filenames = [], [], []
+
+    for i in range(n):
+        train_images.append(images[i * 2]);
+        train_labels.append(labels[i * 2]);
+        train_filenames.append(filenames[i * 2])
+        test_images.append(images[(i * 2) + 1]);
+        test_labels.append(labels[(i * 2) + 1]);
+        test_filenames.append(filenames[(i * 2) + 1])
+
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = \
+        map(lambda x: np.asarray(x),
+            [train_images, train_labels, train_filenames, test_images, test_labels, test_filenames])
+
+    def _fn1(x, a, b):
+        x[a] = np.concatenate([x[a], x[b]], axis=0)  # cata_glau을  cata에 더한다
+        return x
+
+    """
+    4번은 cataract glaucoma 
+    5번은 retina cataract 
+    6번은 retina glaucoma 
+    1번은 glaucoma
+    2번은 cataract
+    3번은 retina
+    """
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 1, 4),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 1, 4), [test_images, test_labels, test_filenames])
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 2, 4),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 2, 4), [test_images, test_labels, test_filenames])
+
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 2, 5),
+                                                      [train_images, train_labels, train_filenames])  # retina cataract을
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 2, 5), [test_images, test_labels, test_filenames])
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 3, 5),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 3, 5), [test_images, test_labels, test_filenames])
+
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 1, 6),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 1, 6), [test_images, test_labels, test_filenames])
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 3, 6),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 3, 6), [test_images, test_labels, test_filenames])
+
+    for i in range(4):
+        print '#', np.shape(train_images[i])
+    for i in range(4):
+        print '#', np.shape(test_images[i])
+
+    train_labels = train_labels[:4]
+    train_filenames = train_filenames[:4]
+
+    test_images = test_images[:4]
+    test_labels = test_labels[:4]
+    test_filenames = test_filenames[:4]
+
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = \
+        map(lambda x: np.concatenate([x[0], x[1], x[2], x[3]], axis=0), \
+            [train_images, train_labels, train_filenames, test_images, test_labels, test_filenames])
+
+    print 'train images ', np.shape(train_images)
+    print 'train labels ', np.shape(train_labels)
+    print 'train fnamess ', np.shape(train_filenames)
+    print 'test images ', np.shape(test_images)
+    print 'test labels ', np.shape(test_labels)
+    print 'test fnames ', np.shape(test_filenames)
+    n_classes = 2
+    if onehot:
+        train_labels = input.cls2onehot(train_labels, depth=n_classes)
+        test_labels = input.cls2onehot(test_labels, depth=n_classes)
+
+    return train_images, train_labels, train_filenames, test_images, test_labels, test_filenames
+
+def type2(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True ,limits = [3000 , 1000 , 1000 , 1000] ):
+    # normal : 3000
+    # glaucoma : 1000
+    # retina : 1000
+    # cataract : 1000
+    train_images, train_labels, train_filenames = [], [], []
+    test_images, test_labels, test_filenames = [], [], []
+
+    names = ['normal_0', 'glaucoma', 'cataract', 'retina', 'cataract_glaucoma', 'retina_cataract', 'retina_glaucoma']
+    for ind , name in enumerate(names):
+        for type in ['train', 'test']:
+            imgs, labs, fnames = reconstruct_tfrecord_rawdata(
+                tfrecord_path=tfrecords_dir + '/' + name + '_' + type + '.tfrecord', resize=resize)
+            print type, ' ', name
+            print 'image shape', np.shape(imgs)
+            print 'label shape', np.shape(labs)
+
+            if type =='train':
+                random_indices = random.sample(range(len(labs)),
+                                               len(labs))  # normal , glaucoma , cataract , retina 만 random shuffle 을 한다
+                if random_shuffle and ind < 4:
+                    print 'random shuffle On : {} limit : {}'.format(name , limits[ind])
+                    limit =limits[ind]
+                else :
+                    limit = None
+                train_images.append(imgs[random_indices[:limit]]);
+                train_labels.append(labs[random_indices[:limit]]);
+                train_filenames.append(fnames[random_indices[:limit]]);
+            else :
+                test_images.append(imgs);
+                test_labels.append(labs);
+                test_filenames.append(fnames);
+    def _fn1(x, a, b):
+        x[a] = np.concatenate([x[a], x[b]], axis=0)  # cata_glau을  cata에 더한다
+        return x
+
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 1, 4),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 1, 4), [test_images, test_labels, test_filenames])
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 2, 4),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 2, 4), [test_images, test_labels, test_filenames])
+
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 2, 5),
+                                                      [train_images, train_labels, train_filenames])  # retina cataract을
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 2, 5), [test_images, test_labels, test_filenames])
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 3, 5),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 3, 5), [test_images, test_labels, test_filenames])
+
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 1, 6),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 1, 6), [test_images, test_labels, test_filenames])
+    train_images, train_labels, train_filenames = map(lambda x: _fn1(x, 3, 6),
+                                                      [train_images, train_labels, train_filenames])
+    test_images, test_labels, test_filenames = map(lambda x: _fn1(x, 3, 6), [test_images, test_labels, test_filenames])
+
+    for i in range(4):
+        print '#', np.shape(train_images[i])
+    for i in range(4):
+        print '#', np.shape(test_images[i])
+
+    train_labels = train_labels[:4]
+    train_filenames = train_filenames[:4]
+
+    test_images = test_images[:4]
+    test_labels = test_labels[:4]
+    test_filenames = test_filenames[:4]
+
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = \
+        map(lambda x: np.concatenate([x[0], x[1], x[2], x[3]], axis=0), \
+            [train_images, train_labels, train_filenames, test_images, test_labels, test_filenames])
+
+    print 'train images ', np.shape(train_images)
+    print 'train labels ', np.shape(train_labels)
+    print 'train fnamess ', np.shape(train_filenames)
+    print 'test images ', np.shape(test_images)
+    print 'test labels ', np.shape(test_labels)
+    print 'test fnames ', np.shape(test_filenames)
+    n_classes = 2
+    if onehot:
+        train_labels = input.cls2onehot(train_labels, depth=n_classes)
+        test_labels = input.cls2onehot(test_labels, depth=n_classes)
+    if not os.path.isdir('./type2'):
+        os.mkdir('./type2')
+    count=0
+    while True:
+        f_path='./type2/{}'.format(count)
+        if not os.path.isdir(f_path):
+            os.mkdir(f_path)
+            break;
+        else:
+            count += 1
+
+
+    np.save(os.path.join(f_path , 'train_imgs.npy') , train_images)
+    np.save(os.path.join(f_path, 'train_labs.npy'), train_labels)
+    np.save(os.path.join(f_path, 'train_fnames.npy'), train_filenames)
+    return train_images, train_labels, train_filenames, test_images, test_labels, test_filenames
+
+def type3(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True ,limits = [6000 , 2000 , 2000 , 2000]):
+    return type2(tfrecords_dir, onehot=onehot, resize=resize, random_shuffle = random_shuffle ,limits = limits)
+
+
+
 if __name__ == '__main__':
-    #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path='./paths/fundus/2' , n_tests=[5,5,5,5,5,5,5] , n_trains=[10,10,10,10,10,10,10])
-    fundus_300x300(n_trains=[None ,None ,None , None ,None ,None , 5])
-    #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/', n_tests=[5, 5, 5, 5, 5, 5, 5])
+    type2('./fundus_300_debug')
 
-    """
-    paths=utils.get_paths_from_text('./paths/fundus/0/normal_test_paths.txt')
-    np_imgs,_=multiproc_make_numpy_images_labels(paths , 0)
-    np.save('normal_test_0' ,np_imgs)
-    paths = utils.get_paths_from_text('./paths/fundus/0/glaucoma_test_paths.txt')
-    np_imgs, _ = multiproc_make_numpy_images_labels(paths, 0)
-    np.save('glaucoma_test_0', np_imgs)
-    paths = utils.get_paths_from_text('./paths/fundus/0/retina_test_paths.txt')
-    np_imgs, _ = multiproc_make_numpy_images_labels(paths, 0)
-    np.save('retina_test_0', np_imgs)
-    paths = utils.get_paths_from_text('./paths/fundus/0/cataract_test_paths.txt')
-    np_imgs, _ = multiproc_make_numpy_images_labels(paths, 0)
-    np.save('cataract_test_0', np_imgs)
-    """
-    #fundus_300x300(folder_path='../fundus_data/cropped_original_fundus_300x300/',reload_folder_path=None,extension='png')
-    #fundus_images(folder_path='../fundus_data/cropped_original_fundus_300x300/',extension='png', reload_paths_folder='./paths/cropped_original_fundus_300x300/14/')
-    """
-    lines=get_paths_from_file('../fundus_data/cropped_optical/paths/cataract_test_paths.txt')
-    imgs,labs=make_numpy_images_labels(lines, 1)
-    print ''
-    print np.shape(imgs)
-    """
-    """macula_299x299 test"""
-    """
-    image_height, image_width, image_color_ch, n_classes, train_imgs_labs, test_imgs, test_labs=macula_299x299()
-    batch_xs , batch_ys= make_train_batch(train_imgs_labs[0] , train_imgs_labs[1],train_imgs_labs[2],train_imgs_labs[3])
-    """
-
-    """
-    #make_paths('./fundus_data/cropped_optical',)
-    cata , glau , retina , normal =fundus_macula_images()
-    batch_xs , batch_ys=make_train_batch(cata[0] , glau[0] , retina[0] , normal[0])
-    batch_xs = map(aug.random_blur , batch_xs)
-    batch_xs = map(aug.random_flip , batch_xs)
-    batch_xs = map(aug.random_rotate, batch_xs)
-
-    utils.plot_images(batch_xs)
-    """
-
-    """
-    cata_train_paths, cata_test_paths = get_train_test_paths('./cataract_paths')
-    normal_train_paths, normal_test_paths = get_train_test_paths('./normal_paths')
-    glau_train_paths, glau_test_paths = get_train_test_paths('./glaucoma_paths')
-    retina_train_paths, retina_test_paths = get_train_test_paths('./retina_paths')
-    """
-
-    """usage: get_train_test_paths"""
-
-    """
-    image_height, image_width, image_color_ch, n_classes, train_imgs, train_labs, test_imgs, test_labs=eye_299x299()
-    plt.imshow(train_imgs[0])
-    plt.show()
-    plt.imshow(train_imgs[-1])
-    plt.show()
-
-    plt.imshow(test_imgs[0])
-    plt.show()
-    plt.imshow(test_imgs[-1])
-    plt.show()
-
-    print train_labs
-    print test_labs
-    """
-    """ 
-    cataract_paths=make_paths('/home/mediwhale/data/eye/resize_eye/abnormal/cataract/' ,'*.png' , 'cataract_paths')
-    retina_paths = make_paths('/home/mediwhale/data/eye/resize_eye/abnormal/retina/', '*.png', 'retina_paths')
-    glaucoma_paths = make_paths('/home/mediwhale/data/eye/resize_eye/abnormal/glaucoma/', '*.png', 'glaucoma_paths')
-    normal_paths = make_paths('/home/mediwhale/data/eye/resize_eye/normal/', '*.png', 'normal_paths')
-    cata_imgs , cata_labels= make_numpy_images_labels(cataract_paths, label_num=1)
-    retina_imgs, retina_labels = make_numpy_images_labels(retina_paths, label_num=1)
-    glaucoma_imgs,glaucoma_labels  = make_numpy_images_labels(glaucoma_paths , label_num=1)
-    normal_imgs,normal_labels  = make_numpy_images_labels(normal_paths[:12000] , label_num=0)
-    get_train_test_images_labels(cata_imgs , retina_imgs)
-    """
