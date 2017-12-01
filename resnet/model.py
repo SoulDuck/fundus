@@ -7,6 +7,14 @@ n_blocks=[]
 
 class Resnet():
     def __init__ (self , n_filters_per_box , n_blocks_per_box  , use_bottlenect , activation=tf.nn.relu , logit_type='gap'):
+        """
+
+        :param n_filters_per_box: [32, 64, 64, 128 , 256 ]  , type = list
+        :param n_blocks_per_box:  [3, 5 , 4, 3, 2 ]  , type = list
+        :param use_bottlenect: True , dtype = boolean
+        :param activation:  , e.g_) relu
+        :param logit_type: 'gap' or 'fc' , dtype = str
+        """
         assert len(n_filters_per_box) == len(n_blocks_per_box)
         ### bottlenect setting  ###
         self.use_bottlenect = use_bottlenect
@@ -84,3 +92,6 @@ class Resnet():
             print 'Not Implemneted , Sorry '
 
         return logit
+
+if __name__ =='__main__':
+    Resnet()
