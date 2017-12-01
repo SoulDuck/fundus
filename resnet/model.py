@@ -118,15 +118,17 @@ class ResNet(object):
         else:
             raise ValueError
 
-        # L2 loss regularization
+        self.train_op = optimizer.minimize(self.cost , global_step= self.global_step)
+        """
         apply_op = optimizer.apply_gradients(
             zip(grads, trainable_variables),
             global_step=self.global_step, name='train_step')
 
         train_ops = [apply_op] + self._extra_train_ops
         self.train_op = tf.group(*train_ops)
+        """
 
-        #self.train_op = optimizer.minimize(self.cost)
+
 
 
     def _batch_norm(self, name, x):
