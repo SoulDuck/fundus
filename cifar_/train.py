@@ -35,9 +35,11 @@ sess.run(init)
 
 for i in range(60000):
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=60)
-    _ , loss = sess.run(fetches=[train_op , cost ] , feed_dict= {x_ : batch_xs, y_ : batch_ys, phase_train : True })
+    _ , loss, acc = sess.run(fetches=[train_op , cost ,accuracy ] , feed_dict= {x_ : batch_xs, y_ : batch_ys, phase_train : True })
+
     if i % 100 ==0 :
-        print loss
+        print '{} {} '.format(loss , acc)
+
 
 
 
