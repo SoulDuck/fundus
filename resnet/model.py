@@ -28,12 +28,14 @@ class Resnet():
         self.x_ = x_
         self.phase_train = phase_train
         """
-        n_blocks_per_box
+        building model
         """
+        self._build_model()
+
     def _build_model(self):
         with tf.variable_scope('stem'):
             # conv filters out = 64
-            layer = convolution2d('conv_0', x=x_, k=7, s=2)
+            layer = convolution2d('conv_0', out_ch= 32,  x=x_, k=7, s=2)
             layer = batch_norm_layer(layer, phase_train= self.phase_train, scope_bn='bn_0')
             layer = self.activation(layer)
         for box_idx in range(self.n_boxes):
@@ -103,4 +105,5 @@ if __name__ =='__main__':
     n_filters_per_box = [16,16,32,32]
     n_blocks_per_box = [5,5,5,5]
     use_bottlenect = True
-    Resnet(x_ , phase_train , n_filters_per_box , n_blocks_per_box , use_bottlenect , activation=tf.nn.relu , logit_type='gap')
+    logits=Resnet(x_ , phase_train , n_filters_per_box , n_blocks_per_box , use_bottlenect , activation=tf.nn.relu , logit_type='gap')
+    print logits

@@ -44,7 +44,7 @@ def avg_pool(name,x , k=3 , s=2 , padding='SAME'):
             print 'layer shape :', layer.get_shape()
     return layer
 
-def batch_norm_layer(x,train_phase,scope_bn):
+def batch_norm_layer(x,phase_train,scope_bn):
     bn_train = batch_norm(x, decay=0.999, center=True, scale=True,
     updates_collections=None,
     is_training=True,
@@ -57,7 +57,7 @@ def batch_norm_layer(x,train_phase,scope_bn):
     reuse=True, # is this right?
     trainable=True,
     scope=scope_bn)
-    z = tf.cond(train_phase, lambda: bn_train, lambda: bn_inference)
+    z = tf.cond(phase_train, lambda: bn_train, lambda: bn_inference)
     return z
 def affine(name,x,out_ch ,keep_prob):
     with tf.variable_scope(name) as scope:
