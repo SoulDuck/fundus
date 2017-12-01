@@ -53,7 +53,8 @@ for i in range(60000):
             cost_list.append(batch_cost)
         val_acc = utils.get_acc(pred_list , test_labs)
         val_cost =  np.sum(cost_list)/float(len(cost_list))
-        print val_acc , val_cost
+
+        print 'train acc :{} train loss : {} val acc : {} val loss : {}'.format(acc , loss,val_acc , val_cost)
 
 
 
