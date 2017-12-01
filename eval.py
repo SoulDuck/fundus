@@ -1,2 +1,2 @@
-import resnet
+import resnet_
 import cnn

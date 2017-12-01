@@ -5,8 +5,8 @@ import cam
 
 filters_per_blocks=[]
 n_blocks=[]
-
-class Resnet():
+a=3
+class Resnet(object):
     def __init__ (self , x_ , phase_train ,  n_filters_per_box , n_blocks_per_box  , stride_per_box ,  use_bottlenect ,\
                   n_classes,activation=tf.nn.relu ,logit_type='gap'):
         """
@@ -38,15 +38,15 @@ class Resnet():
     def _build_model(self):
         with tf.variable_scope('stem'):
             # conv filters out = 64
-            layer = convolution2d('conv_0', out_ch= 32,  x=x_, k=7, s=2)
+            layer = convolution2d('conv_0', out_ch= 32,  x=self.x_, k=7, s=2)
             layer = batch_norm_layer(layer, phase_train= self.phase_train, scope_bn='bn_0')
             layer = self.activation(layer)
         for box_idx in range(self.n_boxes):
             with tf.variable_scope('box_{}'.format(box_idx)):
                 layer=self._box(layer , n_block= self.n_blocks_per_box[box_idx] , block_out_ch= self.n_filters_per_box[box_idx] ,
                           block_stride = self.stride_per_box[box_idx])
-        logit=self._logit(layer ,  self.phase_train)
-        return logit
+        self.logit=self._logit(layer ,  self.phase_train)
+
 
 
     def _box(self, x,n_block , block_out_ch , block_stride):
@@ -67,7 +67,6 @@ class Resnet():
             layer = self._block(layer , block_out_ch=block_out_ch , block_stride = block_stride , block_n=idx)
         return layer
     def _block(self , x , block_out_ch  , block_stride  , block_n):
-
         shortcut_layer = x
         layer=x
         m=4 if self.use_bottlenect else 1
@@ -89,14 +88,12 @@ class Resnet():
                 layer = batch_norm_layer(layer , self.phase_train,'bn_0' )
                 layer = convolution2d('conv_1', layer, block_out_ch, k=3, s=1)
                 shortcut_layer = convolution2d('shortcut_layer', shortcut_layer, out_ch=out_ch, k=1, s=block_stride)
-
-
-
         return shortcut_layer + layer
+
 
     def _logit(self ,x  , phase_train):
         if self.logit_type == 'gap':
-            logit=gap('gap' , x , out_ch = self.n_classes)
+            logit=gap('gap' , x , n_classes = self.n_classes)
         elif self.logit_type == 'fc':
 
             logit=tf.cond(phase_train , lambda: affine('fc' , x ,out_ch=self.n_classes , keep_prob= 0.5 ) ,\
@@ -113,6 +110,6 @@ if __name__ =='__main__':
     n_blocks_per_box = [5,5,5,5]
     stride_per_box= [5, 5, 5, 5]
     use_bottlenect = True
-    logits=Resnet(x_ , phase_train , n_filters_per_box , n_blocks_per_box , stride_per_box , \
+    model=Resnet(x_ , phase_train , n_filters_per_box , n_blocks_per_box , stride_per_box , \
                   use_bottlenect , n_classes=2 , activation=tf.nn.relu  , logit_type='gap' )
-    print logits
+    print model.logit
