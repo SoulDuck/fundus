@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.python.training import moving_averages
 import six
 from collections import namedtuple
+import data
 import numpy as np
 
 HParams = namedtuple('HParams',
@@ -312,8 +313,9 @@ if __name__ ==  '__main__':
     init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
 
     for i in range(100000):
+        batch_xs , batch_ys=data.next_batch(train_imgs , train_labs , batch_size)
         sess.run(init)
-        _ , cost =sess.run(fetches = [model.train_op,model.cost] ,  feed_dict= {x_ : train_imgs[:hps.batch_size]  ,\
-                                                           y_cls : train_labs[:hps.batch_size] } )
+        _ , cost =sess.run(fetches = [model.train_op,model.cost] ,  feed_dict= {x_ : batch_xs  ,\
+                                                           y_cls : batch_ys } )
         print cost
     # eval
