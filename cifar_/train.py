@@ -44,7 +44,7 @@ for i in range(60000):
         print '{} {} '.format(loss, acc)
         for batch_xs , batch_ys in test_imgs_labs:
             pred_list.extend(sess.run(fetches=pred, feed_dict={x_: batch_xs, y_: batch_ys, phase_train: False}))
-        print len(pred_list)
+
         exit()
 
 

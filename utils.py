@@ -327,6 +327,18 @@ def make_folder(root_folder_path , folder_name):
     return root_folder_path+folder_name+str(count)+'/'
 
 
+def get_acc(true , pred):
+    assert np.ndim(true) == np.ndim(pred)
+    if np.ndim(true) ==2:
+        true_cls =np.argmax(true , axis =1 )
+        pred_cls = np.argmax(pred, axis=1)
+
+    tmp=[true_cls == pred_cls]
+    acc=np.sum(tmp) / float(len(true_cls))
+    return acc
+
+
+
 
 
 
