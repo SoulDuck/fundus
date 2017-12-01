@@ -332,7 +332,8 @@ def get_acc(true , pred):
     if np.ndim(true) ==2:
         true_cls =np.argmax(true , axis =1 )
         pred_cls = np.argmax(pred, axis=1)
-
+    print true_cls[:100]
+    print pred_cls[:100]
     tmp=[true_cls == pred_cls]
     acc=np.sum(tmp) / float(len(true_cls))
     return acc
