@@ -127,6 +127,8 @@ class ResNet(object):
         train_ops = [apply_op] + self._extra_train_ops
         self.train_op = tf.group(*train_ops)
 
+        self.train_op = optimizer.minimize(self.cost)
+
 
     def _batch_norm(self, name, x):
         """Batch normalization."""
