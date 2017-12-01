@@ -318,9 +318,11 @@ if __name__ ==  '__main__':
     init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
 
     for i in range(100000):
+        if i%1000:
+            print cost
         batch_xs , batch_ys=data.next_batch(train_imgs , train_labs , batch_size)
         sess.run(init)
         _ , cost =sess.run(fetches = [model.train_op,model.cost] ,  feed_dict= {x_ : batch_xs  ,\
                                                            y_cls : batch_ys } )
-        print cost
+
     # eval
