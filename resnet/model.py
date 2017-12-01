@@ -289,6 +289,8 @@ if __name__ ==  '__main__':
     test_filenames=glob.glob('./cifar_10/cifar-10-batches-py/test_batch*')
     train_imgs , train_labs=get_images_labels(*train_filenames)
     get_images_labels(*test_filenames)
+    train_imgs=train_imgs/255.
+
 
     num_classes=10
     batch_size=128
