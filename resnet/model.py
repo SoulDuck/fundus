@@ -118,15 +118,15 @@ class ResNet(object):
         else:
             raise ValueError
 
-        self.train_op = optimizer.minimize(self.cost , global_step= self.global_step)
-        """
+        #self.train_op = optimizer.minimize(self.cost , global_step= self.global_step)
+
         apply_op = optimizer.apply_gradients(
             zip(grads, trainable_variables),
             global_step=self.global_step, name='train_step')
 
         train_ops = [apply_op] + self._extra_train_ops
         self.train_op = tf.group(*train_ops)
-        """
+
 
 
 
@@ -298,7 +298,7 @@ if __name__ ==  '__main__':
     hps = HParams(batch_size=batch_size,
                   num_classes=num_classes,
                   min_lrn_rate=0.0001,
-                  lrn_rate=0.1,
+                  lrn_rate=0.001,
                   num_residual_units=5,
                   use_bottleneck=False,
                   weight_decay_rate=0.0002,
@@ -326,7 +326,7 @@ if __name__ ==  '__main__':
         sess.run(init)
         _ , cost , preds =sess.run(fetches = [model.train_op,model.cost ,model.predictions ] ,  feed_dict= {x_ : batch_xs  ,\
                                                            y_cls : batch_ys } )
-        if i%1000 ==0 :
+        if i%100 ==0 :
             print cost
             #print preds[:10]
     # eval
