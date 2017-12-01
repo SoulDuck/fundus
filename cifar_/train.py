@@ -6,6 +6,8 @@ import aug
 import cnn
 import input
 import data
+import eval
+import utils
 import numpy as np
 
 train_imgs ,train_labs , test_imgs ,test_labs=input.get_cifar_images_labels(onehot=True)
@@ -32,13 +34,21 @@ sess=tf.Session()
 init = tf.group( tf.global_variables_initializer() , tf.local_variables_initializer())
 sess.run(init)
 
-
+test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)
+test_imgs_labs = zip(test_imgs_list, test_labs_list)
+pred_list=[]
 for i in range(60000):
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=60)
     _ , loss, acc = sess.run(fetches=[train_op , cost ,accuracy ] , feed_dict= {x_ : batch_xs, y_ : batch_ys, phase_train : True })
+    if i % 100 == 0:
+        print '{} {} '.format(loss, acc)
+        for batch_xs , batch_ys in test_imgs_labs:
+            pred_list.extend(sess.run(fetches=pred, feed_dict={x_: batch_xs, y_: batch_ys, phase_train: False}))
+        print len(pred_list)
+        exit()
 
-    if i % 100 ==0 :
-        print '{} {} '.format(loss , acc)
+
+
 
 
 
