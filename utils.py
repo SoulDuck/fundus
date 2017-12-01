@@ -234,7 +234,7 @@ def divide_images(images , batch_size):
 
 
 def divide_images_labels_from_batch(images, labels ,batch_size):
-    debug_flag=True
+    debug_flag=False
 
     batch_img_list=[]
     batch_lab_list = []
