@@ -279,8 +279,8 @@ class ResNet(object):
 
 if __name__ ==  '__main__':
     from  cifar_input import *
-    train_filenames=glob.glob('./cifar_10/data_batch*')
-    test_filenames=glob.glob('./cifar_10/test_batch*')
+    train_filenames=glob.glob('./cifar_10/cifar-10-batches-py/data_batch*')
+    test_filenames=glob.glob('./cifar_10/cifar-10-batches-py/test_batch*')
     train_imgs , train_labs=get_images_labels(*train_filenames)
     get_images_labels(*test_filenames)
 
