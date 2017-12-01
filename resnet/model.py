@@ -297,7 +297,7 @@ if __name__ ==  '__main__':
     hps = HParams(batch_size=batch_size,
                   num_classes=num_classes,
                   min_lrn_rate=0.0001,
-                  lrn_rate=0.1,
+                  lrn_rate=0.5,
                   num_residual_units=5,
                   use_bottleneck=False,
                   weight_decay_rate=0.0002,
