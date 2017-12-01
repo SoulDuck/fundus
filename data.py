@@ -493,12 +493,6 @@ def get_paths_from_file(filepath):
     return newlines
 
 
-# -*- coding:utf-8 -*-
-import tensorflow as tf
-import numpy as np
-import input
-import random
-import os
 
 def reconstruct_tfrecord_rawdata(tfrecord_path, resize=(299, 299)):
     print 'now Reconstruct Image Data please wait a second'
