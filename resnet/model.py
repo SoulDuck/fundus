@@ -318,7 +318,7 @@ if __name__ ==  '__main__':
     init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
 
     for i in range(100000):
-        if i%1000:
+        if i%1000 ==0 :
             print cost
         batch_xs , batch_ys=data.next_batch(train_imgs , train_labs , batch_size)
         sess.run(init)
