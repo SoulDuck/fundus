@@ -335,6 +335,7 @@ def get_acc(true , pred):
     print true_cls[:100]
     print pred_cls[:100]
     tmp=[true_cls == pred_cls]
+    print tmp[:100]
     print np.sum(tmp)
     acc=np.sum(tmp) / float(len(true_cls))
     return acc
