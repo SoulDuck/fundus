@@ -7,26 +7,29 @@ filters_per_blocks=[]
 n_blocks=[]
 
 class Resnet():
-    def __init__ (self , x_ , phase_train ,  n_filters_per_box , n_blocks_per_box  , use_bottlenect ,\
-                  activation=tf.nn.relu , logit_type='gap'):
+    def __init__ (self , x_ , phase_train ,  n_filters_per_box , n_blocks_per_box  , stride_per_box ,  use_bottlenect ,\
+                  n_classes,activation=tf.nn.relu ,logit_type='gap'):
         """
 
         :param n_filters_per_box: [32, 64, 64, 128 , 256 ]  , type = list
         :param n_blocks_per_box:  [3, 5 , 4, 3, 2 ]  , type = list
+        :param stride_per_box: [2, 2, 2, 2 , 2 ]  , type = list
         :param use_bottlenect: True , dtype = boolean
         :param activation:  , e.g_) relu
         :param logit_type: 'gap' or 'fc' , dtype = str
         """
-        assert len(n_filters_per_box) == len(n_blocks_per_box)
+        assert len(n_filters_per_box) == len(n_blocks_per_box) == len(stride_per_box)
         ### bottlenect setting  ###
         self.use_bottlenect = use_bottlenect
         self.activation = activation
         self.n_filters_per_box = n_filters_per_box
         self.n_blocks_per_box = n_blocks_per_box
+        self.stride_per_box = stride_per_box
         self.n_boxes = len(n_filters_per_box)
         self.logit_type = logit_type
         self.x_ = x_
         self.phase_train = phase_train
+        self.n_classes = n_classes
         """
         building model
         """
@@ -39,21 +42,25 @@ class Resnet():
             layer = batch_norm_layer(layer, phase_train= self.phase_train, scope_bn='bn_0')
             layer = self.activation(layer)
         for box_idx in range(self.n_boxes):
-            with tf.variable_scope('box_{}'.foramt(box_idx)):
-                self._box(layer , n_block= self.n_blocks_per_box[box_idx] , block_out_ch= self.n_filters_per_box[box_idx] )
+            with tf.variable_scope('box_{}'.format(box_idx)):
+                layer=self._box(layer , n_block= self.n_blocks_per_box[box_idx] , block_out_ch= self.n_filters_per_box[box_idx] ,
+                          block_stride = self.stride_per_box[box_idx])
+        logit=self._logit(layer ,  self.phase_train)
+        return logit
 
-    def _box(self, x,n_blocks , block_out_ch , block_stride):
+
+    def _box(self, x,n_block , block_out_ch , block_stride):
         """
 
         :param x:
-        :param n_blocks: 5  , dtype = int
+        :param n_block: 5  , dtype = int
         :param block_out_ch: 32 , dtype = int
         :param block_stride: 2 , dtype = int
         :return:
         """
         layer=x
-        for idx in range(n_blocks):
-            if idx == n_blocks-1:
+        for idx in range(n_block):
+            if idx == n_block-1:
                 block_stride = block_stride
             else:
                 block_stride = 1
@@ -61,7 +68,7 @@ class Resnet():
         return layer
     def _block(self , x , block_out_ch  , block_stride  , block_n):
 
-        shortcut = x
+        shortcut_layer = x
         layer=x
         m=4 if self.use_bottlenect else 1
         out_ch = m * block_out_ch
@@ -74,18 +81,18 @@ class Resnet():
                 layer = convolution2d('conv_1', layer, out_ch=block_out_ch, k=3,
                                       s=block_stride)  # fixed padding padding = "SAME"
                 layer = batch_norm_layer(layer, self.phase_train, 'bn_2')
-                layer = convolution2d('conv_2', layer, out_ch=block_out_ch, k=1, s=1)  # fixed padding padding = "SAME"
-
+                layer = convolution2d('conv_2', layer, out_ch=out_ch, k=1, s=1)  # fixed padding padding = "SAME"
+                shortcut_layer = convolution2d('shortcut_layer', shortcut_layer, out_ch=out_ch, k=1, s=block_stride)
         else: #""" redisual layer """
             with tf.variable_scope('residual_{}.'.format(block_n)):
                 layer = convolution2d('conv_0' , layer , block_out_ch , k=3 , s=block_stride) # in here , if not block_stride = 1 , decrease image size
                 layer = batch_norm_layer(layer , self.phase_train,'bn_0' )
                 layer = convolution2d('conv_1', layer, block_out_ch, k=3, s=1)
+                shortcut_layer = convolution2d('shortcut_layer', shortcut_layer, out_ch=out_ch, k=1, s=block_stride)
 
-        if not block_stride ==1: # image size 가 줄어들면 shortcut layer 의 이미지도 줄여야 한다
-            shortcut_layer = convolution2d('shortcut_layer' , out_ch = out_ch , k =1 , s= block_stride)
 
-        return shortcut + layer
+
+        return shortcut_layer + layer
 
     def _logit(self ,x  , phase_train):
         if self.logit_type == 'gap':
@@ -100,10 +107,12 @@ class Resnet():
         return logit
 
 if __name__ =='__main__':
-    phase_train= True
+    phase_train = tf.placeholder(dtype=tf.bool , name='phase_train')
     x_ = tf.placeholder(dtype = tf.float32 , shape = [None , 32, 32 ,3 ] , name = 'x_')
     n_filters_per_box = [16,16,32,32]
     n_blocks_per_box = [5,5,5,5]
+    stride_per_box= [5, 5, 5, 5]
     use_bottlenect = True
-    logits=Resnet(x_ , phase_train , n_filters_per_box , n_blocks_per_box , use_bottlenect , activation=tf.nn.relu , logit_type='gap')
+    logits=Resnet(x_ , phase_train , n_filters_per_box , n_blocks_per_box , stride_per_box , \
+                  use_bottlenect , n_classes=2 , activation=tf.nn.relu  , logit_type='gap' )
     print logits
