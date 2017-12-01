@@ -36,17 +36,24 @@ sess.run(init)
 
 test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)
 test_imgs_labs = zip(test_imgs_list, test_labs_list)
-pred_list=[]
+pred_list , cost_list=[] , []
+
 for i in range(60000):
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=60)
     _ , loss, acc = sess.run(fetches=[train_op , cost ,accuracy ] , feed_dict= {x_ : batch_xs, y_ : batch_ys, phase_train : True })
+
     if i % 100 == 0:
         print '{} {} '.format(loss, acc)
+        # Get Validation Accuracy and Loss
         for batch_xs , batch_ys in test_imgs_labs:
-            pred_list.extend(sess.run(fetches=pred, feed_dict={x_: batch_xs, y_: batch_ys, phase_train: False}))
-        acc=utils.get_acc(pred_list , test_labs)
-        print acc
+            batch_pred , batch_cost = sess.run(fetches=[pred ,cost ], feed_dict={x_: batch_xs, y_: batch_ys, phase_train: False})
+            pred_list.extend(batch_pred)
+            cost_list.extend(batch_cost)
+        val_acc = utils.get_acc(pred_list , test_labs)
+        val_cost =  np.sum(cost_list)/float(len(cost_list))
+        print val_acc , val_cost
         exit()
+
 
 
 
