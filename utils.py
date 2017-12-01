@@ -330,8 +330,10 @@ def make_folder(root_folder_path , folder_name):
 def get_acc(true , pred):
     assert np.ndim(true) == np.ndim(pred) , 'true shape : {} pred shape : {} '.format(np.shape(true) , np.shape(pred))
     if np.ndim(true) ==2:
-        true_cls =np.argmax(true , axis =1 )
+        true_cls =np.argmax(true , axis =1)
         pred_cls = np.argmax(pred, axis=1)
+    print np.shape(true_cls)
+    print np.shape(pred_cls)
     print true_cls[:100]
     print pred_cls[:100]
     tmp=[true_cls == pred_cls]
