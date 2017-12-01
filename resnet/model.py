@@ -290,7 +290,7 @@ if __name__ ==  '__main__':
     train_imgs , train_labs=get_images_labels(*train_filenames)
     get_images_labels(*test_filenames)
     train_imgs=train_imgs/255.
-
+    print np.max(train_imgs)
 
     num_classes=10
     batch_size=128
@@ -323,8 +323,9 @@ if __name__ ==  '__main__':
 
         batch_xs , batch_ys=data.next_batch(train_imgs , train_labs , batch_size)
         sess.run(init)
-        _ , cost =sess.run(fetches = [model.train_op,model.cost] ,  feed_dict= {x_ : batch_xs  ,\
+        _ , cost , preds =sess.run(fetches = [model.train_op,model.cost ,model.predictions ] ,  feed_dict= {x_ : batch_xs  ,\
                                                            y_cls : batch_ys } )
         if i%1000 ==0 :
             print cost
+            print preds[:10]
     # eval
