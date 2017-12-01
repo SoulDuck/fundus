@@ -55,7 +55,7 @@ for i in range(60000):
         val_acc = utils.get_acc(pred_list , test_labs)
         val_cost =  np.sum(cost_list)/float(len(cost_list))
 
-        print 'train acc :{:.4f} train loss : {:.4f} val acc : {:.4f} val loss : {:.4f}'.format(acc , loss,val_acc , val_cost)
+        print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc , loss,val_acc , val_cost)
 
 
 
