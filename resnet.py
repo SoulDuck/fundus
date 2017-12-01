@@ -1,6 +1,7 @@
 #-*- coding:utf-8 -*-
 import tensorflow as tf
 from cnn import convolution2d, batch_norm_layer, affine, max_pool, avg_pool , gap
+
 import cam
 
 filters_per_blocks=[]

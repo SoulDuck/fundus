@@ -201,50 +201,60 @@ for sub_folder_name in sub_folder_names:
 """
 
 
-def augmentation(images , phase_train , img_size_cropped):
-    def _pre_process_image(image, training):
-        num_channels=image.get_shape()[-1]
-        # This function takes a single image as input,
-        # and a boolean whether to build the training or testing graph.
+def aug_tensor_images(images , phase_train , img_size_cropped):
+    num_channels=int(images.get_shape()[-1])
+    print num_channels
 
-        if phase_train:
-            # For training, add the following to the TensorFlow graph.
 
-            # Randomly crop the input image.
-            image = tf.random_crop(image, size=[img_size_cropped, img_size_cropped, num_channels])
+    # This function takes a single image as input,
+    # and a boolean whether to build the training or testing graph.
 
-            # Randomly flip the image horizontally.
-            image = tf.image.random_flip_left_right(image)
+    def _training(image):
+        # For training, add the following to the TensorFlow graph.
+        # Randomly crop the input image.
+        print img_size_cropped
+        image = tf.random_crop(image, size=[img_size_cropped, img_size_cropped, num_channels])
+        print image
 
-            # Randomly adjust hue, contrast and saturation.
-            image = tf.image.random_hue(image, max_delta=0.05)
-            image = tf.image.random_contrast(image, lower=0.3, upper=1.0)
-            image = tf.image.random_brightness(image, max_delta=0.2)
-            image = tf.image.random_saturation(image, lower=0.0, upper=2.0)
+        # Randomly flip the image horizontally.
+        image = tf.image.random_flip_left_right(image)
 
-            # Some of these functions may overflow and result in pixel
-            # values beyond the [0, 1] range. It is unclear from the
-            # documentation of TensorFlow 0.10.0rc0 whether this is
-            # intended. A simple solution is to limit the range.
+        # Randomly adjust hue, contrast and saturation.
+        image = tf.image.random_hue(image, max_delta=0.05)
+        image = tf.image.random_contrast(image, lower=0.3, upper=1.0)
+        image = tf.image.random_brightness(image, max_delta=0.2)
+        image = tf.image.random_saturation(image, lower=0.0, upper=2.0)
+        # Some of these functions may overflow and result in pixel
+        # values beyond the [0, 1] range. It is unclear from the
+        # documentation of TensorFlow 0.10.0rc0 whether this is
+        # intended. A simple solution is to limit the range.
 
-            # Limit the image pixels between [0, 1] in case of overflow.
-            image = tf.minimum(image, 1.0)
-            image = tf.maximum(image, 0.0)
-        else:
-            # For training, add the following to the TensorFlow graph.
+        # Limit the image pixels between [0, 1] in case of overflow.
+        image = tf.minimum(image, 1.0)
+        image = tf.maximum(image, 0.0)
+        return image
+    def _eval(image):
+        print image
+        # For training, add the following to the TensorFlow graph.
 
-            # Crop the input image around the centre so it is the same
-            # size as images that are randomly cropped during training.
-            image = tf.image.resize_image_with_crop_or_pad(image,
-                                                           target_height=img_size_cropped,
-                                                           target_width=img_size_cropped)
-
+        # Crop the input image around the centre so it is the same
+        # size as images that are randomly cropped during training.
+        image = tf.image.resize_image_with_crop_or_pad(image,
+                                                       target_height=img_size_cropped,
+                                                       target_width=img_size_cropped)
         return image
 
 
     # Use TensorFlow to loop over all the input images and call
     # the function above which takes a single image as input.
-    images = tf.map_fn(lambda image: _pre_process_image(image, phase_train ), images)
+    #    logit = tf.cond(phase_train, lambda: affine('fc', x, out_ch=self.n_classes, keep_prob=0.5), \
+    #                    lambda: affine('fc', x, out_ch=self.n_classes, keep_prob=1.0))
 
+    #images=tf.map_fn(lambda image : _training(image) , images)
+    #print images
+    ##images = tf.map_fn(lambda image: _pre_process_image(image, phase_train ), images)
+    images = tf.map_fn(lambda image : tf.cond(phase_train ,  lambda: _training(image)  , lambda :_eval(image)), images)
     return images
 
+    #images =tf.cond(phase_train , tf.map_fn(lambda image : _training(image) , images ) ,\
+    #        tf.map_fn(lambda image : _eval(image) , images ))
