@@ -326,5 +326,5 @@ if __name__ ==  '__main__':
                                                            y_cls : batch_ys } )
         if i%1000 ==0 :
             print cost
-            print preds[:10]
+            #print preds[:10]
     # eval
