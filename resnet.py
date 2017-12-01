@@ -42,6 +42,7 @@ class Resnet(object):
             layer = batch_norm_layer(layer, phase_train= self.phase_train, scope_bn='bn_0')
             layer = self.activation(layer)
         for box_idx in range(self.n_boxes):
+            print '#######   box_{}  ########'.format(box_idx)
             with tf.variable_scope('box_{}'.format(box_idx)):
                 layer=self._box(layer , n_block= self.n_blocks_per_box[box_idx] , block_out_ch= self.n_filters_per_box[box_idx] ,
                           block_stride = self.stride_per_box[box_idx])
@@ -61,10 +62,10 @@ class Resnet(object):
         layer=x
         for idx in range(n_block):
             if idx == n_block-1:
-                block_stride = block_stride
+                layer = self._block(layer, block_out_ch=block_out_ch, block_stride=block_stride, block_n=idx)
+                #box의 마지막 block에서는 이미지를 줄이기 위해서 주어진 strides 을 convolution 에 적용시킨다
             else:
-                block_stride = 1
-            layer = self._block(layer , block_out_ch=block_out_ch , block_stride = block_stride , block_n=idx)
+                layer = self._block(layer , block_out_ch=block_out_ch , block_stride = 1 , block_n=idx)
         return layer
     def _block(self , x , block_out_ch  , block_stride  , block_n):
         shortcut_layer = x
