@@ -43,8 +43,10 @@ def binarization(np_img , threshold):
 #load Image
 fundus_paths=glob.glob('./debug/*.png')
 
-img=Image.open(fundus_paths[0])
 img=Image.open('./debug/hard.png')
+img=Image.open(fundus_paths[1])
+plt.imshow(img)
+plt.show()
 img=img.convert("RGB")
 np_img=np.asarray(img)
 h,w,ch=np.shape(np_img) # how to RGB?
@@ -56,8 +58,8 @@ print h,w,ch
 np_img=np.reshape(np_img , [1,h,w,ch])
 red_np_img=np_img[:,:,:,0]
 red_np_img=np.squeeze(red_np_img)
-binarization(red_np_img , 210)
-exit()
+binarization(red_np_img , 255)
+
 print 'red numpy image shape : {}'.format(np.shape(red_np_img))
 
 
