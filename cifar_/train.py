@@ -48,7 +48,7 @@ for i in range(60000):
         for batch_xs , batch_ys in test_imgs_labs:
             batch_pred , batch_cost = sess.run(fetches=[pred ,cost ], feed_dict={x_: batch_xs, y_: batch_ys, phase_train: False})
             pred_list.extend(batch_pred)
-            cost_list.extend(batch_cost)
+            cost_list.append(batch_cost)
         val_acc = utils.get_acc(pred_list , test_labs)
         val_cost =  np.sum(cost_list)/float(len(cost_list))
         print val_acc , val_cost
