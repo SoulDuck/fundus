@@ -382,7 +382,7 @@ def restore_model(saver,sess,ckpt_dir):
         saver.restore(sess, tf.train.latest_checkpoint(ckpt_dir))
         print '*********************************************'
         print '*            Restore Model                  *'
-        print '*            global step : {}                *'.format(global_step)
+        print '*           global step : {: <6}            *'.format(global_step)
         print '*********************************************'
     else:
         print 'No Model , initializing global step to 0'

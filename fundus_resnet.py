@@ -16,6 +16,7 @@ import os
 # run training using global step
 train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames=data.type2('./fundus_300_debug')
 train_imgs=train_imgs/255.
+test_imgs = test_imgs/255.
 n_classes = 2
 
 x_ = tf.placeholder(dtype = tf.float32 , shape=[None ,299 ,299 ,3 ])
@@ -64,7 +65,7 @@ start_step=utils.restore_model(saver = last_model_saver, sess = sess , ckpt_dir=
 test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)
 test_imgs_labs = zip(test_imgs_list, test_labs_list)
 
-max_acc , min_loss = 0, 100000
+max_acc , min_loss = 0, 10000000
 for step in range(start_step , 60000):
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=60)
     _ , loss, acc = sess.run(fetches=[train_op , cost ,accuracy ] , feed_dict= {x_ : batch_xs, y_ : batch_ys, phase_train : True })
@@ -84,7 +85,6 @@ for step in range(start_step , 60000):
         print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc , loss,val_acc , val_cost)
 
 
-    exit()
 
 
 
