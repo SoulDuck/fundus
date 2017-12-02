@@ -5,6 +5,7 @@ import math
 import glob
 from PIL import Image
 import random
+import tensorflow as tf
 """
 import Image
 
@@ -336,43 +337,45 @@ def get_acc(true , pred):
     return acc
 
 
+"""-----------------------------------------------------------------------------------------------
+                                        TENSORFLOW UTILS
+-----------------------------------------------------------------------------------------------"""
 
 
 
 
+def save_model(sess, saver, max_acc, min_loss, val_acc, val_loss, best_acc_root, best_loss_root, step):
+    try:
+        os.makedirs(best_acc_root)
+        os.makedirs(best_loss_root)
+    except Exception as e :
+        print e # only debug
 
+    if val_acc > max_acc:  # best acc
+        max_acc = val_acc
+        print 'max acc : {}'.format(max_acc)
+        best_acc_folder = os.path.join(best_acc_root, 'step_{}_acc_{}'.format(step, max_acc))
+        saver.save(sess=sess,
+                   save_path=os.path.join(best_acc_folder, 'model'))
+
+    if val_loss < min_loss:  # best loss
+        min_loss = val_loss
+        print 'min loss : {}'.format(min_loss)
+        best_loss_folder = os.path.join(best_loss_root, 'step_{}_loss_{}'.format(step, min_loss))
+        saver.save(sess=sess,
+                   save_path=os.path.join(best_loss_folder, 'model'))
+
+        return max_acc, min_loss
+
+def write_acc_loss(summary_writer ,prefix , loss , acc  , step):
+    summary = tf.Summary(value=[tf.Summary.Value(tag='loss_{}'.format(prefix), simple_value=float(loss)),
+                                tf.Summary.Value(tag='accuracy_{}'.format(prefix), simple_value=float(acc))])
+    summary_writer.add_summary(summary, step)
 if __name__=='__main__':
-    #images=np.load('./FD_300.npy')
-    #np2images(images,'./debug')
-    #make_log_txt()
-    #delete_char_from_paths(folder_path='../fundus_data/cropped_macula/', del_char='*')
-    """
-    paths=glob.glob('./sample_image/original_images/*.png')
-    imgs=open_images(paths)
-    print np.shape(imgs)
-    plot_images(imgs)
-    """
-    """
-    #function divide_images_labels_from_batch test
-    test_imgs=np.load('./test_imgs.npy')
-    test_labs=np.load('./test_labs.npy')
-    imgs,labs=divide_images_labels_from_batch(test_imgs , test_labs ,batch_size=60)
-    print labs[8]
-    """
-    #draw_grpah('./log/79%_top_of_batch_STEM_REDUCTION_A_B_ABNORMAL_NORMAL.txt')
 
-    """
-    f=open('./log/fundus/gradientoptimizer.txt')
-    draw_grpah(f,'./graph/fundus/gradientoptimizer',100)
-    """
-    """
-    imgs=np.load('./normal_test_0.npy')
-    list_imgs=divide_images(imgs , batch_size=60)
-    for imgs in list_imgs:
-        print np.shape(imgs)
-    """
     pred=[0,0,0,1]
     labels=[0,0,0,1]
     pred=np.array([[0.7 , 0.5],[0.7 , 0]])
     labels=np.array([[1. , 0 ],[1, 0 ]])
     print get_acc(pred,labels)
+
