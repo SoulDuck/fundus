@@ -81,7 +81,8 @@ for step in range(start_step , 60000):
         val_cost =  np.sum(cost_list)/float(len(cost_list))
         utils.save_model(sess, saver, max_acc, min_loss, val_acc, val_cost, best_acc_ckpt_dir, best_loss_ckpt_dir,
                          step)
-        utils.write_acc_loss(tb_writer , prefix='test' , loss =val_acc , acc =val_cost  , step=step)
+        utils.write_acc_loss(tb_writer , prefix='test' , loss =val_cost , acc =val_acc  , step=step)
+        utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
         print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc , loss,val_acc , val_cost)
 
 
