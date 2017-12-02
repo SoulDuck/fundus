@@ -3,7 +3,7 @@ import resnet
 import tensorflow as tf
 import numpy as np
 import aug
-train_imgs, train_labss, train_filenames, test_imgs, test_labs, test_filenames=data.type2('./fundus_300_debug')
+train_imgs, train_labss, train_filenames, test_imgs, test_labs, test_filenames=data.type2('./fundus_300')
 train_imgs=train_imgs/255.
 n_classes = 10
 
