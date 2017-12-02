@@ -88,7 +88,8 @@ def gap(name,x , n_classes ):
 
 def algorithm(y_conv , y_ , learning_rate , optimizer='GradientDescentOptimizer'):
 
-    assert int(y_conv.get_shape()[-1]) == int(y_.get_shape()[-1])
+    assert int(y_conv.get_shape()[-1]) == int(y_.get_shape()[-1]) \
+        , 'logits : {} true labels :{}'.format(y_conv.get_shape()[-1] , y_.get_shape()[-1])
     """
 
     :param y_conv: logits

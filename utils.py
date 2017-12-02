@@ -344,24 +344,26 @@ def get_acc(true , pred):
 
 
 
-def save_model(sess, saver, max_acc, min_loss, val_acc, val_loss, best_acc_root, best_loss_root, step):
+def save_model(sess, saver, max_acc, min_loss, val_acc, val_loss, best_acc_ckpt_dir, best_loss_ckpt_dir, step):
     try:
-        os.makedirs(best_acc_root)
-        os.makedirs(best_loss_root)
+        os.mkdir(best_acc_ckpt_dir)
+        os.mkdir(best_loss_ckpt_dir)
     except Exception as e :
         print e # only debug
 
     if val_acc > max_acc:  # best acc
         max_acc = val_acc
         print 'max acc : {}'.format(max_acc)
-        best_acc_folder = os.path.join(best_acc_root, 'step_{}_acc_{}'.format(step, max_acc))
+        best_acc_folder = os.path.join(best_acc_ckpt_dir, 'step_{}_acc_{}'.format(step, max_acc))
+        os.mkdir(best_acc_folder)
         saver.save(sess=sess,
                    save_path=os.path.join(best_acc_folder, 'model'))
 
     if val_loss < min_loss:  # best loss
         min_loss = val_loss
         print 'min loss : {}'.format(min_loss)
-        best_loss_folder = os.path.join(best_loss_root, 'step_{}_loss_{}'.format(step, min_loss))
+        best_loss_folder = os.path.join(best_loss_ckpt_dir, 'step_{}_loss_{}'.format(step, min_loss))
+        os.mkdir(best_loss_folder)
         saver.save(sess=sess,
                    save_path=os.path.join(best_loss_folder, 'model'))
 
@@ -371,6 +373,21 @@ def write_acc_loss(summary_writer ,prefix , loss , acc  , step):
     summary = tf.Summary(value=[tf.Summary.Value(tag='loss_{}'.format(prefix), simple_value=float(loss)),
                                 tf.Summary.Value(tag='accuracy_{}'.format(prefix), simple_value=float(acc))])
     summary_writer.add_summary(summary, step)
+
+def restore_model(saver,sess,ckpt_dir):
+
+    if tf.train.get_checkpoint_state(checkpoint_dir=ckpt_dir):
+        last_ckpt_filename=tf.train.latest_checkpoint(ckpt_dir, latest_filename=None)
+        global_step = int(os.path.basename(last_ckpt_filename).split('-')[1])
+        saver.restore(sess, tf.train.latest_checkpoint(ckpt_dir))
+        print '*********************************************'
+        print '*            Restore Model                  *'
+        print '*            global step : {}                *'.format(global_step)
+        print '*********************************************'
+    else:
+        print 'No Model , initializing global step to 0'
+        global_step=0
+    return global_step
 if __name__=='__main__':
 
     pred=[0,0,0,1]
