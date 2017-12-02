@@ -98,6 +98,9 @@ for step in range(start_step , 60000):
                          step)
         utils.write_acc_loss(tb_writer , prefix='test' , loss =val_cost , acc =val_acc  , step=step)
         utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
+        lr_summary=tf.Summary(value = [tf.Summary.Value(tag='learning_rate' , simple_value = float(lr))])
+        tb_writer.add_summary(lr_summary, step)
+
         print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc , loss,val_acc , val_cost)
 
 
