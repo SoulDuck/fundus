@@ -34,9 +34,9 @@ model = resnet.Resnet(aug_x_, phase_train, n_filters_per_box, n_blocks_per_box, 
 logit=model.logit
 pred,pred_cls , cost , train_op,correct_pred ,accuracy=cnn.algorithm( logit , y_ , learning_rate=lr_ , optimizer='AdamOptimizer')
 def lr_schedule(step):
-    if step < 5000:
+    if step < 2000:
         lr = 0.001
-    elif step < 10000:
+    elif step < 7000:
         lr = 0.0007
     elif step < 15000:
         lr = 0.0005
