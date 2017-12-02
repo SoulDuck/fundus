@@ -19,7 +19,6 @@ new_img.save("new.png","PNG")
 """
 
 
-
 def concat_all(images , axis):
     for i,image in enumerate(images):
         image=np.asarray(image)

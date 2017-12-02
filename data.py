@@ -8,7 +8,7 @@ import random
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import aug
-
+import tensorflow as tf
 
 
 
@@ -627,8 +627,8 @@ def type1(tfrecords_dir, onehot=True, resize=(299, 299)):
     print 'test fnames ', np.shape(test_filenames)
     n_classes = 2
     if onehot:
-        train_labels = input.cls2onehot(train_labels, depth=n_classes)
-        test_labels = input.cls2onehot(test_labels, depth=n_classes)
+        train_labels = cls2onehot(train_labels, depth=n_classes)
+        test_labels = cls2onehot(test_labels, depth=n_classes)
 
     return train_images, train_labels, train_filenames, test_images, test_labels, test_filenames
 
@@ -713,8 +713,8 @@ def type2(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True 
     print 'test fnames ', np.shape(test_filenames)
     n_classes = 2
     if onehot:
-        train_labels = input.cls2onehot(train_labels, depth=n_classes)
-        test_labels = input.cls2onehot(test_labels, depth=n_classes)
+        train_labels = cls2onehot(train_labels, depth=n_classes)
+        test_labels = cls2onehot(test_labels, depth=n_classes)
     if not os.path.isdir('./type2'):
         os.mkdir('./type2')
     count=0
@@ -738,5 +738,5 @@ def type3(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True 
 
 
 if __name__ == '__main__':
-    type2('./fundus_300_debug')
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames=type2('./fundus_300_debug')
 
