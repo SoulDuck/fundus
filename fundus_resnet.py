@@ -21,6 +21,7 @@ n_classes = 2
 
 x_ = tf.placeholder(dtype = tf.float32 , shape=[None ,299 ,299 ,3 ])
 y_ = tf.placeholder(dtype = tf.float32 , shape=[None , n_classes] )
+lr_ = tf.placeholder(dtype=tf.float32 , name='learning_rate')
 phase_train = tf.placeholder(dtype = tf.bool , name = 'phase_train')
 aug_x_=aug.aug_tensor_images(x_ , phase_train ,  img_size_cropped=224 )
 n_filters_per_box = [8, 16, 32, 64]
@@ -31,8 +32,20 @@ use_bottlenect =  False
 model = resnet.Resnet(aug_x_, phase_train, n_filters_per_box, n_blocks_per_box, stride_per_box, \
                        use_bottlenect, n_classes=n_classes, activation=tf.nn.relu, logit_type='gap')
 logit=model.logit
-pred,pred_cls , cost , train_op,correct_pred ,accuracy=cnn.algorithm( logit , y_ , learning_rate=0.01 , optimizer='AdamOptimizer')
-
+pred,pred_cls , cost , train_op,correct_pred ,accuracy=cnn.algorithm( logit , y_ , learning_rate=lr_ , optimizer='AdamOptimizer')
+def lr_schedule(step):
+    if step < 5000:
+        lr = 0.001
+    elif step < 10000:
+        lr = 0.0007
+    elif step < 15000:
+        lr = 0.0005
+    elif step < 20000:
+        lr = 0.0003
+    elif step < 25000:
+        lr = 0.0001
+    else:
+        lr = 0.00005
 
 """----------------------------------------------------------------------------------------------------------------
                                                 Make Session                                 
@@ -67,8 +80,10 @@ test_imgs_labs = zip(test_imgs_list, test_labs_list)
 
 max_acc , min_loss = 0, 10000000
 for step in range(start_step , 60000):
+    lr=lr_schedule(step)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=60)
-    _ , loss, acc = sess.run(fetches=[train_op , cost ,accuracy ] , feed_dict= {x_ : batch_xs, y_ : batch_ys, phase_train : True })
+    _, loss, acc = sess.run(fetches=[train_op, cost, accuracy],
+                            feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True , lr_ : lr})
     last_model_saver.save(sess , save_path=last_model_ckpt_path , global_step=step)
     if step % 100 == 0:
         # Get Validation Accuracy and Loss
