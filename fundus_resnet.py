@@ -6,7 +6,13 @@ import aug
 import cnn
 import utils
 import os
+import argparse
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--bottlenect' , dest='use_bottlenect' , action = 'store_true')
+parser.add_argument('--no_bottlenect' , dest='should_save_model', action ='store_false')
+args=parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
                                                 Input Data
@@ -27,7 +33,7 @@ aug_x_=aug.aug_tensor_images(x_ , phase_train ,  img_size_cropped=224 )
 n_filters_per_box = [8, 16, 32, 64]
 n_blocks_per_box = [2, 2, 2, 2]
 stride_per_box = [2, 2, 2, 2]
-use_bottlenect =  False
+use_bottlenect =  args.use_bottlenect
 
 model = resnet.Resnet(aug_x_, phase_train, n_filters_per_box, n_blocks_per_box, stride_per_box, \
                        use_bottlenect, n_classes=n_classes, activation=tf.nn.relu, logit_type='gap')
