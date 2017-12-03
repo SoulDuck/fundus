@@ -92,7 +92,7 @@ test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs
 test_imgs_labs = zip(test_imgs_list, test_labs_list)
 
 max_acc , min_loss = 0, 10000000
-for step in range(start_step , 60000):
+for step in range(start_step , 100000):
     lr=lr_schedule(step)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=60)
     _, loss, acc = sess.run(fetches=[train_op, cost, accuracy],
