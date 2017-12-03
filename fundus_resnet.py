@@ -8,10 +8,16 @@ import utils
 import os
 import argparse
 
+#update list : activation list
+#nonlinearities (sigmoid, tanh, elu, softplus, and softsign), continuous but not everywhere differentiable functions
+# (relu, relu6, crelu and relu_x), and random regularization (dropout).
+
+
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bottlenect' , dest='use_bottlenect' , action = 'store_true')
-parser.add_argument('--no_bottlenect' , dest='should_save_model', action ='store_false')
+parser.add_argument('--no_bottlenect' , dest='use_bottlenect', action ='store_false')
 args=parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
@@ -92,7 +98,7 @@ for step in range(start_step , 60000):
     _, loss, acc = sess.run(fetches=[train_op, cost, accuracy],
                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True , lr_ : lr})
     last_model_saver.save(sess , save_path=last_model_ckpt_path , global_step=step)
-    if step % 100 == 0:
+    if step % 3 == 0:
         # Get Validation Accuracy and Loss
         pred_list, cost_list = [], []
         for batch_xs , batch_ys in test_imgs_labs:
