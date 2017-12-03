@@ -1,7 +1,10 @@
-import numpy as np
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--nargs', nargs='+', type=int , default=[1,2,3])
+parser.add_argument('--a')
+args=parser.parse_args()
 
-np_tmp = np.array([[1,2] , [5,6]])
-list_tmp=list(np_tmp)
-list_tmp.insert(1,[3,4])
-print list_tmp
+print type(args.nargs[0])
+print args.nargs
+print args.a
 

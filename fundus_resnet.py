@@ -19,6 +19,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--bottlenect' , dest='use_bottlenect' , action = 'store_true')
 parser.add_argument('--no_bottlenect' , dest='use_bottlenect', action ='store_false')
 parser.add_argument('--ckpt_dir')
+parser.add_argument('--n_filters_per_box', nargs='+', type=int , default=[8, 16, 32, 64])
+parser.add_argument('--n_blocks_per_box', nargs='+', type=int , default=[2, 2, 2, 2])
+parser.add_argument('--stride_per_box', nargs='+', type=int , default=[2, 2, 2, 2])
+
+
 args=parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
@@ -37,9 +42,10 @@ y_ = tf.placeholder(dtype = tf.float32 , shape=[None , n_classes] )
 lr_ = tf.placeholder(dtype=tf.float32 , name='learning_rate')
 phase_train = tf.placeholder(dtype = tf.bool , name = 'phase_train')
 aug_x_=aug.aug_tensor_images(x_ , phase_train ,  img_size_cropped=224 )
-n_filters_per_box = [8, 16, 32, 64]
-n_blocks_per_box = [2, 2, 2, 2]
-stride_per_box = [2, 2, 2, 2]
+
+n_filters_per_box = args.n_filters_per_box
+n_blocks_per_box = args.n_blocks_per_box
+stride_per_box = args.stride_per_box
 use_bottlenect =  args.use_bottlenect
 
 model = resnet.Resnet(aug_x_, phase_train, n_filters_per_box, n_blocks_per_box, stride_per_box, \
