@@ -378,7 +378,7 @@ def save_model(sess, saver, max_acc, min_loss, val_acc, val_loss, best_acc_ckpt_
         saver.save(sess=sess,
                    save_path=os.path.join(best_loss_folder, 'model'))
 
-        return max_acc, min_loss
+    return max_acc, min_loss
 
 def write_acc_loss(summary_writer ,prefix , loss , acc  , step):
     summary = tf.Summary(value=[tf.Summary.Value(tag='loss_{}'.format(prefix), simple_value=float(loss)),
