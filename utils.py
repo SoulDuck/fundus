@@ -345,15 +345,6 @@ def get_acc(true , pred):
 
 
 def save_model(sess, saver, max_acc, min_loss, val_acc, val_loss, best_acc_ckpt_dir, best_loss_ckpt_dir, step):
-    print sess
-    print saver
-    print max_acc
-    print min_loss
-    print val_acc
-    print val_loss
-    print best_acc_ckpt_dir
-    print best_loss_ckpt_dir
-    print step
     try:
         os.mkdir(best_acc_ckpt_dir)
         os.mkdir(best_loss_ckpt_dir)
@@ -361,7 +352,6 @@ def save_model(sess, saver, max_acc, min_loss, val_acc, val_loss, best_acc_ckpt_
         print e # only debug
 
     if val_acc > max_acc:  # best acc
-        print '@@@@@@@@@@@'
         max_acc = val_acc
         print 'max acc : {}'.format(max_acc)
         best_acc_folder = os.path.join(best_acc_ckpt_dir, 'step_{}_acc_{}'.format(step, max_acc))
@@ -370,7 +360,6 @@ def save_model(sess, saver, max_acc, min_loss, val_acc, val_loss, best_acc_ckpt_
                    save_path=os.path.join(best_acc_folder, 'model'))
 
     if val_loss < min_loss:  # best loss
-        print '***********'
         min_loss = val_loss
         print 'min loss : {}'.format(min_loss)
         best_loss_folder = os.path.join(best_loss_ckpt_dir, 'step_{}_loss_{}'.format(step, min_loss))
