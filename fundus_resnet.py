@@ -107,6 +107,7 @@ for step in range(start_step , 60000):
             cost_list.append(batch_cost)
         val_acc = utils.get_acc(pred_list , test_labs)
         val_cost =  np.sum(cost_list)/float(len(cost_list))
+        print 'a'
         max_acc, min_loss = utils.save_model(sess, saver, max_acc, min_loss, val_acc, val_cost, best_acc_ckpt_dir,
                                              best_loss_ckpt_dir,
                                              step)
