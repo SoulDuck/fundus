@@ -345,6 +345,15 @@ def get_acc(true , pred):
 
 
 def save_model(sess, saver, max_acc, min_loss, val_acc, val_loss, best_acc_ckpt_dir, best_loss_ckpt_dir, step):
+    print sess
+    print saver
+    print max_acc
+    print min_loss
+    print val_acc
+    print val_loss
+    print best_acc_ckpt_dir
+    print best_loss_ckpt_dir
+    print step
     try:
         os.mkdir(best_acc_ckpt_dir)
         os.mkdir(best_loss_ckpt_dir)
