@@ -18,6 +18,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--bottlenect' , dest='use_bottlenect' , action = 'store_true')
 parser.add_argument('--no_bottlenect' , dest='use_bottlenect', action ='store_false')
+parser.add_argument('--ckpt_dir')
 args=parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
@@ -73,10 +74,11 @@ sess.run(init)
 logs_path='./logs/fundus_resnet'
 tb_writer =tf.summary.FileWriter(logs_path)
 tb_writer.add_graph(tf.get_default_graph())
-best_acc_ckpt_dir = './model/fundus_resnet_type2/best_acc'
-best_loss_ckpt_dir = './model/fundus_resnet_type2/best_loss'
-last_model_ckpt_dir = './model/fundus_resnet_type2/last_model'
+best_acc_ckpt_dir = os.path.join('./model' , args.ckpt_dir , 'best_acc')
+best_loss_ckpt_dir = os.path.join('./model' , args.ckpt_dir , 'best_loss')
+last_model_ckpt_dir = os.path.join('./model' , args.ckpt_dir , 'last_model')
 last_model_ckpt_path=  os.path.join(last_model_ckpt_dir , 'model')
+
 try:
     os.makedirs(last_model_ckpt_dir)
 except Exception as e :
@@ -98,7 +100,7 @@ for step in range(start_step , 100000):
     _, loss, acc = sess.run(fetches=[train_op, cost, accuracy],
                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True , lr_ : lr})
     last_model_saver.save(sess , save_path=last_model_ckpt_path , global_step=step)
-    if step % 3 == 0:
+    if step % 100 == 0:
         # Get Validation Accuracy and Loss
         pred_list, cost_list = [], []
         for batch_xs , batch_ys in test_imgs_labs:
@@ -114,7 +116,6 @@ for step in range(start_step , 100000):
         utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
         lr_summary=tf.Summary(value = [tf.Summary.Value(tag='learning_rate' , simple_value = float(lr))])
         tb_writer.add_summary(lr_summary, step)
-
         print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc , loss,val_acc , val_cost)
 
 
