@@ -107,10 +107,11 @@ for step in range(start_step , 60000):
             cost_list.append(batch_cost)
         val_acc = utils.get_acc(pred_list , test_labs)
         val_cost =  np.sum(cost_list)/float(len(cost_list))
-        print 'a'
+
         max_acc, min_loss = utils.save_model(sess, saver, max_acc, min_loss, val_acc, val_cost, best_acc_ckpt_dir,
                                              best_loss_ckpt_dir,
                                              step)
+        print 'a'
         utils.write_acc_loss(tb_writer , prefix='test' , loss =val_cost , acc =val_acc  , step=step)
         utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
         lr_summary=tf.Summary(value = [tf.Summary.Value(tag='learning_rate' , simple_value = float(lr))])
