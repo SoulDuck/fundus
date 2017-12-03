@@ -52,7 +52,7 @@ def lr_schedule(step):
                                                 Make Session                                 
 ----------------------------------------------------------------------------------------------------------------"""
 config = tf.ConfigProto()
-config.gpu_options.allow_growth= True
+config.gpu_options.allow_growth= False
 saver = tf.train.Saver(max_to_keep=10000000)
 last_model_saver = tf.train.Saver(max_to_keep=1)
 sess=tf.Session(config=config)
