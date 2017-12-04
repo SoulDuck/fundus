@@ -15,8 +15,6 @@ import argparse
 # (relu, relu6, crelu and relu_x), and random regularization (dropout).
 # parser.add_argument('--dataset', '-ds' , type=str , choices=['C10', 'C10+', 'C100' , 'C100+' , 'SVHN' , 'Fundus' ] , default='C10')
 
-
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--bottlenect' , dest='use_bottlenect' , action = 'store_true')
 parser.add_argument('--no_bottlenect' , dest='use_bottlenect', action ='store_false')
@@ -25,9 +23,9 @@ parser.add_argument('--n_filters_per_box', nargs='+', type=int , default=[8, 16,
 parser.add_argument('--n_blocks_per_box', nargs='+', type=int , default=[2, 2, 2, 2])
 parser.add_argument('--stride_per_box', nargs='+', type=int , default=[2, 2, 2, 2])
 parser.add_argument('--logit_type', type = str , choices=['gap', 'fc'] )
-
-
+parser.add_argument('--batch_size', type = int )
 args=parser.parse_args()
+
 
 """----------------------------------------------------------------------------------------------------------------
                                                 Input Data
@@ -106,7 +104,7 @@ test_imgs_labs = zip(test_imgs_list, test_labs_list)
 max_acc , min_loss = 0, 10000000
 for step in range(start_step , 100000):
     lr=lr_schedule(step)
-    batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=60)
+    batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
     _, loss, acc = sess.run(fetches=[train_op, cost, accuracy],
                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True , lr_ : lr})
     last_model_saver.save(sess , save_path=last_model_ckpt_path , global_step=step)
@@ -127,9 +125,3 @@ for step in range(start_step , 100000):
         lr_summary=tf.Summary(value = [tf.Summary.Value(tag='learning_rate' , simple_value = float(lr))])
         tb_writer.add_summary(lr_summary, step)
         print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc , loss,val_acc , val_cost)
-
-
-
-
-
-
