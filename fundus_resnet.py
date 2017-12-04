@@ -11,7 +11,7 @@ import argparse
 #update list : activation list
 #nonlinearities (sigmoid, tanh, elu, softplus, and softsign), continuous but not everywhere differentiable functions
 # (relu, relu6, crelu and relu_x), and random regularization (dropout).
-
+# parser.add_argument('--dataset', '-ds' , type=str , choices=['C10', 'C10+', 'C100' , 'C100+' , 'SVHN' , 'Fundus' ] , default='C10')
 
 
 
@@ -22,6 +22,7 @@ parser.add_argument('--ckpt_dir')
 parser.add_argument('--n_filters_per_box', nargs='+', type=int , default=[8, 16, 32, 64])
 parser.add_argument('--n_blocks_per_box', nargs='+', type=int , default=[2, 2, 2, 2])
 parser.add_argument('--stride_per_box', nargs='+', type=int , default=[2, 2, 2, 2])
+parser.add_argument('--logit_type', type = str , choices=['gap', 'fc'] )
 
 
 args=parser.parse_args()
@@ -49,7 +50,8 @@ stride_per_box = args.stride_per_box
 use_bottlenect =  args.use_bottlenect
 
 model = resnet.Resnet(aug_x_, phase_train, n_filters_per_box, n_blocks_per_box, stride_per_box, \
-                       use_bottlenect, n_classes=n_classes, activation=tf.nn.relu, logit_type='gap')
+                       use_bottlenect, n_classes=n_classes, activation=tf.nn.relu, logit_type=args.logit_type)
+
 logit=model.logit
 pred,pred_cls , cost , train_op,correct_pred ,accuracy=cnn.algorithm( logit , y_ , learning_rate=lr_ , optimizer='AdamOptimizer')
 def lr_schedule(step):
