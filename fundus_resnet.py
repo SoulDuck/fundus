@@ -8,7 +8,9 @@ import utils
 import os
 import argparse
 
+
 #update list : activation list
+#L2 Loss
 #nonlinearities (sigmoid, tanh, elu, softplus, and softsign), continuous but not everywhere differentiable functions
 # (relu, relu6, crelu and relu_x), and random regularization (dropout).
 # parser.add_argument('--dataset', '-ds' , type=str , choices=['C10', 'C10+', 'C100' , 'C100+' , 'SVHN' , 'Fundus' ] , default='C10')
@@ -56,7 +58,7 @@ logit=model.logit
 pred,pred_cls , cost , train_op,correct_pred ,accuracy=cnn.algorithm( logit , y_ , learning_rate=lr_ , optimizer='AdamOptimizer')
 def lr_schedule(step):
     if step < 2000:
-        lr = 0.001
+        lr = 0.007
     elif step < 7000:
         lr = 0.0007
     elif step < 15000:
