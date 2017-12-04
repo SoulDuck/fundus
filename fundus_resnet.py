@@ -79,7 +79,7 @@ last_model_saver = tf.train.Saver(max_to_keep=1)
 sess=tf.Session(config=config)
 init = tf.group( tf.global_variables_initializer() , tf.local_variables_initializer())
 sess.run(init)
-logs_path='./logs/fundus_resnet'
+logs_path=os.path.join('./logs' , 'fundus_resnet' , args.ckpt_dir)
 tb_writer =tf.summary.FileWriter(logs_path)
 tb_writer.add_graph(tf.get_default_graph())
 best_acc_ckpt_dir = os.path.join('./model' , args.ckpt_dir , 'best_acc')
