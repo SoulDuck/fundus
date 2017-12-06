@@ -57,13 +57,13 @@ pred, pred_cls, cost, train_op, correct_pred, accuracy = cnn.algorithm(logit, y_
 
 def lr_schedule(step):
     if step < 2000:
-        lr = 0.0007
+        lr = 0.0001
     elif step < 7000:
-        lr = 0.0007
+        lr = 0.0001
     elif step < 15000:
-        lr = 0.0005
+        lr = 0.0001
     elif step < 20000:
-        lr = 0.0003
+        lr = 0.0001
     elif step < 25000:
         lr = 0.0001
     else:
