@@ -23,6 +23,9 @@ parser.add_argument('--n_blocks_per_box', nargs='+', type=int, default=[2, 2, 2,
 parser.add_argument('--stride_per_box', nargs='+', type=int, default=[2, 2, 2, 2])
 parser.add_argument('--logit_type', type=str, choices=['gap', 'fc'])
 parser.add_argument('--batch_size', type=int)
+parser.add_argument('--color_aug', dest='use_color_aug' , action='store_true')
+parser.add_argument('--no_color_aug', dest='use_color_aug' , action='store_false')
+
 args = parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
@@ -40,7 +43,7 @@ x_ = tf.placeholder(dtype=tf.float32, shape=[None, 299, 299, 3])
 y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes])
 lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
-aug_x_ = aug.aug_tensor_images(x_, phase_train, img_size_cropped=224 , color_aug=False)
+aug_x_ = aug.aug_tensor_images(x_, phase_train, img_size_cropped=224 , color_aug=args.use_color_aug)
 
 n_filters_per_box = args.n_filters_per_box
 n_blocks_per_box = args.n_blocks_per_box
