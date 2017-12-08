@@ -201,7 +201,7 @@ for sub_folder_name in sub_folder_names:
 """
 
 
-def aug_tensor_images(images , phase_train , img_size_cropped):
+def aug_tensor_images(images , phase_train , img_size_cropped , color_aug=True):
     num_channels=int(images.get_shape()[-1])
     print num_channels
 
@@ -218,12 +218,19 @@ def aug_tensor_images(images , phase_train , img_size_cropped):
 
         # Randomly flip the image horizontally.
         image = tf.image.random_flip_left_right(image)
+        image = tf.image.random_flip_up_down(image)
 
         # Randomly adjust hue, contrast and saturation.
-        image = tf.image.random_hue(image, max_delta=0.05)
-        image = tf.image.random_contrast(image, lower=0.3, upper=1.0)
-        image = tf.image.random_brightness(image, max_delta=0.2)
-        image = tf.image.random_saturation(image, lower=0.0, upper=2.0)
+        if color_aug:
+            print 'hue augmentation On'
+            print 'random_contrast augmentation On'
+            print 'random_brightness augmentation On'
+            print 'random_saturation augmentation On'
+            image = tf.image.random_hue(image, max_delta=0.05)
+            image = tf.image.random_contrast(image, lower=0.3, upper=1.0)
+            image = tf.image.random_brightness(image, max_delta=0.2)
+            image = tf.image.random_saturation(image, lower=0.0, upper=2.0)
+
         # Some of these functions may overflow and result in pixel
         # values beyond the [0, 1] range. It is unclear from the
         # documentation of TensorFlow 0.10.0rc0 whether this is
