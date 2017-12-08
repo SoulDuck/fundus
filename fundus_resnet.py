@@ -40,7 +40,7 @@ x_ = tf.placeholder(dtype=tf.float32, shape=[None, 299, 299, 3])
 y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes])
 lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
-aug_x_ = aug.aug_tensor_images(x_, phase_train, img_size_cropped=224)
+aug_x_ = aug.aug_tensor_images(x_, phase_train, img_size_cropped=224 , color_aug=False)
 
 n_filters_per_box = args.n_filters_per_box
 n_blocks_per_box = args.n_blocks_per_box
