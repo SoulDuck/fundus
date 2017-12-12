@@ -25,6 +25,8 @@ parser.add_argument('--logit_type', type=str, choices=['gap', 'fc'])
 parser.add_argument('--batch_size', type=int)
 parser.add_argument('--color_aug', dest='use_color_aug' , action='store_true')
 parser.add_argument('--no_color_aug', dest='use_color_aug' , action='store_false')
+parser.add_argumnet('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
+parser.add_argumnet('--lr_values',nargs='+', type=float, default=[0.001 , 0.0001 , 0.0001 , 0.00001])
 
 args = parser.parse_args()
 
@@ -58,20 +60,19 @@ pred, pred_cls, cost, train_op, correct_pred, accuracy = cnn.algorithm(logit, y_
                                                                        optimizer='AdamOptimizer')
 
 
-def lr_schedule(step):
-    if step < 2000:
-        lr = 0.0001
-    elif step < 7000:
-        lr = 0.0001
-    elif step < 15000:
-        lr = 0.0001
-    elif step < 20000:
-        lr = 0.0001
-    elif step < 25000:
-        lr = 0.0001
-    else:
-        lr = 0.00005
-    return lr
+def lr_schedule(step ,lr_iters , lr_values):
+    assert len(lr_iters) == len(lr_values)
+
+    def _fn(step, lr_iters, lr_values):
+        n_lr_iters = len(lr_iters)
+        for idx in range(n_lr_iters):
+            if step < lr_iters[idx]:
+                return lr_iters[idx], lr_values[idx]
+            elif idx <= n_lr_iters - 1:
+                continue
+        return lr_iters[idx], lr_values[idx]
+    lr_iter , lr_value=_fn(step , lr_iters ,lr_values)
+    return lr_value
 
 
 """----------------------------------------------------------------------------------------------------------------
@@ -107,7 +108,7 @@ test_imgs_labs = zip(test_imgs_list, test_labs_list)
 
 max_acc, min_loss = 0, 10000000
 for step in range(start_step, 100000):
-    lr = lr_schedule(step)
+    lr = lr_schedule(step , args.lr_iters , args.lr_values)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
     _, loss, acc = sess.run(fetches=[train_op, cost, accuracy],
                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True, lr_: lr})
