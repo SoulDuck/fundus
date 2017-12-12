@@ -25,9 +25,9 @@ parser.add_argument('--logit_type', type=str, choices=['gap', 'fc'])
 parser.add_argument('--batch_size', type=int)
 parser.add_argument('--color_aug', dest='use_color_aug' , action='store_true')
 parser.add_argument('--no_color_aug', dest='use_color_aug' , action='store_false')
-parser.add_argumnet('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
-parser.add_argumnet('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.00001])
-parser.add_argumnet('--bottlenect_factor' , type=int , default=4)
+parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
+parser.add_argument('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.00001])
+parser.add_argument('--bottlenect_factor' , type=int , default=4)
 args = parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
