@@ -9,7 +9,7 @@ n_blocks=[]
 a=3
 class Resnet(object):
     def __init__ (self , x_ , phase_train ,  n_filters_per_box , n_blocks_per_box  , stride_per_box ,  use_bottlenect ,\
-                  n_classes,activation=tf.nn.relu ,logit_type='gap'):
+                  n_classes,activation=tf.nn.relu ,logit_type='gap' , bottlenect_factor =4):
         """
 
         :param n_filters_per_box: [32, 64, 64, 128 , 256 ]  , type = list
@@ -31,6 +31,7 @@ class Resnet(object):
         self.x_ = x_
         self.phase_train = phase_train
         self.n_classes = n_classes
+        self.bottlenect_factor = bottlenect_factor
         """
         building model
         """
@@ -71,7 +72,7 @@ class Resnet(object):
     def _block(self , x , block_out_ch  , block_stride  , block_n):
         shortcut_layer = x
         layer=x
-        m=4 if self.use_bottlenect else 1
+        m=self.bottlenect_factor if self.use_bottlenect else 1
         out_ch = m * block_out_ch
         """ bottlenect layer """
         if self.use_bottlenect:

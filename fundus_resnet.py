@@ -27,7 +27,7 @@ parser.add_argument('--color_aug', dest='use_color_aug' , action='store_true')
 parser.add_argument('--no_color_aug', dest='use_color_aug' , action='store_false')
 parser.add_argumnet('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
 parser.add_argumnet('--lr_values',nargs='+', type=float, default=[0.001 , 0.0001 , 0.0001 , 0.00001])
-parser.add_argumnet('bottlenect_factor' , type=int , default=4)
+parser.add_argumnet('--bottlenect_factor' , type=int , default=4)
 args = parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
@@ -53,7 +53,8 @@ stride_per_box = args.stride_per_box
 use_bottlenect = args.use_bottlenect
 
 model = resnet.Resnet(aug_x_, phase_train, n_filters_per_box, n_blocks_per_box, stride_per_box, \
-                      use_bottlenect, n_classes=n_classes, activation=tf.nn.relu, logit_type=args.logit_type)
+                      use_bottlenect, n_classes=n_classes, activation=tf.nn.relu, logit_type=args.logit_type ,\
+                      bottlenect_factor=args.bottlenect_factor)
 
 logit = model.logit
 pred, pred_cls, cost, train_op, correct_pred, accuracy = cnn.algorithm(logit, y_, learning_rate=lr_,
