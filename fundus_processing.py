@@ -100,7 +100,13 @@ def blue_free_image(image):
         print image[:, :, 2].mean()
     return image
 
-
+def get_redfree_images(images):
+    debug_flag= False
+    if __debug__ ==debug_flag:
+        print "get_redfree_images debug mode"
+        print "image shape is ",np.shape(images)
+    imgs = map(red_free_image, images)
+    return imgs
 
 def crop_resize_fundus(path):
     debug_flag=False

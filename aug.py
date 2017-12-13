@@ -14,10 +14,16 @@ def check_type_numpy(a):
     else:
         return False
 
-def random_rotate(image):
+def random_rotate(img):
     debug_flag=False
-    if check_type_numpy(image):
-        img=Image.fromarray(image)
+    if check_type_numpy(img):
+        if np.max(img)<=1:
+            img=img*255.
+            print np.max(img)
+        print type(img)
+        img=Image.fromarray(img.astype('uint8'))
+        plt.imshow(img)
+        plt.show()
     ### usage: map(random_rotate , images) ###
     ind=random.randint(0,180)
     minus = random.randint(0,1)
@@ -61,56 +67,6 @@ def aug_level_1(imgs):
     imgs = map(random_rotate, imgs)
     return imgs
 
-def get_redfree_images(images):
-    debug_flag= False
-    if __debug__ ==debug_flag:
-        print "get_redfree_images debug mode"
-        print "image shape is ",np.shape(images)
-    imgs = map(red_free_image, images)
-    return imgs
-if __name__ == '__main__':
-    img=Image.open('./data/rion.png')
-    img=random_rotate(img)
-    img=random_flip(img)
-    img=random_blur(img)
-    #print np.shape(img)
-    #img=img.rotate(45)
-    #print np.shape(img)
-    plt.imshow(img)
-    plt.show()
-    """
-    img=cv2.imread('./data/rion.png',0)
-    rows, cols=img.shape
-    rotated_img=cv2.getRotationMatrix2D((cols/2, rows/2),90,1)
-    img=np.asarray(img )
-    img=img/255.
-    print img.shape
-    plt.imshow(img)
-    plt.show()
-    plt.imshow(rotated_img)
-    plt.show()
-    """
-
-"""usage:red free image"""
-"""
-extension='png'
-src_root_folder='../fundus_data/cropped_original_fundus_300x300/'
-target_root_folder='../fundus_data/cropped_original_fundus_redfree/'
-root_folder, sub_folder_names, file_list=os.walk(src_root_folder).next()
-for sub_folder_name in sub_folder_names:
-    src_folder=os.path.join(src_root_folder, sub_folder_name)
-    saved_folder=os.path.join(target_root_folder , sub_folder_name)
-    if not os.path.isdir(saved_folder):
-        os.mkdir(saved_folder)
-        print saved_folder+'is made'
-    paths=glob.glob(src_folder +'/*.'+extension)
-    images=map(Image.open , paths[:])
-    names=map(lambda x : x.split('/')[-1].split('.')[0] ,paths[:3])
-    start_time=time.time()
-    redFree_images = map(red_free_image, images[:60])
-    print np.shape(redFree_images)
-    print  time.time() - start_time
-"""
 
 
 def aug_tensor_images(images , phase_train , img_size_cropped , color_aug=True):
@@ -175,5 +131,26 @@ def aug_tensor_images(images , phase_train , img_size_cropped , color_aug=True):
     images = tf.map_fn(lambda image : tf.cond(phase_train ,  lambda: _training(image)  , lambda :_eval(image)), images)
     return images
 
-    #images =tf.cond(phase_train , tf.map_fn(lambda image : _training(image) , images ) ,\
-    #        tf.map_fn(lambda image : _eval(image) , images ))
+
+
+
+if __name__ == '__main__':
+    img=Image.open('./debug/0.png').convert('RGB')
+    np_img = np.asarray(img)
+    print np.shape(np_img)
+    print np_img[:10, :10, :]
+
+    img=random_rotate(img)
+    np_img=np.asarray(img)
+    print np_img[:10 , :10 , :]
+    plt.imshow(img)
+    plt.show()
+    img = Image.open('./debug/0.png').convert('RGB')
+    np_img = np.asarray(img)
+    print np.shape(np_img)
+    img=random_rotate(img)
+
+    plt.imshow(img)
+    plt.show()
+
+
