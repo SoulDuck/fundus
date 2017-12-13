@@ -98,8 +98,7 @@ class Resnet(object):
         if self.logit_type == 'gap':
             logit=gap('gap' , x , n_classes = self.n_classes)
         elif self.logit_type == 'fc':
-            layer=affine('fc', x, out_ch=self.n_classes)
-            logit = tf.cond(phase_train, lambda: tf.nn.dropout(layer, keep_prob=0.5), lambda: layer)
+            logit=affine('fc', x, out_ch=self.n_classes)
         else :
             print 'Not Implemneted , Sorry '
         logit=tf.identity(logit , 'logit')
