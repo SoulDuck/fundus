@@ -113,5 +113,21 @@ def algorithm(y_conv , y_ , learning_rate , optimizer='GradientDescentOptimizer'
     accuracy =  tf.reduce_mean(tf.cast(correct_pred , dtype=tf.float32) , name='accuracy')
     return pred,pred_cls , cost , train_op,correct_pred ,accuracy
 
+
+def lr_schedule(step ,lr_iters , lr_values):
+    assert len(lr_iters) == len(lr_values)
+
+    def _fn(step, lr_iters, lr_values):
+        n_lr_iters = len(lr_iters)
+        for idx in range(n_lr_iters):
+            if step < lr_iters[idx]:
+                return lr_iters[idx], lr_values[idx]
+            elif idx <= n_lr_iters - 1:
+                continue
+        return lr_iters[idx], lr_values[idx]
+    lr_iter , lr_value=_fn(step , lr_iters ,lr_values)
+    return lr_value
+
+
 if __name__ == '__main__':
     print 'a'

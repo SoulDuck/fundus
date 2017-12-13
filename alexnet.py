@@ -27,7 +27,7 @@ class Alexnet(object):
         self.logit_type = logit_type
         self.n_conv_layers = 5
         self.n_fc_layers = 3  # fc_0 , fc_1 , fc_2
-        self._build_model()
+        self.logit=self._build_model()
 
     def _norm(self , x_ , phase_train , scope_bn):
         if self.norm == 'BN':
