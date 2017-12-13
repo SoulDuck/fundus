@@ -27,8 +27,8 @@ class Alexnet(object):
         self.logit_type = logit_type
         self.n_conv_layers = 5
         self.n_fc_layers = 3  # fc_0 , fc_1 , fc_2
-        self.logit=self._build_model()
         self.keep_prob=0.5
+        self.logit=self._build_model()
 
     def _norm(self , x_ , phase_train , scope_bn):
         if self.norm == 'BN':
@@ -39,9 +39,10 @@ class Alexnet(object):
             raise AssertionError
         return layer
     def _build_model(self):
+        layer=self.x_
         for i in range(self.n_conv_layers):
             if i < 2:
-                layer=convolution2d(name='conv_{}'.format(i) , x=self.x_ , out_ch=self.conv_n_filters[i] \
+                layer=convolution2d(name='conv_{}'.format(i) , x=layer , out_ch=self.conv_n_filters[i] \
                               , k=self.conv_k_sizes[i] ,s=self.conv_strides[i])
                 layer=max_pool(name='max_pool_{}'.format(i) , x=layer , k=3 , s=2 )
 
@@ -49,16 +50,20 @@ class Alexnet(object):
             else:
                 layer = convolution2d(name='conv_{}'.format(i), x= layer , out_ch=self.conv_n_filters[i] \
                                       , k=self.conv_k_sizes[i], s=self.conv_strides[i])
-            layer = tf.identity(layer , name = 'top_conv')
-            layer = max_pool(name='max_pool_{}'.format(i), x=layer, k=3, s=2)
 
+        layer = tf.identity(layer , name = 'top_conv')
+        layer = max_pool(name='max_pool_{}'.format(i), x=layer, k=3, s=2)
         if self.logit_type == 'fc':
             for j in range(self.n_fc_layers):
                 layer=affine(name='fc_{}'.format(j) , x=layer , out_ch=self.fc_nodes[j])
-                dropout(layer , self.phase_train , keep_prob=self.keep_prob)
+                if j != self.n_fc_layers-1:
+                    print self.keep_prob
+                    layer=dropout(layer , self.phase_train , keep_prob=self.keep_prob)
 
         elif self.logit_type == 'gap':
             layer = gap('gap', layer , n_classes=self.n_classes)
+        else:
+            raise AssertionError
         logit = tf.identity(layer, name='logits')
         return logit
 
