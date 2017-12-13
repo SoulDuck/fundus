@@ -36,7 +36,7 @@ args = parser.parse_args()
 # tensorboard
 # model save
 # run training using global step
-train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300')
+train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300' , save_dir_name=args.ckpt_dir)
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
 n_classes = 2
