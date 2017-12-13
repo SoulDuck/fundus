@@ -62,7 +62,8 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 saver = tf.train.Saver(max_to_keep=10000000)
 last_model_saver = tf.train.Saver(max_to_keep=1)
-sess = tf.Session(config=config)
+with tf.device('/gpu:1'):
+    sess = tf.Session(config=config)
 init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
 sess.run(init)
 logs_path = os.path.join('./logs', 'fundus_resnet', args.ckpt_dir)
