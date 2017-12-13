@@ -71,7 +71,6 @@ def affine(name,x,out_ch):
 
         b_fc=tf.Variable(tf.constant(0.1 ), out_ch)
         layer=tf.matmul(x , w_fc) + b_fc
-
         layer=tf.nn.relu(layer)
 
         print 'layer name :'
@@ -128,6 +127,8 @@ def lr_schedule(step ,lr_iters , lr_values):
     lr_iter , lr_value=_fn(step , lr_iters ,lr_values)
     return lr_value
 
+def dropout(x_ , phase_train , keep_prob):
+    return tf.cond(phase_train , lambda : tf.nn.dropout(x_ , keep_prob=keep_prob) , lambda: x_)
 
 if __name__ == '__main__':
     print 'a'

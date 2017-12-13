@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 import tensorflow as tf
-from cnn import convolution2d, batch_norm_layer, affine, max_pool, avg_pool , gap
+from cnn import convolution2d, batch_norm_layer, affine, max_pool, avg_pool , gap , dropout
 class Alexnet(object):
     def __init__(self , x_ , phase_train , conv_n_filters  , conv_k_sizes , conv_strides , fc_nodes,n_classes , activation , \
                  norm ,logit_type , ):
@@ -28,6 +28,7 @@ class Alexnet(object):
         self.n_conv_layers = 5
         self.n_fc_layers = 3  # fc_0 , fc_1 , fc_2
         self.logit=self._build_model()
+        self.keep_prob=0.5
 
     def _norm(self , x_ , phase_train , scope_bn):
         if self.norm == 'BN':
@@ -54,6 +55,8 @@ class Alexnet(object):
         if self.logit_type == 'fc':
             for j in range(self.n_fc_layers):
                 layer=affine(name='fc_{}'.format(j) , x=layer , out_ch=self.fc_nodes[j])
+                dropout(layer , self.phase_train , keep_prob=self.keep_prob)
+
         elif self.logit_type == 'gap':
             layer = gap('gap', layer , n_classes=self.n_classes)
         logit = tf.identity(layer, name='logits')
