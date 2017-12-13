@@ -8,14 +8,19 @@ import os
 import utils
 
 parser = argparse.ArgumentParser()
-parser.add_argument('')
+parser.add_argument('--ckpt_dir')
 parser.add_argument('--conv_n_filters' , nargs='+' , type=int , default=[])
 parser.add_argument('--conv_k_sizes' , nargs='+' , type=int , default=[])
 parser.add_argument('--conv_strides', nargs='+' , type=int , default=[])
 parser.add_argument('--fc_nodes' , nargs='+', type=int , default=[])
-parser.add_argument('--logit_type')
+parser.add_argument('--logit_type' , type=str  , choices=['gap', 'fc'])
+parser.add_argument('--batch_size' , type=int)
 parser.add_argument('--activation')
 parser.add_argument('--norm')
+parser.add_argument('--color_aug' ,dest='use_color_aug' , action='store_true')
+parser.add_argument('--no_color_aug', dest='use_color_aug', action='store_false')
+parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
+parser.add_argument('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.00001])
 
 args=parser.parse_args()
 
@@ -100,4 +105,5 @@ for step in range(start_step, 100000):
         lr_summary = tf.Summary(value=[tf.Summary.Value(tag='learning_rate', simple_value=float(lr))])
         tb_writer.add_summary(lr_summary, step)
         print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc, loss,
-
+                                                                                                        val_acc,
+                                                                                                        val_cost)

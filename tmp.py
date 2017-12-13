@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import glob
 from PIL import Image
 import json
+import os
 #### argparse : how to parse list
 parser = argparse.ArgumentParser()
 #parser.add_argument('--nargs_int_type', nargs='+', type=int)
@@ -45,3 +46,5 @@ for s in step:
 
 for i in range(3):
     print i
+
+os.path.join('asdf', None)

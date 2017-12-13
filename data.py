@@ -632,7 +632,7 @@ def type1(tfrecords_dir, onehot=True, resize=(299, 299)):
 
     return train_images, train_labels, train_filenames, test_images, test_labels, test_filenames
 
-def type2(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True ,limits = [3000 , 1000 , 1000 , 1000] ):
+def type2(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True ,limits = [3000 , 1000 , 1000 , 1000] , save_dir_name=None ):
     # normal : 3000
     # glaucoma : 1000
     # retina : 1000
@@ -717,14 +717,22 @@ def type2(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True 
         test_labels = cls2onehot(test_labels, depth=n_classes)
     if not os.path.isdir('./type2'):
         os.mkdir('./type2')
+    if not save_dir_name is None:
+        os.mkdir(os.path.join('./type2', save_dir_name))
     count=0
     while True:
-        f_path='./type2/{}'.format(count)
+
+        if save_dir_name == None:
+            f_path='./type2/{}'.format(count)
+        else:
+            f_path = os.path.join('./type2',save_dir_name, '{}'.format(count))
+
         if not os.path.isdir(f_path):
             os.mkdir(f_path)
             break;
         else:
             count += 1
+
 
 
     np.save(os.path.join(f_path , 'train_imgs.npy') , train_images)
