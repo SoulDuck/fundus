@@ -44,9 +44,9 @@ phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
 aug_x_ = aug.aug_tensor_images(x_, phase_train, img_size_cropped=224 , color_aug=args.use_color_aug)
 
 
-
-model = alexnet.Alexnet(x_ , phase_train , args.conv_n_filters , args.conv_k_sizes , \
-                        args.conv_strides , args.fc_nodes , n_classes , args.activation , args.norm  , args.logit_type)
+with tf.device('/gpu:1'):
+    model = alexnet.Alexnet(x_ , phase_train , args.conv_n_filters , args.conv_k_sizes , \
+                            args.conv_strides , args.fc_nodes , n_classes , args.activation , args.norm  , args.logit_type)
 
 logit=model.logit
 print np.shape(logit)
