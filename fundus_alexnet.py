@@ -9,14 +9,14 @@ import utils
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--ckpt_dir')
-parser.add_argument('--conv_n_filters' , nargs='+' , type=int , default=[])
-parser.add_argument('--conv_k_sizes' , nargs='+' , type=int , default=[])
-parser.add_argument('--conv_strides', nargs='+' , type=int , default=[])
-parser.add_argument('--fc_nodes' , nargs='+', type=int , default=[])
+parser.add_argument('--conv_n_filters' , nargs='+' , type=int , default= [96, 256, 384, 384, 256])
+parser.add_argument('--conv_k_sizes' , nargs='+' , type=int , default=[11, 5, 3, 3, 3])
+parser.add_argument('--conv_strides', nargs='+' , type=int , default=[2, 2, 1, 1, 1])
+parser.add_argument('--fc_nodes' , nargs='+', type=int , default=[4096, 4096, 2])
 parser.add_argument('--logit_type' , type=str  , choices=['gap', 'fc'])
 parser.add_argument('--batch_size' , type=int)
 parser.add_argument('--activation')
-parser.add_argument('--norm')
+parser.add_argument('--norm' , default='LRN')
 parser.add_argument('--color_aug' ,dest='use_color_aug' , action='store_true')
 parser.add_argument('--no_color_aug', dest='use_color_aug', action='store_false')
 parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
@@ -28,10 +28,12 @@ args=parser.parse_args()
                                                 Input Data
 ----------------------------------------------------------------------------------------------------------------"""
 
-train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300')
+train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug' , save_dir_name='alexnet')
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
 n_classes = 2
+
+
 
 
 x_ = tf.placeholder(dtype=tf.float32, shape=[None, 299, 299, 3])
@@ -44,6 +46,8 @@ aug_x_ = aug.aug_tensor_images(x_, phase_train, img_size_cropped=224 , color_aug
 
 model = alexnet.Alexnet(x_ , phase_train , args.conv_n_filters , args.conv_k_sizes , \
                         args.conv_strides , args.fc_nodes , n_classes , args.activation , args.norm  , args.logit_type)
+
+exit()
 logit=model.logit
 pred, pred_cls, cost, train_op, correct_pred, accuracy = cnn.algorithm(logit, y_, learning_rate=lr_,
                                                                        optimizer='AdamOptimizer')

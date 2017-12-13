@@ -33,7 +33,7 @@ class Alexnet(object):
         if self.norm == 'BN':
             layer=batch_norm_layer(x_  , phase_train , self.norm+'_'+scope_bn)
         elif self.norm =='LRN':
-            layer=tf.nn.lrn(name=self.norm+'_'+scope_bn)
+            layer=tf.nn.lrn(input=x_, name=self.norm+'_'+scope_bn)
         else :
             raise AssertionError
         return layer
@@ -43,7 +43,8 @@ class Alexnet(object):
                 layer=convolution2d(name='conv_{}'.format(i) , x=self.x_ , out_ch=self.conv_n_filters[i] \
                               , k=self.conv_k_sizes[i] ,s=self.conv_strides[i])
                 layer=max_pool(name='max_pool_{}'.format(i) , x=layer , k=3 , s=2 )
-                layer=self._norm(layer , phase_train , scope_bn='norm_{}'.format(i))
+
+                layer=self._norm(layer , self.phase_train , scope_bn='norm_{}'.format(i))
             else:
                 layer = convolution2d(name='conv_{}'.format(i), x= layer , out_ch=self.conv_n_filters[i] \
                                       , k=self.conv_k_sizes[i], s=self.conv_strides[i])

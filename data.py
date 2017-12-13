@@ -718,7 +718,8 @@ def type2(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True 
     if not os.path.isdir('./type2'):
         os.mkdir('./type2')
     if not save_dir_name is None:
-        os.mkdir(os.path.join('./type2', save_dir_name))
+        if not os.path.isdir(os.path.join('./type2', save_dir_name)):
+            os.mkdir(os.path.join('./type2', save_dir_name))
     count=0
     while True:
 
