@@ -44,9 +44,9 @@ phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
 aug_x_ = aug.aug_tensor_images(x_, phase_train, img_size_cropped=224 , color_aug=args.use_color_aug)
 
 
-with tf.device('/gpu:1'):
-    model = alexnet.Alexnet(x_ , phase_train , args.conv_n_filters , args.conv_k_sizes , \
-                            args.conv_strides , args.fc_nodes , n_classes , args.activation , args.norm  , args.logit_type)
+
+model = alexnet.Alexnet(x_ , phase_train , args.conv_n_filters , args.conv_k_sizes , \
+                        args.conv_strides , args.fc_nodes , n_classes , args.activation , args.norm  , args.logit_type)
 
 logit=model.logit
 print np.shape(logit)
@@ -62,10 +62,10 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 saver = tf.train.Saver(max_to_keep=10000000)
 last_model_saver = tf.train.Saver(max_to_keep=1)
-with tf.device('/gpu:1'):
-    sess = tf.Session(config=config)
-    init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
-    sess.run(init)
+
+sess = tf.Session(config=config)
+init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+sess.run(init)
 logs_path = os.path.join('./logs', 'fundus_resnet', args.ckpt_dir)
 tb_writer = tf.summary.FileWriter(logs_path)
 tb_writer.add_graph(tf.get_default_graph())
