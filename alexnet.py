@@ -33,7 +33,7 @@ class Alexnet(object):
         if self.norm == 'BN':
             layer=batch_norm_layer(x_  , phase_train , self.norm+'_'+scope_bn)
         elif self.norm =='LRN':
-            layer=tf.nn.lrn(input=x_, name=self.norm+'_'+scope_bn)
+            layer=tf.nn.lrn(input=x_, depth_radius=4 , alpha=0.001 / 9.0 ,beta=0.75 ,name=self.norm+'_'+scope_bn)
         else :
             raise AssertionError
         return layer
