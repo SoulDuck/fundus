@@ -39,7 +39,7 @@ def random_rotate(img):
 
 def random_rotate_image(images):
     images=np.asarray(map(lambda image : random_rotate(image) , images))
-
+    return images
 
 def random_flip(image):
     debug_flag = False
