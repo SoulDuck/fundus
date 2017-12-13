@@ -41,3 +41,7 @@ lr_values=[0.01,0.001,0.0001]
 for s in step:
     iter_ , lr_value = _fn(s , lr_iters , lr_values)
     print '{} : {} : {}'.format(s , iter_ , lr_value)
+
+
+for i in range(3):
+    print i
