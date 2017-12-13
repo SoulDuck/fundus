@@ -19,11 +19,7 @@ def random_rotate(img):
     if check_type_numpy(img):
         if np.max(img)<=1:
             img=img*255.
-            print np.max(img)
-        print type(img)
         img=Image.fromarray(img.astype('uint8'))
-        plt.imshow(img)
-        plt.show()
     ### usage: map(random_rotate , images) ###
     ind=random.randint(0,180)
     minus = random.randint(0,1)
@@ -32,10 +28,18 @@ def random_rotate(img):
         ind=ind*-1
     img=img.rotate(ind)
     img=np.asarray(img)
+
+
     #image type is must be PIL
     if __debug__ == debug_flag:
         print ind
+        plt.imshow(img)
+        plt.show()
     return img
+
+def random_rotate_image(images):
+    images=np.asarray(map(lambda image : random_rotate(image) , images))
+
 
 def random_flip(image):
     debug_flag = False

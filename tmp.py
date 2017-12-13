@@ -7,4 +7,6 @@ test_imgs = test_imgs /255.
 print np.shape(train_imgs)
 n_classes = 2
 
-rotated_imgs=map(lambda batch_x : aug.random_rotate(batch_x) , train_imgs[:60])
+#rotated_imgs=map(lambda batch_x : aug.random_rotate(batch_x) , train_imgs[:60])
+aug.random_rotate_image(train_imgs[:60])
+
