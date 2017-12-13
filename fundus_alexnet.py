@@ -29,7 +29,7 @@ args=parser.parse_args()
                                                 Input Data
 ----------------------------------------------------------------------------------------------------------------"""
 
-train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug' , save_dir_name=args.ckpt_dir)
+train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300' , save_dir_name=args.ckpt_dir)
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
 n_classes = 2
@@ -91,7 +91,7 @@ max_acc, min_loss = 0, 10000000
 for step in range(start_step, 100000):
     lr = cnn.lr_schedule(step , args.lr_iters , args.lr_values)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
-
+    batch_xs=aug.random_rotate_image(batch_xs) # random rotate images
     _, loss, acc = sess.run(fetches=[train_op, cost, accuracy],
                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True, lr_: lr})
     last_model_saver.save(sess, save_path=last_model_ckpt_path, global_step=step)
