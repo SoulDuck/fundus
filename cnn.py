@@ -78,7 +78,7 @@ def affine(name,x,out_ch):
         return layer
 def gap(name,x , n_classes ):
     in_ch=x.get_shape()[-1]
-    gap_x=tf.reduce_mean(x, (1,2))
+    gap_x=tf.reduce_mean(x, (1,2) ,name='global_average_pooling')
     with tf.variable_scope(name) as scope:
         gap_w=tf.get_variable('w' , shape=[in_ch , n_classes] , initializer=tf.random_normal_initializer(0,0.01) , trainable=True)
     y_conv=tf.matmul(gap_x, gap_w , name='y_conv')
