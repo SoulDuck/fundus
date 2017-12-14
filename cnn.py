@@ -99,6 +99,7 @@ def lr_schedule(step ,lr_iters , lr_values):
     return lr_value
 
 def dropout(x_ , phase_train , keep_prob):
+    print 'dropout applied'
     return tf.cond(phase_train , lambda : tf.nn.dropout(x_ , keep_prob=keep_prob) , lambda: x_)
 
 def l2_loss(optimizer ,loss_tensor ):

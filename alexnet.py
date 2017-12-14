@@ -1,6 +1,7 @@
 #-*- coding:utf-8 -*-
 import tensorflow as tf
 from cnn import convolution2d, batch_norm_layer, affine, max_pool, avg_pool , gap , dropout
+import cam
 class Alexnet(object):
     def __init__(self , x_ , phase_train , conv_n_filters  , conv_k_sizes , conv_strides , fc_nodes,n_classes , activation , \
                  norm ,logit_type , ):
@@ -62,10 +63,11 @@ class Alexnet(object):
 
 
         elif self.logit_type == 'gap':
-            layer = gap('gap', layer , n_classes=self.n_classes)
+            logit = gap('gap', layer , n_classes=self.n_classes)
+            self.cam = cam.get_class_map('gap', logit, 0, int(x_.get_shape)[2])
         else:
             raise AssertionError
-        logit = tf.identity(layer, name='logits')
+        logit = tf.identity(logit, name='logits')
         return logit
 
 
