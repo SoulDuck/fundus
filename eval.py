@@ -1,124 +1,88 @@
+#-*- coding: utf-8 -*-
+import tensorflow as tf
+import cam
 import numpy as np
-from PIL import Image
-import utils
-import random
+import os
+import data
+## for mnist dataset ##
+from tensorflow.examples.tutorials.mnist import input_data
+mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+"""
+train_imgs = mnist.train.images.reshape([-1,28,28,1])
+train_labs = mnist.train.labels
+test_imgs = mnist.test.images.reshape([-1,28,28,1])
+test_labs = mnist.test.labels
+"""
+#for Fundus_300
+def get_acc(preds , trues):
+    #onehot vector check
+    np.ndim(preds) == np.ndim(trues) , 'predictions and True Values has same shape and has to be OneHot Vector'
+    if np.ndim(preds) == 2:
+        preds_cls =np.argmax(preds , axis=1)
+        trues_cls = np.argmax(trues, axis=1)
 
-def dense_crop(image , crop_height , crop_width , lr_flip =False, ud_flip=False):
+    else:
+        preds_cls=preds
+        trues_cls = trues
+    acc=np.sum([preds_cls == trues_cls])/float(len(preds_cls))
+    return acc
+
+
+
+
+
+def eval(model_path ,test_images , batch_size  , save_root_folder):
+    print 'eval'
+    b,h,w,c=np.shape(test_images)
+
+    if np.max(test_images) > 1:
+        test_images = test_images / 255.
+    sess = tf.Session()
+
+    saver = tf.train.import_meta_graph(meta_graph_or_file=model_path+'.meta') #example model path ./models/fundus_300/5/model_1.ckpt
+    saver.restore(sess, save_path=model_path) # example model path ./models/fundus_300/5/model_1.ckpt
+
+    x_ = tf.get_default_graph().get_tensor_by_name('x_:0')
+    y_ = tf.get_default_graph().get_tensor_by_name('y_:0')
+    pred_ = tf.get_default_graph().get_tensor_by_name('softmax:0')
+    is_training_=tf.get_default_graph().get_tensor_by_name('is_training:0')
+    top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
+    logits = tf.get_default_graph().get_tensor_by_name('logits:0')
+    cam_ = tf.get_default_graph().get_tensor_by_name('classmap:0')
+    cam.eval_inspect_cam(sess, cam_, top_conv, test_images[:], x_, y_, is_training_,
+                                                    logits,save_root_folder)
+
     """
-     _________________
-    | ____       ___  |
-    ||    |-->->|   | |
-    ||____|     |___| |
-
-            ...
-      ____       ____
-    ||    |-->->|    ||
-    ||____|     |____||
-    |_________________|
-
-
-
-    :param image:
-    :param crop_height:
-    :param crop_width:
-    :param lr_flip:
-    :param ud_flip:
-    :return:
+    try:
+        print np.shape(vis_abnormal)
+        vis_normal=vis_normal.reshape([h,w])
+        vis_abnormal = vis_abnormal.reshape([h,w])
+        plt.imshow(vis_normal)
+        plt.show()
+        plt.imshow(vis_abnormal)
+        plt.show()
+    except Exception as e :
+        print e
+        pass
     """
-    cropped_images=[]
-    img_h,img_w,ch=np.shape(image)
-    n_h_move = img_h - crop_height + 1
-    n_w_move = img_w - crop_width + 1
-    for h in range(n_h_move):
-        for w in range(n_w_move):
-            cropped_images.append(image[ h : h+crop_height , w : w+crop_width , :])
-
-    ori_cropped_images=np.asarray(cropped_images)
-    #indices = random.sample(range(5900), 60)
-
-    if lr_flip:
-        lr_flip_cropped_images=np.flip(ori_cropped_images[:, ] , axis=2)
-        #utils.plot_images(lr_flip_cropped_images[:60], random_order=True)
-        cropped_images=np.vstack((ori_cropped_images , lr_flip_cropped_images))
-
-    if ud_flip:
-        ud_flip_cropped_images = np.flip(ori_cropped_images[:, ], axis=1)
-        #utils.plot_images(ud_flip_cropped_images[:60], random_order=True)
-        cropped_images = np.vstack((cropped_images, ud_flip_cropped_images))
-
-    if lr_flip and ud_flip:
-        lr_ud_flip_cropped_images = np.flip(ud_flip_cropped_images, axis=2)
-        cropped_images = np.vstack((cropped_images, lr_ud_flip_cropped_images))
-
-    return np.asarray(cropped_images)
-
-def central_eval(image , crop_height , crop_width ,lr_flip =False, ud_flip=False ):
-    cropped_images=[]
-    up_left_crop_image=image[:crop_height , :crop_width , :]
-    up_right_crop_image = image[:crop_height, : -crop_width, :]
-    cropped_images.append(up_left_crop_image)
-    cropped_images.append(up_right_crop_image)
-    cropped_images=np.asarray(cropped_images)
-    utils.plot_images(cropped_images)
-
-def sparse_eval(image , crop_height , crop_width ,lr_flip =False, ud_flip=False ):
-    """
-     _________________
-    | ____       ___  |
-    ||    |     |   | |
-    ||____| ____|___| |
-    |      |    |     |
-    |      |____|     |
-    | ____       ____ |
-    ||    |     |    ||
-    ||____|     |____||
-    |_________________|
-
-    :return:
-    """
-    h,w,ch=np.shape(image)
-    ori_cropped_images=[]
-    up_left_crop_image = image[:crop_height, :crop_width, :]
-    up_right_crop_image = image[:crop_height, -crop_width: , :]
-    h_gap=(h - crop_height) / 2
-    w_gap = (w - crop_width) / 2
-    central_crop_image = image[ h_gap : h_gap + crop_height , w_gap : w_gap + crop_width , :]
-    down_left_crop_image = image[-crop_height:, :crop_width, :]
-    down_right_crop_image = image[-crop_height:, -crop_width:, :]
-
-    ori_cropped_images.append(up_left_crop_image )
-    ori_cropped_images.append(up_right_crop_image)
-    ori_cropped_images.append(central_crop_image)
-    ori_cropped_images.append(down_left_crop_image)
-    ori_cropped_images.append(down_right_crop_image)
-
-    ori_cropped_images=np.asarray(ori_cropped_images)
-    if lr_flip:
-        lr_flip_cropped_images=np.flip(ori_cropped_images[:, ] , axis=2)
-        #utils.plot_images(lr_flip_cropped_images[:60], random_order=True)
-        cropped_images=np.vstack((ori_cropped_images , lr_flip_cropped_images))
-
-    if ud_flip:
-        ud_flip_cropped_images = np.flip(ori_cropped_images[:, ], axis=1)
-        #utils.plot_images(ud_flip_cropped_images[:60], random_order=True)
-        cropped_images = np.vstack((cropped_images, ud_flip_cropped_images))
-
-    if lr_flip and ud_flip:
-        lr_ud_flip_cropped_images = np.flip(ud_flip_cropped_images , axis=2)
-        cropped_images = np.vstack((cropped_images , lr_ud_flip_cropped_images))
-    utils.plot_images(cropped_images)
-    return cropped_images
-
-
-if __name__ == '__main__':
-    img=Image.open('./debug/0.png')
-    img=np.asarray(img)
-    #images=dense_crop(img , 224 ,224 , lr_flip=True  , ud_flip=True )
-    images=sparse_eval(img , 224 ,224 , lr_flip=True  , ud_flip=True )
-
-    print 'image shape : {}'.format(np.shape(images))
-    indices=random.sample(range(len(images)), 60)
-    utils.plot_images(images[indices] , random_order=True)
-
-
-
+    share=len(test_images)/batch_size
+    print share
+    remainder=len(test_images)%batch_size
+    predList=[]
+    for s in range(share):
+        pred = sess.run(pred_ , feed_dict={x_ : test_images[s*batch_size:(s+1)*batch_size],is_training_:False})
+        print 'pred_ ' ,pred
+        predList.extend(pred)
+    pred = sess.run(pred_, feed_dict={x_: test_images[-1*remainder:], is_training_: False})
+    predList.extend(pred)
+    assert len(predList) == len(test_images)
+    tf.reset_default_graph()
+    print 'pred sample ',predList[:1]
+    return np.asarray(predList)
+if __name__ =='__main__':
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300',
+                                                                                                       resize=(
+                                                                                                       299, 299))
+    model_path ='./models/step_118000_acc_0.838333427906/model'
+    pred=eval(model_path, test_images)
+    print np.shape(pred)
