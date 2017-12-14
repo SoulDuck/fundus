@@ -31,10 +31,8 @@ def get_acc(preds , trues):
 
 
 
-def eval(model_path ,test_images , batch_size  , save_root_folder):
+def eval(model_path ,test_images , batch_size  , save_root_folder='./actmap'):
     """
-
-
     :param model_path:
     :param test_images:
     :param batch_size:
@@ -54,13 +52,21 @@ def eval(model_path ,test_images , batch_size  , save_root_folder):
     x_ = tf.get_default_graph().get_tensor_by_name('x_:0')
     y_ = tf.get_default_graph().get_tensor_by_name('y_:0')
     pred_ = tf.get_default_graph().get_tensor_by_name('softmax:0')
-    is_training_=tf.get_default_graph().get_tensor_by_name('is_training:0')
+    try:
+        is_training_=tf.get_default_graph().get_tensor_by_name('is_training:0')
+    except:
+        is_training_ = tf.get_default_graph().get_tensor_by_name('phase_train:0')
     top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
-    logits = tf.get_default_graph().get_tensor_by_name('logits:0')
+    try:
+        logits = tf.get_default_graph().get_tensor_by_name('logits:0')
+    except:
+        logits = tf.get_default_graph().get_tensor_by_name('y_conv:0')
     cam_ = tf.get_default_graph().get_tensor_by_name('classmap:0')
-    cam.eval_inspect_cam(sess, cam_, top_conv, test_images[:], x_, y_, is_training_,
-                                                    logits,save_root_folder)
+    vis_abnormal, vis_normal = cam.inspect_cam(sess, cam_, top_conv, test_images, test_labels, x_, y_, is_training_,
+                                               logits,
+                                               savedir_root='./actmap')
 
+    #def inspect_cam(sess, cam , top_conv , test_imgs, test_labs, global_step , x_ , y_ , phase_train , y  , savedir='actmap'):
     """
     try:
         print np.shape(vis_abnormal)
@@ -75,11 +81,10 @@ def eval(model_path ,test_images , batch_size  , save_root_folder):
         pass
     """
     share=len(test_images)/batch_size
-    print share
     remainder=len(test_images)%batch_size
     predList=[]
     for s in range(share):
-        pred = sess.run(pred_ , feed_dict={x_ : test_images[s*batch_size:(s+1)*batch_size],is_training_:False})
+        pred = sess.run(pred_, feed_dict={x_: test_images[s * batch_size:(s + 1) * batch_size], is_training_: False})
         print 'pred_ ' ,pred
         predList.extend(pred)
     pred = sess.run(pred_, feed_dict={x_: test_images[-1*remainder:], is_training_: False})
@@ -89,9 +94,10 @@ def eval(model_path ,test_images , batch_size  , save_root_folder):
     print 'pred sample ',predList[:1]
     return np.asarray(predList)
 if __name__ =='__main__':
+
     train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300_debug',
                                                                                                        resize=(
                                                                                                        299, 299))
-    model_path ='./ensemble_models/step_21600_acc_0.848333358765'
-    pred=eval(model_path, test_images , batch_size=60 , )
+    model_path ='./ensemble_models/step_21600_acc_0.848333358765/model'
+    pred=eval(model_path, test_images , batch_size=60 , save_root_folder='./actmap')
     print np.shape(pred)

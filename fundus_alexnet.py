@@ -16,14 +16,15 @@ parser.add_argument('--conv_strides', nargs='+' , type=int , default=[2, 2, 1, 1
 parser.add_argument('--fc_nodes' , nargs='+', type=int , default=[4096, 4096, 2])
 parser.add_argument('--logit_type' , type=str  , choices=['gap', 'fc'] , default='gap')
 parser.add_argument('--batch_size' , type=int , default= 60)
-parser.add_argument('--activation')
-parser.add_argument('--norm' , default='BN')
+parser.add_argument('--optimizer' ,type=str  , choices=['adam', 'sgd', 'momentum'])
+parser.add_argument('--norm' , default='BN' , choices=['BN' , 'LRN'])
 parser.add_argument('--color_aug' ,dest='use_color_aug' , action='store_true')
 parser.add_argument('--no_color_aug', dest='use_color_aug', action='store_false')
 parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
 parser.add_argument('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.00001])
 parser.add_argument('--l2_loss' , dest='use_l2_loss' , action='store_true')
 parser.add_argument('--no_l2_loss' , dest='use_l2_loss' , action='store_false')
+#parser.add_argument('--activation')
 args=parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
@@ -43,16 +44,12 @@ y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes])
 lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
 aug_x_ = aug.aug_tensor_images(x_, phase_train, img_size_cropped=224 , color_aug=args.use_color_aug)
-
-
-
-model = alexnet.Alexnet(x_ , phase_train , args.conv_n_filters , args.conv_k_sizes , \
+model = alexnet.Alexnet(aug_x_ , phase_train , args.conv_n_filters , args.conv_k_sizes , \
                         args.conv_strides , args.fc_nodes , n_classes , args.activation , args.norm  , args.logit_type)
-
 logit=model.logit
-print np.shape(logit)
+print "logits's shape : {}".format(np.shape(logit))
 pred, pred_cls, cost, train_op, correct_pred, accuracy = cnn.algorithm(logit, y_, learning_rate=lr_,
-                                                                       optimizer='AdamOptimizer')
+                                                                       optimizer=args.optimizer ,l2_loss=args.use_l2_loss)
 
 
 
