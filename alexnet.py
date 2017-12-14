@@ -60,6 +60,7 @@ class Alexnet(object):
                     print self.keep_prob
                     layer=dropout(layer , self.phase_train , keep_prob=self.keep_prob)
 
+
         elif self.logit_type == 'gap':
             layer = gap('gap', layer , n_classes=self.n_classes)
         else:

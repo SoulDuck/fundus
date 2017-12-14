@@ -84,7 +84,31 @@ def gap(name,x , n_classes ):
     y_conv=tf.matmul(gap_x, gap_w , name='y_conv')
     return y_conv
 
-def algorithm(y_conv , y_ , learning_rate , optimizer='GradientDescentOptimizer'):
+def lr_schedule(step ,lr_iters , lr_values):
+    assert len(lr_iters) == len(lr_values)
+
+    def _fn(step, lr_iters, lr_values):
+        n_lr_iters = len(lr_iters)
+        for idx in range(n_lr_iters):
+            if step < lr_iters[idx]:
+                return lr_iters[idx], lr_values[idx]
+            elif idx <= n_lr_iters - 1:
+                continue
+        return lr_iters[idx], lr_values[idx]
+    lr_iter , lr_value=_fn(step , lr_iters ,lr_values)
+    return lr_value
+
+def dropout(x_ , phase_train , keep_prob):
+    return tf.cond(phase_train , lambda : tf.nn.dropout(x_ , keep_prob=keep_prob) , lambda: x_)
+
+def l2_loss(optimizer ,loss_tensor ):
+        l2_loss = tf.add_n([tf.nn.l2_loss(var) for var in tf.trainable_variables()], name='l2_loss')
+        weight_decay = 1e-4
+        train_op = optimizer.minimize(loss_tensor + l2_loss * weight_decay, name='train_op')
+        return train_op
+
+
+def algorithm(y_conv , y_ , learning_rate , optimizer='GradientDescentOptimizer' , l2_loss=False):
 
     assert int(y_conv.get_shape()[-1]) == int(y_.get_shape()[-1]) \
         , 'logits : {} true labels :{}'.format(y_conv.get_shape()[-1] , y_.get_shape()[-1])
@@ -107,28 +131,16 @@ def algorithm(y_conv , y_ , learning_rate , optimizer='GradientDescentOptimizer'
     pred=tf.nn.softmax(y_conv , name='softmax')
     pred_cls=tf.argmax(pred , axis=1 , name='pred_cls')
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y_conv , labels=y_) , name='cost')
-    train_op = optimizer_dic[optimizer](learning_rate).minimize(cost)
+
+    if l2_loss:
+        l2_loss(optimizer_dic[optimizer](learning_rate), cost)
+    else:
+        train_op = optimizer_dic[optimizer](learning_rate).minimize(cost,name='train_op')
     correct_pred=tf.equal(tf.argmax(y_conv , 1) , tf.argmax(y_ , 1) , name='correct_pred')
     accuracy =  tf.reduce_mean(tf.cast(correct_pred , dtype=tf.float32) , name='accuracy')
     return pred,pred_cls , cost , train_op,correct_pred ,accuracy
 
 
-def lr_schedule(step ,lr_iters , lr_values):
-    assert len(lr_iters) == len(lr_values)
-
-    def _fn(step, lr_iters, lr_values):
-        n_lr_iters = len(lr_iters)
-        for idx in range(n_lr_iters):
-            if step < lr_iters[idx]:
-                return lr_iters[idx], lr_values[idx]
-            elif idx <= n_lr_iters - 1:
-                continue
-        return lr_iters[idx], lr_values[idx]
-    lr_iter , lr_value=_fn(step , lr_iters ,lr_values)
-    return lr_value
-
-def dropout(x_ , phase_train , keep_prob):
-    return tf.cond(phase_train , lambda : tf.nn.dropout(x_ , keep_prob=keep_prob) , lambda: x_)
 
 if __name__ == '__main__':
     print 'a'

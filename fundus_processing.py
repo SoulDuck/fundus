@@ -9,9 +9,6 @@ import glob , sys, os
 import utils
 from multiprocessing import Pool
 
-
-
-
 def red_free_image(image):
     debug_flag = False
     # if not type(imgs).__module__ == np.__name__:
@@ -214,10 +211,6 @@ def find_optical(path):
     img = Image.open(path)
 
 
-def show_progress(i,max_iter):
-    msg='\r Progress {0}/{1}'.format(i,max_iter)
-    sys.stdout.write(msg)
-    sys.stdout.flush()
 """
 def save_img(img, save_folder , extension):
     name = path.split('/')[-1].split('.')[0]
