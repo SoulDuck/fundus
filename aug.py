@@ -35,6 +35,7 @@ def random_rotate(img):
         print ind
         plt.imshow(img)
         plt.show()
+    img=img/255.
     return img
 
 def random_rotate_image(images):
