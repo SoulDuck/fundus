@@ -9,6 +9,54 @@ import glob , sys, os
 import utils
 from multiprocessing import Pool
 
+
+def add_padding(images , padded_images_height ,padded_images_width ):
+
+
+    """
+
+     _______________
+    |Back    ^      |
+    |ground  |      |
+    |   _________   |
+    |<-|         |->|
+    |  | ori_img |  |
+    |  |_________|  |
+    |        |      |
+    |        V      |
+    |_______________|
+
+
+    :param images: shape : 4D , (batch , height , width , channel)
+    :return: numpy type of images
+
+    """
+
+    b , ori_img_h , ori_img_w , ch =np.shape(images)
+    assert (ori_img_h < padded_images_height )and (ori_img_w < padded_images_width)
+    bg=np.zeros(shape=(b , padded_images_height  , padded_images_width , ch))
+
+    h_gap = (padded_images_height - ori_img_h) / 2
+    w_gap = (padded_images_width - ori_img_w) / 2
+    #element wise sum bg with images
+    print np.shape(images)
+    bg[: , h_gap : h_gap+ori_img_h , w_gap : w_gap +ori_img_w , :] = images
+    print np.shape(bg)
+    #print np.shape(padded_images)
+
+    return bg
+
+
+
+
+
+
+
+
+
+
+
+
 def red_free_image(image):
     debug_flag = False
     # if not type(imgs).__module__ == np.__name__:

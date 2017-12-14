@@ -15,7 +15,7 @@ parser.add_argument('--conv_k_sizes' , nargs='+' , type=int , default=[11, 5, 3,
 parser.add_argument('--conv_strides', nargs='+' , type=int , default=[2, 2, 1, 1, 1])
 parser.add_argument('--fc_nodes' , nargs='+', type=int , default=[4096, 4096, 2])
 parser.add_argument('--logit_type' , type=str  , choices=['gap', 'fc'] , default='gap')
-parser.add_argument('--batch_size' , type=int , default= 30)
+parser.add_argument('--batch_size' , type=int , default= 60)
 parser.add_argument('--activation')
 parser.add_argument('--norm' , default='BN')
 parser.add_argument('--color_aug' ,dest='use_color_aug' , action='store_true')
