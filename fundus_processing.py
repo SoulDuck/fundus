@@ -12,7 +12,6 @@ from multiprocessing import Pool
 
 def add_padding(images , padded_images_height ,padded_images_width ):
 
-
     """
 
      _______________

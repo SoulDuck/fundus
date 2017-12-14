@@ -28,6 +28,7 @@ parser.add_argument('--no_color_aug', dest='use_color_aug' , action='store_false
 parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
 parser.add_argument('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.00001])
 parser.add_argument('--bottlenect_factor' , type=int , default=4)
+parser.add_argument('--optimizer' ,type=str  , choices=['adam', 'sgd', 'momentum'])
 args = parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
