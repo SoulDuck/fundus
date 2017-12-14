@@ -64,7 +64,7 @@ class Alexnet(object):
 
         elif self.logit_type == 'gap':
             logit = gap('gap', layer , n_classes=self.n_classes)
-            self.cam = cam.get_class_map('gap', logit, 0, int(self.x_.get_shape)[2])
+            self.cam = cam.get_class_map('gap', logit, 0, int(self.x_.get_shape[2]))
         else:
             raise AssertionError
         logit = tf.identity(logit, name='logits')
