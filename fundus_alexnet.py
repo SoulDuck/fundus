@@ -9,22 +9,24 @@ import os
 import utils
 
 parser = argparse.ArgumentParser()
+
 parser.add_argument('--ckpt_dir' , default='alexnet')
 parser.add_argument('--optimizer' ,type=str  , choices=['adam', 'sgd', 'momentum'])
+parser.add_argument('--norm'  , choices=['BN' , 'LRN'])
+parser.add_argument('--l2_loss' , dest='use_l2_loss' , action='store_true')
+parser.add_argument('--no_l2_loss' , dest='use_l2_loss' , action='store_false')
+parser.add_argument('--color_aug' ,dest='use_color_aug' , action='store_true')
+parser.add_argument('--no_color_aug', dest='use_color_aug', action='store_false')
+
 parser.add_argument('--conv_n_filters' , nargs='+' , type=int , default= [96, 256, 384, 384, 256])
 parser.add_argument('--conv_k_sizes' , nargs='+' , type=int , default=[11, 5, 3, 3, 3])
 parser.add_argument('--conv_strides', nargs='+' , type=int , default=[2, 2, 1, 1, 1])
 parser.add_argument('--fc_nodes' , nargs='+', type=int , default=[4096, 4096, 2])
 parser.add_argument('--logit_type' , type=str  , choices=['gap', 'fc'] , default='gap')
 parser.add_argument('--batch_size' , type=int , default= 60)
-parser.add_argument('--norm'  , choices=['BN' , 'LRN'])
-parser.add_argument('--color_aug' ,dest='use_color_aug' , action='store_true')
-parser.add_argument('--no_color_aug', dest='use_color_aug', action='store_false')
 parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
 parser.add_argument('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.00001])
-parser.add_argument('--l2_loss' , dest='use_l2_loss' , action='store_true')
-parser.add_argument('--no_l2_loss' , dest='use_l2_loss' , action='store_false')
-#parser.add_argument('--activation')
+parser.add_argument('--activation')
 args=parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
