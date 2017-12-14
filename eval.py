@@ -5,8 +5,8 @@ import numpy as np
 import os
 import data
 ## for mnist dataset ##
-from tensorflow.examples.tutorials.mnist import input_data
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+#from tensorflow.examples.tutorials.mnist import input_data
+#mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 """
 train_imgs = mnist.train.images.reshape([-1,28,28,1])
 train_labs = mnist.train.labels
@@ -32,6 +32,15 @@ def get_acc(preds , trues):
 
 
 def eval(model_path ,test_images , batch_size  , save_root_folder):
+    """
+
+
+    :param model_path:
+    :param test_images:
+    :param batch_size:
+    :param save_root_folder: folder to save class activation map
+    :return:
+    """
     print 'eval'
     b,h,w,c=np.shape(test_images)
 
@@ -80,9 +89,9 @@ def eval(model_path ,test_images , batch_size  , save_root_folder):
     print 'pred sample ',predList[:1]
     return np.asarray(predList)
 if __name__ =='__main__':
-    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300',
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300_debug',
                                                                                                        resize=(
                                                                                                        299, 299))
-    model_path ='./models/step_118000_acc_0.838333427906/model'
-    pred=eval(model_path, test_images)
+    model_path ='./ensemble_models/step_21600_acc_0.848333358765'
+    pred=eval(model_path, test_images , batch_size=60 , )
     print np.shape(pred)

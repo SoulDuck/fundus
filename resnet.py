@@ -1,8 +1,10 @@
 #-*- coding:utf-8 -*-
 import tensorflow as tf
 from cnn import convolution2d, batch_norm_layer, affine, max_pool, avg_pool , gap
-
 import cam
+
+
+import cnn
 
 filters_per_blocks=[]
 n_blocks=[]
@@ -96,13 +98,17 @@ class Resnet(object):
 
     def _logit(self ,x  , phase_train):
         if self.logit_type == 'gap':
+            im_width=int(self.x_.get_shape()[1])
             logit=gap('gap' , x , n_classes = self.n_classes)
+            self.cam = cam.get_class_map('gap', logit, 0, im_width)
         elif self.logit_type == 'fc':
             logit=affine('fc', x, out_ch=self.n_classes)
         else :
             print 'Not Implemneted , Sorry '
         logit=tf.identity(logit , 'logit')
         return logit
+
+
 
 if __name__ =='__main__':
     phase_train = tf.placeholder(dtype=tf.bool , name='phase_train')

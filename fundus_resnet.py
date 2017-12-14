@@ -98,7 +98,7 @@ test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs
 test_imgs_labs = zip(test_imgs_list, test_labs_list)
 
 max_acc, min_loss = 0, 10000000
-for step in range(start_step, 100000):
+for step in range( start_step, 100000 ):
     lr = cnn.lr_schedule(step , args.lr_iters , args.lr_values)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
     #rotate_imgs=map(  lambda batch_x : aug.random_rotate(batch_x), batch_xs)
@@ -125,3 +125,4 @@ for step in range(start_step, 100000):
         print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc, loss,
                                                                                                         val_acc,
                                                                                                         val_cost)
+
