@@ -63,7 +63,8 @@ model = resnet.Resnet(aug_x_, phase_train, n_filters_per_box, n_blocks_per_box, 
 
 logit = model.logit
 pred, pred_cls, cost, train_op, correct_pred, accuracy = cnn.algorithm(logit, y_, learning_rate=lr_,
-                                                                       optimizer='AdamOptimizer')
+                                                                       optimizer=args.optimizer , \
+                                                                       use_l2_loss=args.use_l2_loss )
 
 
 """----------------------------------------------------------------------------------------------------------------

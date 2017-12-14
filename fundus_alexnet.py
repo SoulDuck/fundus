@@ -51,7 +51,7 @@ model = alexnet.Alexnet(aug_x_ , phase_train , args.conv_n_filters , args.conv_k
 logit=model.logit
 print "logits's shape : {}".format(np.shape(logit))
 pred, pred_cls, cost, train_op, correct_pred, accuracy = cnn.algorithm(logit, y_, learning_rate=lr_,
-                                                                       optimizer=args.optimizer ,l2_loss=args.use_l2_loss)
+                                                                       optimizer=args.optimizer ,use_l2_loss=args.use_l2_loss)
 
 
 
