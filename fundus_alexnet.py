@@ -93,7 +93,7 @@ for step in range(start_step, 100000):
     lr = cnn.lr_schedule(step , args.lr_iters , args.lr_values)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
     batch_xs=aug.random_rotate_image(batch_xs) # random rotate images
-
+    assert np.max(batch_xs) <= 1
     _, loss, acc = sess.run(fetches=[train_op, cost, accuracy],
                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True, lr_: lr})
     last_model_saver.save(sess, save_path=last_model_ckpt_path, global_step=step)
