@@ -52,7 +52,7 @@ class Alexnet(object):
                 layer = convolution2d(name='conv_{}'.format(i), x= layer , out_ch=self.conv_n_filters[i] \
                                       , k=self.conv_k_sizes[i], s=self.conv_strides[i])
 
-        layer = tf.identity(layer , name = 'top_conv')
+        top_conv = tf.identity(layer , name = 'top_conv')
         layer = max_pool(name='max_pool_{}'.format(i), x=layer, k=3, s=2)
         if self.logit_type == 'fc':
             for j in range(self.n_fc_layers):
@@ -64,7 +64,7 @@ class Alexnet(object):
 
         elif self.logit_type == 'gap':
             logit = gap('gap', layer , n_classes=self.n_classes)
-            self.cam = cam.get_class_map('gap', logit, 0, int(self.x_.get_shape()[2]))
+            self.cam = cam.get_class_map('gap', top_conv, 0, int(self.x_.get_shape()[2]))
         else:
             raise AssertionError
         logit = tf.identity(logit, name='logits')
