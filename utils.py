@@ -353,7 +353,8 @@ def save_model(sess, saver, max_acc, min_loss, val_acc, val_loss, best_acc_ckpt_
         os.mkdir(best_acc_ckpt_dir)
         os.mkdir(best_loss_ckpt_dir)
     except Exception as e :
-        print e # only debug
+        #print e # only debug
+        pass
 
     if val_acc > max_acc:  # best acc
         max_acc = val_acc
