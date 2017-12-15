@@ -103,16 +103,8 @@ def dense_crop(image , crop_height , crop_width , lr_flip =False, ud_flip=False)
 
     return np.asarray(cropped_images)
 
-def central_eval(image , crop_height , crop_width ,lr_flip =False, ud_flip=False ):
-    cropped_images=[]
-    up_left_crop_image=image[:crop_height , :crop_width , :]
-    up_right_crop_image = image[:crop_height, : -crop_width, :]
-    cropped_images.append(up_left_crop_image)
-    cropped_images.append(up_right_crop_image)
-    cropped_images=np.asarray(cropped_images)
-    utils.plot_images(cropped_images)
 
-def sparse_eval(image , crop_height , crop_width ,lr_flip =False, ud_flip=False ):
+def sparse_crop(image , crop_height , crop_width ,lr_flip =False, ud_flip=False ):
     """
      _________________
     | ____       ___  |
@@ -165,7 +157,7 @@ if __name__ == '__main__':
     img=Image.open('./debug/0.png')
     img=np.asarray(img)
     #images=dense_crop(img , 224 ,224 , lr_flip=True  , ud_flip=True )
-    images=sparse_eval(img , 224 ,224 , lr_flip=True  , ud_flip=True )
+    images=sparse_crop(img , 224 ,224 , lr_flip=True  , ud_flip=True )
 
     print 'image shape : {}'.format(np.shape(images))
     indices=random.sample(range(len(images)), 60)

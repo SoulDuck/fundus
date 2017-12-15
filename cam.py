@@ -3,7 +3,10 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import os
 from PIL import Image
+import PIL
+import utils
 import numpy as np
+import fundus_processing
 from skimage.io import imsave
 import scipy.misc
 def get_class_map(name,x , label , im_width):
@@ -50,7 +53,9 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
                                      feed_dict={x_: ori_img.reshape([1, ori_img_h, ori_img_w, ori_img_ch]),
                                                 phase_train: False})
         cam_= sess.run( cam ,  feed_dict={ y_:label , top_conv:top_conv_ }) #cam_answer
+
         cam_=np.asarray((map(lambda x: (x-x.min())/(x.max()-x.min()) , cam_))) #-->why need this?
+
         cam_img = cam_.reshape([ori_img_h, ori_img_w])
         cam_img = cam_img.reshape([ori_img_h, ori_img_w])
         plt.imshow(cam_img, cmap=plt.cm.jet, alpha=0.5, interpolation='nearest',
@@ -59,16 +64,28 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
         cmap = plt.cm.jet
         plt.imsave('{}/actmap_abnormal_label_0.png'.format(save_dir), cmap(cam_img))
         cam_img=Image.open('{}/actmap_abnormal_label_0.png'.format(save_dir))
+        ##임시로 한것이다 나중에 299 가 아닌 224로 고쳐진 코드가 있으면 지우자
+        cam_img=cam_img.resize((224,224) , PIL.Image.ANTIALIAS)
+        np_cam_img=np.asarray(cam_img) #img 2 numpy
+        np_cam_img=fundus_processing.add_padding(np_cam_img.reshape(1,224,224,-1) , 299,299) # padding
+        print np.shape(np_cam_img)
+        print np.max(np_cam_img)
+        print np.min(np_cam_img)
+        cam_img = Image.fromarray(
+            np_cam_img.reshape([ori_img_h, ori_img_w , 4 ]).astype('uint8'))  # padding#numpy 2 img
+
+
         ori_img=Image.fromarray(ori_img.astype('uint8')).convert("RGBA")
         #cam_img = Image.fromarray(cam_img.astype('uint8')).convert("RGBA")
         overlay_img = Image.blend(ori_img, cam_img, 0.5)
         plt.imshow(overlay_img)
         plt.show()
-        exit()
         plt.close();
+        """
         if test_imgs.shape[-1] == 1:  # grey
             plt.imshow(1 -img.reshape([test_imgs.shape[1], test_imgs.shape[2]]))
             plt.show()
+        """
 
 
 """

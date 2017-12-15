@@ -3,7 +3,9 @@ import tensorflow as tf
 import cam
 import numpy as np
 import os
+import utils
 import data
+import fundus_processing
 ## for mnist dataset ##
 #from tensorflow.examples.tutorials.mnist import input_data
 #mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
@@ -62,9 +64,8 @@ def eval(model_path ,test_images , batch_size  , save_root_folder='./actmap'):
     except:
         logits = tf.get_default_graph().get_tensor_by_name('y_conv:0')
     cam_ = tf.get_default_graph().get_tensor_by_name('classmap:0')
-    vis_abnormal, vis_normal = cam.inspect_cam(sess, cam_, top_conv, test_images, test_labels, x_, y_, is_training_,
-                                               logits,
-                                               savedir_root='./actmap')
+    cam.inspect_cam(sess, cam_, top_conv, test_images, test_labels, x_, y_, is_training_, logits,
+                    savedir_root='./actmap')
 
     #def inspect_cam(sess, cam , top_conv , test_imgs, test_labs, global_step , x_ , y_ , phase_train , y  , savedir='actmap'):
     """
@@ -87,9 +88,10 @@ def eval(model_path ,test_images , batch_size  , save_root_folder='./actmap'):
         pred = sess.run(pred_, feed_dict={x_: test_images[s * batch_size:(s + 1) * batch_size], is_training_: False})
         print 'pred_ ' ,pred
         predList.extend(pred)
-    pred = sess.run(pred_, feed_dict={x_: test_images[-1*remainder:], is_training_: False})
-    predList.extend(pred)
-    assert len(predList) == len(test_images)
+    if not remainder == 0:
+        pred = sess.run(pred_, feed_dict={x_: test_images[-1*remainder:], is_training_: False})
+        predList.extend(pred)
+    assert len(predList) == len(test_images) , 'n pred list : {} n test images : {}'.format(len(predList) , len(test_images))
     tf.reset_default_graph()
     print 'pred sample ',predList[:1]
     return np.asarray(predList)
@@ -99,5 +101,8 @@ if __name__ =='__main__':
                                                                                                        resize=(
                                                                                                        299, 299))
     model_path ='./ensemble_models/step_21600_acc_0.848333358765/model'
-    pred=eval(model_path, test_images , batch_size=60 , save_root_folder='./actmap')
+    sparse_cropped_images=fundus_processing.sparse_crop(test_images[0] , 224 ,224 ,lr_flip=True , ud_flip=True)
+    sparse_cropped_images=fundus_processing.add_padding(sparse_cropped_images , 299 ,299 )
+    utils.plot_images(sparse_cropped_images)
+    pred=eval(model_path, sparse_cropped_images , batch_size=5 , save_root_folder='./actmap')
     print np.shape(pred)
