@@ -17,7 +17,7 @@ parser.add_argument('--l2_loss' , dest='use_l2_loss' , action='store_true')
 parser.add_argument('--no_l2_loss' , dest='use_l2_loss' , action='store_false')
 parser.add_argument('--color_aug' ,dest='use_color_aug' , action='store_true')
 parser.add_argument('--no_color_aug', dest='use_color_aug', action='store_false')
-
+parser.add_argument('--max_iter' , type=int)
 parser.add_argument('--conv_n_filters' , nargs='+' , type=int , default= [96, 256, 384, 384, 256])
 parser.add_argument('--conv_k_sizes' , nargs='+' , type=int , default=[11, 5, 3, 3, 3])
 parser.add_argument('--conv_strides', nargs='+' , type=int , default=[2, 2, 1, 1, 1])
@@ -89,7 +89,7 @@ test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs
 test_imgs_labs = zip(test_imgs_list, test_labs_list)
 
 max_acc, min_loss = 0, 10000000
-for step in range(start_step, 300000):
+for step in range(start_step, args.max_iter):
     lr = cnn.lr_schedule(step , args.lr_iters , args.lr_values)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
     batch_xs=aug.random_rotate_image(batch_xs) # random rotate images
