@@ -100,8 +100,8 @@ class Resnet(object):
     def _logit(self ,x  , phase_train):
         if self.logit_type == 'gap':
             im_width=int(self.x_.get_shape()[1])
-            self.cam = cam.get_class_map('gap', self.top_conv, 0, im_width)
             logit=gap('gap' , x , n_classes = self.n_classes)
+            self.cam = cam.get_class_map('gap', self.top_conv, 0, im_width)
         elif self.logit_type == 'fc':
             logit=affine('fc', x, out_ch=self.n_classes)
         else :
