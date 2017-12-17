@@ -29,6 +29,8 @@ parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40
 parser.add_argument('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.00001])
 parser.add_argument('--bottlenect_factor' , type=int , default=4)
 parser.add_argument('--optimizer' ,type=str  , choices=['adam', 'sgd', 'momentum'])
+parser.add_argument('--l2_loss' , dest='use_l2_loss' ,action='store_true')
+parser.add_argument('--no_l2_loss' , dest='use_l2_loss' ,action='store_false')
 args = parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
