@@ -137,8 +137,6 @@ def algorithm(y_conv , y_ , learning_rate , optimizer , use_l2_loss):
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y_conv , labels=y_) , name='cost')
 
     if use_l2_loss:
-        print optimizer_dic[optimizer]
-        print 'use L2 LOSS'
         train_op=l2_loss(optimizer_dic[optimizer], cost)
     else:
         train_op = optimizer_dic[optimizer].minimize(cost,name='train_op')
