@@ -50,7 +50,8 @@ class Resnet(object):
             with tf.variable_scope('box_{}'.format(box_idx)):
                 layer=self._box(layer , n_block= self.n_blocks_per_box[box_idx] , block_out_ch= self.n_filters_per_box[box_idx] ,
                           block_stride = self.stride_per_box[box_idx])
-        self.logit=self._logit(layer ,  self.phase_train)
+        self.top_conv=tf.identity(layer  , 'top_conv')
+        self.logit=self._logit(self.top_conv , self.phase_train)
 
 
 
@@ -99,8 +100,8 @@ class Resnet(object):
     def _logit(self ,x  , phase_train):
         if self.logit_type == 'gap':
             im_width=int(self.x_.get_shape()[1])
+            self.cam = cam.get_class_map('gap', self.top_conv, 0, im_width)
             logit=gap('gap' , x , n_classes = self.n_classes)
-            self.cam = cam.get_class_map('gap', logit, 0, im_width)
         elif self.logit_type == 'fc':
             logit=affine('fc', x, out_ch=self.n_classes)
         else :
