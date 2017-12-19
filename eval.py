@@ -105,4 +105,8 @@ if __name__ =='__main__':
     sparse_cropped_images=fundus_processing.add_padding(sparse_cropped_images , 299 ,299 )
     utils.plot_images(sparse_cropped_images)
     pred=eval(model_path, sparse_cropped_images , batch_size=5 , save_root_folder='./actmap')
+    pred_0 = np.sum(pred[:, 0])
+    pred_1 = np.sum(pred[:, 1])
+    print pred_0/float(len(pred))
+    print pred_1/float(len(pred))
     print np.shape(pred)
