@@ -103,13 +103,13 @@ def eval(model_path ,test_images , batch_size  , save_root_folder='./actmap'):
     print 'pred sample ',predList[:1]
     return np.asarray(predList)
 
-def eval_image_with_sparse_croppping(model_path , image , image_size):
+def eval_image_with_sparse_croppping(model_path , image , image_size , actmap_save_folder='./actmap'):
     cropped_height, cropped_weight = image_size
     sparse_cropped_images = fundus_processing.sparse_crop(image, cropped_height, cropped_weight, lr_flip=True,
                                                           ud_flip=True)
     sparse_cropped_images = fundus_processing.add_padding(sparse_cropped_images, 299, 299)
     #utils.plot_images(sparse_cropped_images)
-    pred = eval(model_path, sparse_cropped_images, batch_size=5, save_root_folder='./actmap')
+    pred = eval(model_path, sparse_cropped_images, batch_size=5, save_root_folder=actmap_save_folder)
     pred_0 = np.sum(pred[:, 0])
     pred_1 = np.sum(pred[:, 1])
     mean_pred = (pred_0 / float(len(pred)) ,pred_1 / float(len(pred)))
