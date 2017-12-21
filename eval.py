@@ -104,6 +104,7 @@ def eval(model_path ,test_images , batch_size  , save_root_folder='./actmap'):
     return np.asarray(predList)
 
 def eval_image_with_sparse_croppping(model_path , image , image_size , actmap_save_folder):
+    print actmap_save_folder
     cropped_height, cropped_weight = image_size
     sparse_cropped_images = fundus_processing.sparse_crop(image, cropped_height, cropped_weight, lr_flip=True,
                                                           ud_flip=True)
