@@ -116,7 +116,7 @@ def sparse_crop(image , crop_height , crop_width ,lr_flip =False, ud_flip=False 
     h_gap = (h - crop_height) / 2
     w_gap = (w - crop_width) / 2
 
-    cropped_images=[]
+    ori_cropped_images=[]
     up_left_crop_image = image[:crop_height, :crop_width, :]
     up_right_crop_image = image[:crop_height, -crop_width: , :]
     up_middle_crop_image = image[:crop_height, w_gap : w_gap + crop_width , :]
@@ -129,26 +129,26 @@ def sparse_crop(image , crop_height , crop_width ,lr_flip =False, ud_flip=False 
     down_right_crop_image = image[-crop_height:, -crop_width:, :]
     down_middle_crop_image = image[-crop_height: , w_gap: w_gap + crop_width, :]
 
-    cropped_images.append(up_left_crop_image )
-    cropped_images.append(up_right_crop_image)
-    cropped_images.append(up_middle_crop_image)
+    ori_cropped_images.append(up_left_crop_image )
+    ori_cropped_images.append(up_right_crop_image)
+    ori_cropped_images.append(up_middle_crop_image)
 
-    cropped_images.append(central_left_crop_image)
-    cropped_images.append(central_right_crop_image)
-    cropped_images.append(central_crop_image)
+    ori_cropped_images.append(central_left_crop_image)
+    ori_cropped_images.append(central_right_crop_image)
+    ori_cropped_images.append(central_crop_image)
 
-    cropped_images.append(down_left_crop_image)
-    cropped_images.append(down_right_crop_image)
-    cropped_images.append(down_middle_crop_image)
+    ori_cropped_images.append(down_left_crop_image)
+    ori_cropped_images.append(down_right_crop_image)
+    ori_cropped_images.append(down_middle_crop_image)
 
-    cropped_images=np.asarray(cropped_images)
+    ori_cropped_images=np.asarray(ori_cropped_images)
     if lr_flip:
-        lr_flip_cropped_images=np.flip(cropped_images[:, ] , axis=2)
+        lr_flip_cropped_images=np.flip(ori_cropped_images[:, ] , axis=2)
         #utils.plot_images(lr_flip_cropped_images[:60], random_order=True)
-        cropped_images=np.vstack((cropped_images , lr_flip_cropped_images))
+        cropped_images=np.vstack((ori_cropped_images , lr_flip_cropped_images))
 
     if ud_flip:
-        ud_flip_cropped_images = np.flip(cropped_images[:, ], axis=1)
+        ud_flip_cropped_images = np.flip(ori_cropped_images[:, ], axis=1)
         #utils.plot_images(ud_flip_cropped_images[:60], random_order=True)
         cropped_images = np.vstack((cropped_images, ud_flip_cropped_images))
 
