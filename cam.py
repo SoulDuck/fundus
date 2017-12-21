@@ -34,6 +34,7 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
     except Exception:
         pass;
     for s in range(num_images):
+        utils.show_progress(s , num_images)
         save_dir=os.path.join(savedir_root ,'img_{}'.format(s))
         try:
             os.mkdir(save_dir);
