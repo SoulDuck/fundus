@@ -136,7 +136,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
     mean_preds=np.asarray(mean_preds)
 
     if not labels is None:
-        acc = utils.get_acc(ture=labels,pred=mean_preds )
+        acc = utils.get_acc(true=labels,pred=mean_preds )
     return mean_preds, acc
 
 
