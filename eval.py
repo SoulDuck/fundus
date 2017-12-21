@@ -106,7 +106,7 @@ def eval(model_path ,test_images , batch_size  , actmap_save_root_folder='./actm
 def eval_image_with_sparse_croppping(model_path , image , image_size , actmap_save_folder):
     cropped_height, cropped_weight = image_size
     sparse_cropped_images = fundus_processing.sparse_crop(image, cropped_height, cropped_weight, lr_flip=True,
-                                                          ud_flip=True)
+                                                          ud_flip=False)
     sparse_cropped_images = fundus_processing.add_padding(sparse_cropped_images, 299, 299)
     #utils.plot_images(sparse_cropped_images)
     pred = eval(model_path, sparse_cropped_images, batch_size=5, actmap_save_root_folder=actmap_save_folder)
@@ -140,7 +140,11 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
         print acc
     return mean_preds, acc
 
-
+def merge_all_cam(images):
+    n , cropped_h, cropped_w , ch  =np.shape(images)
+    merged_image=np.zeros(299,299,3)
+    merged_image[:cropped_h  , :cropped_w , :] += images[0]
+    merged_image[:cropped_h, -cropped_w:, :] += images[2]
 
 
 #def get_cam_with_sparse_cropped_images()
