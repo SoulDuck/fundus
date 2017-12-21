@@ -45,10 +45,6 @@ def add_padding(images , padded_images_height ,padded_images_width ):
 
     return bg
 
-import numpy as np
-from PIL import Image
-import utils
-import random
 
 
 

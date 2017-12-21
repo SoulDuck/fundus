@@ -102,8 +102,15 @@ if __name__ =='__main__':
                                                                                                        299, 299))
     model_path ='./ensemble_models/step_21600_acc_0.848333358765/model'
     sparse_cropped_images=fundus_processing.sparse_crop(test_images[0] , 224 ,224 ,lr_flip=True , ud_flip=True)
+    print np.shape(sparse_cropped_images)
+    print np.max(sparse_cropped_images)
     sparse_cropped_images=fundus_processing.add_padding(sparse_cropped_images , 299 ,299 )
+
+    sparse_cropped_images=sparse_cropped_images.astype(np.int32)
+    print np.shape(sparse_cropped_images)
+    print np.max(sparse_cropped_images)
     utils.plot_images(sparse_cropped_images)
+    exit()
     pred=eval(model_path, sparse_cropped_images , batch_size=5 , save_root_folder='./actmap')
     pred_0 = np.sum(pred[:, 0])
     pred_1 = np.sum(pred[:, 1])

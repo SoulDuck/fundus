@@ -90,7 +90,7 @@ def get_models_paths(dir_path):
     return ret_subdir_paths
 
 
-def ensemble_with_all_combibation(model_paths, test_images, test_labels):
+def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_root_folder='./actmap'):
     max_acc = 0
     max_pred = None
     max_list = []
@@ -107,8 +107,6 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels):
             # ./models/vgg_11/step_12500_acc_0.841666698456 --> ./models/vgg_11/step_12500_acc_0.841666698456/model
             # activation 이 저장될 세이브 장소를 만든다
             # 파일 경로는 ./activation_map/model_name/
-            save_root_folder = './activation_map/{}'.format(name)
-
             os.mkdir(save_root_folder)
             tmp_pred = eval.eval(path, test_images, batch_size=60, save_root_folder=save_root_folder)
             print 'tmp_pred', tmp_pred
@@ -198,7 +196,7 @@ if __name__ == '__main__':
     models_path = get_models_paths(args.models_path)
     print 'number of model paths : {}'.format(len(models_path))
     train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1(
-        './fundus_300', resize=(299, 299))
+        './fundus_300_debug', resize=(299, 299))
 
     acc, max_list, pred = ensemble_with_all_combibation(models_path, test_images, test_labels)
     np.save('./best_preds', pred)

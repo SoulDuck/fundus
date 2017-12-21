@@ -41,7 +41,10 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
             pass;
         ori_img = test_imgs[s]
         if ori_img.shape[-1]==1: #gray image
-            plt.imsave('{}/image_test.png'.format(save_dir) ,ori_img.reshape([ori_img_h , ori_img_w]))
+            if np.max(ori_img) < 1:
+                plt.imsave('{}/image_test.png'.format(save_dir) ,ori_img.reshape([ori_img_h , ori_img_w]))/255.
+            else:
+                plt.imsave('{}/image_test.png'.format(save_dir), ori_img.reshape([ori_img_h, ori_img_w]))
         else :
             plt.imsave('{}/image_test.png'.format(save_dir), ori_img)
 
