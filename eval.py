@@ -142,7 +142,11 @@ if __name__ =='__main__':
                                                                                                        resize=(
                                                                                                        299, 299))
     model_path = './ensemble_models/step_21600_acc_0.848333358765/model'
-    mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
+    #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
+    preds=eval_images(model_path ,  test_images , (224,224) )
+    print len(preds)
+    print len(preds[:10])
+
 
     """
     sparse_cropped_images=fundus_processing.sparse_crop(test_images[0] , 224 ,224 ,lr_flip=True , ud_flip=True)
