@@ -103,7 +103,7 @@ def eval(model_path ,test_images , batch_size  , save_root_folder='./actmap'):
     print 'pred sample ',predList[:1]
     return np.asarray(predList)
 
-def eval_image_with_sparse_croppping(model_path , image , image_size , actmap_save_folder='./actmap'):
+def eval_image_with_sparse_croppping(model_path , image , image_size , actmap_save_folder):
     cropped_height, cropped_weight = image_size
     sparse_cropped_images = fundus_processing.sparse_crop(image, cropped_height, cropped_weight, lr_flip=True,
                                                           ud_flip=True)
@@ -114,17 +114,19 @@ def eval_image_with_sparse_croppping(model_path , image , image_size , actmap_sa
     pred_1 = np.sum(pred[:, 1])
     mean_pred = (pred_0 / float(len(pred)) ,pred_1 / float(len(pred)))
     return mean_pred
-def eval_image_with_dense_croppping(model_path , image , image_size):
+def eval_image_with_dense_croppping(model_path , image , image_size , actmap_save_folder):
     pass;
 
 def eval_images(model_path , images , image_size , cropping_type , labels=None):
     mean_preds=[]
     assert  len(images) > 1
-    for image in images:
+    for i , image in enumerate(images):
         if cropping_type =='sparse':
-            mean_pred = eval_image_with_sparse_croppping(model_path, image, image_size)
+            mean_pred = eval_image_with_sparse_croppping(model_path, image, image_size,
+                                                         actmap_save_folder=os.path.join('./actmap' , str(i)))
         elif cropping_type == 'dense':
-            mean_pred = eval_image_with_dense_croppping(model_path, image, image_size)
+            mean_pred = eval_image_with_dense_croppping(model_path, image, image_size,
+                                                         actmap_save_folder=os.path.join('./actmap' , str(i)))
         else:
             raise AssertionError
         mean_preds.append(mean_pred)
@@ -143,7 +145,7 @@ if __name__ =='__main__':
                                                                                                        299, 299))
     model_path = './ensemble_models/step_21600_acc_0.848333358765/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
-    preds=eval_images(model_path ,  test_images , (224,224) )
+    preds=eval_images(model_path ,  test_images , (224,224)  , )
     print len(preds)
     print len(preds[:10])
 
