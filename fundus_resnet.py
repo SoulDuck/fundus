@@ -31,6 +31,7 @@ parser.add_argument('--bottlenect_factor' , type=int , default=4)
 parser.add_argument('--optimizer' ,type=str  , choices=['adam', 'sgd', 'momentum'])
 parser.add_argument('--l2_loss' , dest='use_l2_loss' ,action='store_true')
 parser.add_argument('--no_l2_loss' , dest='use_l2_loss' ,action='store_false')
+parser.add_argument('--max_iter' , type=int)
 args = parser.parse_args()
 
 """----------------------------------------------------------------------------------------------------------------
@@ -101,7 +102,7 @@ test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs
 test_imgs_labs = zip(test_imgs_list, test_labs_list)
 
 max_acc, min_loss = 0, 10000000
-for step in range( start_step, 100000 ):
+for step in range( start_step, args.max_iter ):
     lr = cnn.lr_schedule(step , args.lr_iters , args.lr_values)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
     rotate_imgs=map(  lambda batch_x : aug.random_rotate(batch_x), batch_xs)

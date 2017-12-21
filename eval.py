@@ -95,12 +95,43 @@ def eval(model_path ,test_images , batch_size  , save_root_folder='./actmap'):
     tf.reset_default_graph()
     print 'pred sample ',predList[:1]
     return np.asarray(predList)
+
+def eval_image_with_sparse_croppping(model_path , image , image_size):
+    cropped_height, cropped_weight = image_size
+    sparse_cropped_images = fundus_processing.sparse_crop(image, cropped_height, cropped_weight, lr_flip=True,
+                                                          ud_flip=True)
+    sparse_cropped_images = fundus_processing.add_padding(sparse_cropped_images, 299, 299)
+    #utils.plot_images(sparse_cropped_images)
+    pred = eval(model_path, sparse_cropped_images, batch_size=5, save_root_folder='./actmap')
+    pred_0 = np.sum(pred[:, 0])
+    pred_1 = np.sum(pred[:, 1])
+    mean_pred = (pred_0 / float(len(pred)) ,pred_1 / float(len(pred)))
+    return mean_pred
+def eval_image_with_dense_croppping(model_path , image , image_size):
+    pass;
+
+def eval_images(model_path , images , image_size , cropping_type):
+    assert  len(images) > 1
+    for image in images:
+        if cropping_type =='sparse':
+            mean_pred = eval_image_with_sparse_croppping(model_path, image, image_size)
+        elif cropping_type == 'dense':
+            mean_pred = eval_image_with_dense_croppping(model_path, image, image_size)
+        else:
+            raise AssertionError
+    return mean_pred
+
+
+#def get_cam_with_sparse_cropped_images()
 if __name__ =='__main__':
 
     train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300_debug',
                                                                                                        resize=(
                                                                                                        299, 299))
-    model_path ='./ensemble_models/step_21600_acc_0.848333358765/model'
+    model_path = './ensemble_models/step_21600_acc_0.848333358765/model'
+    mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
+
+    """
     sparse_cropped_images=fundus_processing.sparse_crop(test_images[0] , 224 ,224 ,lr_flip=True , ud_flip=True)
     print np.shape(sparse_cropped_images)
     print np.max(sparse_cropped_images)
@@ -114,3 +145,4 @@ if __name__ =='__main__':
     print pred_0/float(len(pred))
     print pred_1/float(len(pred))
     print np.shape(pred)
+    """

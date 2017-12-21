@@ -62,7 +62,7 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
         cam_img = cam_img.reshape([ori_img_h, ori_img_w])
         plt.imshow(cam_img, cmap=plt.cm.jet, alpha=0.5, interpolation='nearest',
                    vmin=0, vmax=1)
-        plt.show()
+        #plt.show()
         cmap = plt.cm.jet
         plt.imsave('{}/actmap_abnormal_label_0.png'.format(save_dir), cmap(cam_img))
         cam_img=Image.open('{}/actmap_abnormal_label_0.png'.format(save_dir))
@@ -81,7 +81,8 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
         #cam_img = Image.fromarray(cam_img.astype('uint8')).convert("RGBA")
         overlay_img = Image.blend(ori_img, cam_img, 0.5)
         plt.imshow(overlay_img)
-        plt.show()
+        plt.imsave('{}/overlay.png'.format(save_dir), overlay_img)
+        #plt.show()
         plt.close();
         """
         if test_imgs.shape[-1] == 1:  # grey
