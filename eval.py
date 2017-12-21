@@ -72,7 +72,7 @@ def eval(model_path ,test_images , batch_size  , save_root_folder='./actmap'):
         logits = tf.get_default_graph().get_tensor_by_name('y_conv:0')
     cam_ = tf.get_default_graph().get_tensor_by_name('classmap:0')
     cam.inspect_cam(sess, cam_, top_conv, test_images, test_labels, x_, y_, is_training_, logits,
-                    savedir_root='./actmap')
+                    savedir_root=save_root_folder)
 
     #def inspect_cam(sess, cam , top_conv , test_imgs, test_labs, global_step , x_ , y_ , phase_train , y  , savedir='actmap'):
     """
