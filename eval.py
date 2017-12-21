@@ -110,7 +110,8 @@ def eval_image_with_sparse_croppping(model_path , image , image_size):
 def eval_image_with_dense_croppping(model_path , image , image_size):
     pass;
 
-def eval_images(model_path , images , image_size , cropping_type):
+def eval_images(model_path , images , image_size , cropping_type , labels=None):
+    mean_preds=[]
     assert  len(images) > 1
     for image in images:
         if cropping_type =='sparse':
@@ -119,7 +120,12 @@ def eval_images(model_path , images , image_size , cropping_type):
             mean_pred = eval_image_with_dense_croppping(model_path, image, image_size)
         else:
             raise AssertionError
-    return mean_pred
+        mean_preds.append(mean_pred)
+    mean_preds=np.asarray(mean_preds)
+    if not labels is None:
+        acc = utils.get_acc(pred=mean_preds, labels=labels)
+    return mean_preds, acc
+
 
 
 #def get_cam_with_sparse_cropped_images()
