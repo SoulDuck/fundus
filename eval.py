@@ -137,6 +137,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
 
     if not labels is None:
         acc = utils.get_acc(true=labels,pred=mean_preds )
+        print acc
     return mean_preds, acc
 
 
