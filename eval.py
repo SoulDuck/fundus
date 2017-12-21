@@ -129,8 +129,10 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
                                                          actmap_save_folder=os.path.join('./actmap' , str(i)))
         else:
             raise AssertionError
+        print mean_preds
         mean_preds.append(mean_pred)
     mean_preds=np.asarray(mean_preds)
+
     if not labels is None:
         acc = utils.get_acc(pred=mean_preds, labels=labels)
     return mean_preds, acc
