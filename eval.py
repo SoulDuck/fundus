@@ -105,7 +105,7 @@ def eval(model_path ,test_images , batch_size  , actmap_save_root_folder='./actm
 
 def eval_image_with_sparse_croppping(model_path , image , image_size , actmap_save_folder):
     cropped_height, cropped_weight = image_size
-    sparse_cropped_images = fundus_processing.sparse_crop(image, cropped_height, cropped_weight, lr_flip=True,
+    sparse_cropped_images = fundus_processing.sparse_crop(image, cropped_height, cropped_weight, lr_flip=False,
                                                           ud_flip=False)
     sparse_cropped_images = fundus_processing.add_padding(sparse_cropped_images, 299, 299)
     #utils.plot_images(sparse_cropped_images)
