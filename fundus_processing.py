@@ -156,9 +156,9 @@ def sparse_crop(image , crop_height , crop_width ,lr_flip =False, ud_flip=False 
         lr_ud_flip_cropped_images = np.flip(ud_flip_cropped_images , axis=2)
         cropped_images = np.vstack((cropped_images , lr_ud_flip_cropped_images))
 
+    utils.plot_images(cropped_images)
     if lr_flip != False and ud_flip !=False:
         cropped_images= ori_cropped_images
-    utils.plot_images(cropped_images)
     return cropped_images
 
 
