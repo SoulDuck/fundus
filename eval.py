@@ -145,7 +145,7 @@ if __name__ =='__main__':
                                                                                                        299, 299))
     model_path = './ensemble_models/step_21600_acc_0.848333358765/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
-    preds=eval_images(model_path ,  test_images , (224,224)  , )
+    preds=eval_images(model_path ,  test_images , (224,224) , test_labels)
     print len(preds)
     print len(preds[:10])
 
