@@ -100,7 +100,7 @@ def eval(model_path ,test_images , batch_size  , save_root_folder='./actmap'):
         predList.extend(pred)
     assert len(predList) == len(test_images) , 'n pred list : {} n test images : {}'.format(len(predList) , len(test_images))
     tf.reset_default_graph()
-    print 'pred sample ',predList[:1]
+    #print 'pred sample ',predList[:1]
     return np.asarray(predList)
 
 def eval_image_with_sparse_croppping(model_path , image , image_size , actmap_save_folder):

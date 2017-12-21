@@ -70,9 +70,6 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
         cam_img=cam_img.resize((224,224) , PIL.Image.ANTIALIAS)
         np_cam_img=np.asarray(cam_img) #img 2 numpy
         np_cam_img=fundus_processing.add_padding(np_cam_img.reshape(1,224,224,-1) , 299,299) # padding
-        print np.shape(np_cam_img)
-        print np.max(np_cam_img)
-        print np.min(np_cam_img)
         cam_img = Image.fromarray(
             np_cam_img.reshape([ori_img_h, ori_img_w , 4 ]).astype('uint8'))  # padding#numpy 2 img
 

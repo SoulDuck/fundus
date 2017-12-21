@@ -38,10 +38,7 @@ def add_padding(images , padded_images_height ,padded_images_width ):
     h_gap = (padded_images_height - ori_img_h) / 2
     w_gap = (padded_images_width - ori_img_w) / 2
     #element wise sum bg with images
-    print np.shape(images)
     bg[: , h_gap : h_gap+ori_img_h , w_gap : w_gap +ori_img_w , :] = images
-    print np.shape(bg)
-    #print np.shape(padded_images)
 
     return bg
 
