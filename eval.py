@@ -120,7 +120,9 @@ def eval_image_with_dense_croppping(model_path , image , image_size , actmap_sav
 def eval_images(model_path , images , image_size , cropping_type , labels=None ):
     mean_preds=[]
     assert  len(images) > 1
+    print 'n images : {} '.format(len(images))
     for i , image in enumerate(images):
+
         if cropping_type =='sparse':
             mean_pred = eval_image_with_sparse_croppping(model_path, image, image_size,
                                                          actmap_save_folder=os.path.join('./actmap' , str(i)))
