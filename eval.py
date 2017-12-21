@@ -1,4 +1,10 @@
 #-*- coding: utf-8 -*-
+import matplotlib
+import os
+if "DISPLAY" not in os.environ:
+    # remove Travis CI Error
+    matplotlib.use('Agg')
+
 import tensorflow as tf
 import cam
 import numpy as np
@@ -6,6 +12,7 @@ import os
 import utils
 import data
 import fundus_processing
+
 ## for mnist dataset ##
 #from tensorflow.examples.tutorials.mnist import input_data
 #mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
