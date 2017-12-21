@@ -130,16 +130,16 @@ def sparse_crop(image , crop_height , crop_width ,lr_flip =False, ud_flip=False 
     down_middle_crop_image = image[-crop_height: , w_gap: w_gap + crop_width, :]
 
     ori_cropped_images.append(up_left_crop_image )
-    ori_cropped_images.append(up_right_crop_image)
     ori_cropped_images.append(up_middle_crop_image)
+    ori_cropped_images.append(up_right_crop_image)
 
     ori_cropped_images.append(central_left_crop_image)
-    ori_cropped_images.append(central_right_crop_image)
     ori_cropped_images.append(central_crop_image)
+    ori_cropped_images.append(central_right_crop_image)
 
     ori_cropped_images.append(down_left_crop_image)
-    ori_cropped_images.append(down_right_crop_image)
     ori_cropped_images.append(down_middle_crop_image)
+    ori_cropped_images.append(down_right_crop_image)
 
     ori_cropped_images=np.asarray(ori_cropped_images)
     if lr_flip:
