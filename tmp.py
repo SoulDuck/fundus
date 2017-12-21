@@ -15,7 +15,6 @@ n_classes = 2
 aug.random_rotate_image(train_imgs[:60])
 
 """ image resize and crop test"""
-
 img=test_imgs[0:1]
 tf_ori_img=tf.Variable(img)
 tf_img=tf.image.resize_image_with_crop_or_pad(tf_ori_img , 224, 224)
@@ -192,3 +191,4 @@ plt.show()
 
 
 #tf.image.
+

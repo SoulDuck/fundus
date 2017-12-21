@@ -220,6 +220,6 @@ if __name__ == '__main__':
     """
     model_list=['step_13600_acc_0.840000033379' ,'step_14600_acc_0.841666817665' ,'step_15900_acc_0.843333363533']
     print model_list
-
-
     """
+
+
