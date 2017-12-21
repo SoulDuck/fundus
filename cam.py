@@ -41,13 +41,12 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
             pass;
         ori_img = test_imgs[s]
         if ori_img.shape[-1]==1: #gray image
-            if np.max(ori_img) < 1:
-                plt.imsave('{}/image_test.png'.format(save_dir) ,ori_img.reshape([ori_img_h , ori_img_w]))/255.
-            else:
-                plt.imsave('{}/image_test.png'.format(save_dir), ori_img.reshape([ori_img_h, ori_img_w]))
+            plt.imsave('{}/image_test.png'.format(save_dir), ori_img.reshape([ori_img_h, ori_img_w]))
         else :
-            plt.imsave('{}/image_test.png'.format(save_dir), ori_img)
-
+            if np.max(ori_img) > 1:
+                plt.imsave('{}/image_test.png'.format(save_dir), ori_img/255.)
+            else:
+                plt.imsave('{}/image_test.png'.format(save_dir), ori_img/255.)
         if labels is None: #만약 어디 class의 activation map 을 볼지 지정하지 않는다면 test_labels(정답)의 라벨을 본다
             label = test_labs[s:s+1]
         else :

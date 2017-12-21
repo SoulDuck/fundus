@@ -105,12 +105,9 @@ if __name__ =='__main__':
     print np.shape(sparse_cropped_images)
     print np.max(sparse_cropped_images)
     sparse_cropped_images=fundus_processing.add_padding(sparse_cropped_images , 299 ,299 )
-
-    sparse_cropped_images=sparse_cropped_images.astype(np.int32)
     print np.shape(sparse_cropped_images)
     print np.max(sparse_cropped_images)
     utils.plot_images(sparse_cropped_images)
-    exit()
     pred=eval(model_path, sparse_cropped_images , batch_size=5 , save_root_folder='./actmap')
     pred_0 = np.sum(pred[:, 0])
     pred_1 = np.sum(pred[:, 1])
