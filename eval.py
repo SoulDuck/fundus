@@ -132,6 +132,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
     mean_preds=[]
     assert  len(images) > 1
     print 'n images : {} '.format(len(images))
+
     for i , image in enumerate(images):
 
         if cropping_type =='sparse':
@@ -143,6 +144,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
         elif cropping_type =='central':
              mean_pred = np.squeeze(
                 eval(model_path, image, batch_size=1, actmap_save_root_folder=os.path.join('./actmap', str(i))))
+             #이걸 너무 느리다  batch size  만큼 수정하게 해야 한다
 
 
         else:
@@ -163,10 +165,10 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
 #def get_cam_with_sparse_cropped_images()
 if __name__ =='__main__':
 
-    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300',
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300_debug',
                                                                                                        resize=(
                                                                                                        299, 299))
-    model_path = './ensemble_models/step_11400_acc_0.846666693687/model'
+    model_path = './ensemble_models/alexnet_step_312700_acc_0.849180327869/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
     preds=eval_images(model_path ,  test_images , (224,224) , 'central',test_labels)
 
