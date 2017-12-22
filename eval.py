@@ -157,7 +157,7 @@ def merge_all_cam(images):
 #def get_cam_with_sparse_cropped_images()
 if __name__ =='__main__':
 
-    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300_debug',
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300',
                                                                                                        resize=(
                                                                                                        299, 299))
     model_path = './ensemble_models/step_11400_acc_0.846666693687/model'
