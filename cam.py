@@ -59,8 +59,17 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
 
         cam_=np.asarray((map(lambda x: (x-x.min())/(x.max()-x.min()) , cam_))) #-->why need this?
 
-        cam_img = cam_.reshape(cropped_img_size)
-        cam_img = cam_img.reshape(cropped_img_size) # why need this?
+
+        #기존의 class activation map을 뽑을때 실수를 해서
+        #299, 299 사이즈로 activation map을 biinear interpolation 을 했다
+        # 그래서 기존의 것과 같이 쓸수 잇도록 수정한다
+        try:
+            cam_img = cam_.reshape((ori_img_h, ori_img_w))
+            cam_img = cam_img.reshape((ori_img_h, ori_img_w)) # why need this?
+        except:
+            cam_img = cam_.reshape(cropped_img_size)
+            cam_img = cam_img.reshape(cropped_img_size)  # why need this?
+
         plt.imshow(cam_img, cmap=plt.cm.jet, alpha=0.5, interpolation='nearest',
                    vmin=0, vmax=1)
         #plt.show()
