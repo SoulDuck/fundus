@@ -141,11 +141,16 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
             mean_pred = eval_image_with_dense_croppping(model_path, image, image_size,
                                                          actmap_save_folder=os.path.join('./actmap' , str(i)))
         elif cropping_type =='central':
-            mean_pred = eval(model_path, image, batch_size=1, actmap_save_root_folder=os.path.join('./actmap', str(i)))
+            mean_pred = np.squeeze(
+                eval(model_path, image, batch_size=1, actmap_save_root_folder=os.path.join('./actmap', str(i))))
+
+
         else:
             raise AssertionError
         print mean_pred
+        print np.shape(mean_pred)
         mean_preds.append(mean_pred)
+
     mean_preds=np.asarray(mean_preds)
 
     if not labels is None:
@@ -163,9 +168,10 @@ if __name__ =='__main__':
                                                                                                        299, 299))
     model_path = './ensemble_models/step_11400_acc_0.846666693687/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
-    preds=eval_images(model_path ,  test_images[:10] , (224,224) , 'central',test_labels[:10])
+    preds=eval_images(model_path ,  test_images , (224,224) , 'central',test_labels)
+
     print len(preds)
-    print len(preds[:10])
+    print len(preds[:2])
 
 
     """
