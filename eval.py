@@ -132,28 +132,26 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
     mean_preds=[]
     assert  len(images) > 1
     print 'n images : {} '.format(len(images))
+    if cropping_type == 'central':
+        mean_pred = np.squeeze(
+            mean_preds=eval(model_path, images, batch_size=60, actmap_save_root_folder=os.path.join('./actmap', 'central')))
+        # 이걸 너무 느리다  batch size  만큼 수정하게 해야 한다
+    else:
+        for i , image in enumerate(images):
 
-    for i , image in enumerate(images):
+            if cropping_type =='sparse':
+                mean_pred = eval_image_with_sparse_croppping(model_path, image, image_size,
+                                                             actmap_save_folder=os.path.join('./actmap' , str(i)))
+            elif cropping_type == 'dense':
+                mean_pred = eval_image_with_dense_croppping(model_path, image, image_size,
+                                                             actmap_save_folder=os.path.join('./actmap' , str(i)))
+            elif cropping_type =='central':
+                raise AssertionError
+            print mean_pred
+            print np.shape(mean_pred)
+            mean_preds.append(mean_pred)
 
-        if cropping_type =='sparse':
-            mean_pred = eval_image_with_sparse_croppping(model_path, image, image_size,
-                                                         actmap_save_folder=os.path.join('./actmap' , str(i)))
-        elif cropping_type == 'dense':
-            mean_pred = eval_image_with_dense_croppping(model_path, image, image_size,
-                                                         actmap_save_folder=os.path.join('./actmap' , str(i)))
-        elif cropping_type =='central':
-             mean_pred = np.squeeze(
-                eval(model_path, image, batch_size=1, actmap_save_root_folder=os.path.join('./actmap', str(i))))
-             #이걸 너무 느리다  batch size  만큼 수정하게 해야 한다
-
-
-        else:
-            raise AssertionError
-        print mean_pred
-        print np.shape(mean_pred)
-        mean_preds.append(mean_pred)
-
-    mean_preds=np.asarray(mean_preds)
+        mean_preds=np.asarray(mean_preds)
 
     if not labels is None:
         acc = utils.get_acc(true=labels,pred=mean_preds )
@@ -168,7 +166,10 @@ if __name__ =='__main__':
     train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300_debug',
                                                                                                        resize=(
                                                                                                        299, 299))
+    model_path = './ensemble_models/bottlenect_fc_16@3_32@4_64@6_128@3_no_color_aug_bf_4_l2loss_rotateAug_adam/model'
     model_path = './ensemble_models/alexnet_step_312700_acc_0.849180327869/model'
+    model_path = './ensemble_models/residual_fc_16@2_32@2_64@2_128@2_no_color_aug_2/model'
+    model_path = './ensemble_models/5556_resnet_step_47800_acc_0.84262295082/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
     preds=eval_images(model_path ,  test_images , (224,224) , 'central',test_labels)
 
