@@ -106,6 +106,7 @@ class Resnet(object):
             logit=affine('fc', x, out_ch=self.n_classes)
         else :
             print 'Not Implemneted , Sorry '
+            raise AssertionError
         logit=tf.identity(logit , 'logit')
         return logit
 
@@ -113,11 +114,25 @@ class Resnet(object):
 
 if __name__ =='__main__':
     phase_train = tf.placeholder(dtype=tf.bool , name='phase_train')
-    x_ = tf.placeholder(dtype = tf.float32 , shape = [None , 32, 32 ,3 ] , name = 'x_')
+    x_ = tf.placeholder(dtype = tf.float32 , shape = [None , 32, 32 ,3 ] )
+    y_ = tf.placeholder(dtype=tf.float32, shape=[None, 32, 32, 3])
+    print x_
+    print y_
+
     n_filters_per_box = [16,16,32,32]
     n_blocks_per_box = [5,5,5,5]
     stride_per_box= [5, 5, 5, 5]
     use_bottlenect = True
     model=Resnet(x_ , phase_train , n_filters_per_box , n_blocks_per_box , stride_per_box , \
                   use_bottlenect , n_classes=2 , activation=tf.nn.relu  , logit_type='gap' )
-    print model.logit
+
+
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    saver = tf.train.Saver(max_to_keep=10000000)
+    last_model_saver = tf.train.Saver(max_to_keep=1)
+    sess = tf.Session(config=config)
+    init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+    sess.run(init)
+    ##3
+    ###

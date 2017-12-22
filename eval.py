@@ -57,14 +57,21 @@ def eval(model_path ,test_images , batch_size  , actmap_save_root_folder='./actm
 
     saver = tf.train.import_meta_graph(meta_graph_or_file=model_path+'.meta') #example model path ./models/fundus_300/5/model_1.ckpt
     saver.restore(sess, save_path=model_path) # example model path ./models/fundus_300/5/model_1.ckpt
+    try:
+        x_ = tf.get_default_graph().get_tensor_by_name('x_:0')
+    except :
+        x_ = tf.get_default_graph().get_tensor_by_name('Placeholder:0')
+    try:
+        y_ = tf.get_default_graph().get_tensor_by_name('y_:0')
+    except:
+        y_ = tf.get_default_graph().get_tensor_by_name('Placeholder_1:0')
 
-    x_ = tf.get_default_graph().get_tensor_by_name('x_:0')
-    y_ = tf.get_default_graph().get_tensor_by_name('y_:0')
     pred_ = tf.get_default_graph().get_tensor_by_name('softmax:0')
     try:
         is_training_=tf.get_default_graph().get_tensor_by_name('is_training:0')
     except:
         is_training_ = tf.get_default_graph().get_tensor_by_name('phase_train:0')
+
     top_conv = tf.get_default_graph().get_tensor_by_name('top_conv:0')
     try:
         logits = tf.get_default_graph().get_tensor_by_name('logits:0')
@@ -150,10 +157,10 @@ def merge_all_cam(images):
 #def get_cam_with_sparse_cropped_images()
 if __name__ =='__main__':
 
-    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300',
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300_debug',
                                                                                                        resize=(
                                                                                                        299, 299))
-    model_path = './ensemble_models/step_21600_acc_0.848333358765/model'
+    model_path = './ensemble_models/step_11400_acc_0.846666693687/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
     preds=eval_images(model_path ,  test_images[:] , (224,224) , 'sparse',test_labels[:])
     print len(preds)

@@ -21,7 +21,7 @@ def get_class_map(name,x , label , im_width):
     return classmap
 
 def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, logit, savedir_root='actmap',
-                    labels=None):
+                    labels=None , cropped_img_size = (224,224)):
 
     debug_flag=False
     assert np.ndim(test_imgs) ==4 , "test_imgs's rank must be 4 , test_imgs rank :{}".format(np.ndim(test_imgs))
@@ -59,8 +59,8 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
 
         cam_=np.asarray((map(lambda x: (x-x.min())/(x.max()-x.min()) , cam_))) #-->why need this?
 
-        cam_img = cam_.reshape([ori_img_h, ori_img_w])
-        cam_img = cam_img.reshape([ori_img_h, ori_img_w])
+        cam_img = cam_.reshape(cropped_img_size)
+        cam_img = cam_img.reshape(cropped_img_size) # why need this?
         plt.imshow(cam_img, cmap=plt.cm.jet, alpha=0.5, interpolation='nearest',
                    vmin=0, vmax=1)
         #plt.show()

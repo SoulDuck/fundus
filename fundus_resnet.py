@@ -14,6 +14,7 @@ import argparse
 # (relu, relu6, crelu and relu_x), and random regularization (dropout).
 # parser.add_argument('--dataset', '-ds' , type=str , choices=['C10', 'C10+', 'C100' , 'C100+' , 'SVHN' , 'Fundus' ] , default='C10')
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--bottlenect', dest='use_bottlenect', action='store_true')
 parser.add_argument('--no_bottlenect', dest='use_bottlenect', action='store_false')
@@ -40,13 +41,13 @@ args = parser.parse_args()
 # tensorboard
 # model save
 # run training using global step
-train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300' , save_dir_name=args.ckpt_dir)
+train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug' , save_dir_name=args.ckpt_dir)
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
 n_classes = 2
 
-x_ = tf.placeholder(dtype=tf.float32, shape=[None, 299, 299, 3])
-y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes])
+x_ = tf.placeholder(dtype=tf.float32, shape=[None, 299, 299, 3] , name='x_')
+y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes] , name='y_')
 lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
 aug_x_ = aug.aug_tensor_images(x_, phase_train, img_size_cropped=224 , color_aug=args.use_color_aug)
