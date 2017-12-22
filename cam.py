@@ -98,6 +98,36 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
         """
 
 
+def merge_all_cam(images):
+    n, cropped_h, cropped_w, ch = np.shape(images)
+    merged_image = np.zeros(299, 299, 3)
+    gap_h = int(299 - cropped_h / 2)
+    gap_w = int(299 - cropped_w / 2)
+
+    merged_image[:cropped_h, :cropped_w, :] += images[0]
+    merged_image[:cropped_h, -cropped_w:, :] += images[2]
+
+
+if __name__ == '__main__':
+    images=[]
+    left_top = np.asarray(
+        Image.open('/Users/seongjungkim/PycharmProjects/fundus/actmap/sample/left_top.png').convert('RGB'))
+    right_top = np.asarray(
+        Image.open('/Users/seongjungkim/PycharmProjects/fundus/actmap/sample/right_top.png').convert('RGB'))
+
+    merged = np.add(left_top , right_top)
+    images.append(left_top)
+
+    images.append(right_top)
+    images.append(merged)
+    print np.max(merged)
+    print np.max(right_top)
+    plt.imshow(merged)
+    plt.show()
+    print np.shape(np.asarray(images))
+
+
+
 """
 def eval_inspect_cam(sess, cam , top_conv ,test_imgs , x, y_ ,phase_train, y , savedir_root):
     ABNORMAL_LABEL =np.asarray([[0,1]])

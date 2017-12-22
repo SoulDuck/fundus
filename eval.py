@@ -49,6 +49,10 @@ def eval(model_path ,test_images , batch_size  , actmap_save_root_folder='./actm
     :return:
     """
     print 'eval'
+    if len(np.shape(test_images)) ==3:
+        h,w,ch=np.shape(test_images)
+        test_images=test_images.reshape([1,h,w,ch])
+
     b,h,w,c=np.shape(test_images)
 
     if np.max(test_images) > 1:
@@ -136,6 +140,8 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
         elif cropping_type == 'dense':
             mean_pred = eval_image_with_dense_croppping(model_path, image, image_size,
                                                          actmap_save_folder=os.path.join('./actmap' , str(i)))
+        elif cropping_type =='central':
+            mean_pred = eval(model_path, image, batch_size=1, actmap_save_root_folder=os.path.join('./actmap', str(i)))
         else:
             raise AssertionError
         print mean_pred
@@ -147,22 +153,17 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
         print acc
     return mean_preds, acc
 
-def merge_all_cam(images):
-    n , cropped_h, cropped_w , ch  =np.shape(images)
-    merged_image=np.zeros(299,299,3)
-    merged_image[:cropped_h  , :cropped_w , :] += images[0]
-    merged_image[:cropped_h, -cropped_w:, :] += images[2]
 
 
 #def get_cam_with_sparse_cropped_images()
 if __name__ =='__main__':
 
-    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300',
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300_debug',
                                                                                                        resize=(
                                                                                                        299, 299))
     model_path = './ensemble_models/step_11400_acc_0.846666693687/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
-    preds=eval_images(model_path ,  test_images[:] , (224,224) , 'sparse',test_labels[:])
+    preds=eval_images(model_path ,  test_images[:10] , (224,224) , 'central',test_labels[:10])
     print len(preds)
     print len(preds[:10])
 
