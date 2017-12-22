@@ -141,7 +141,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
             mean_pred = eval_image_with_dense_croppping(model_path, image, image_size,
                                                          actmap_save_folder=os.path.join('./actmap' , str(i)))
         elif cropping_type =='central':
-            mean_pred = np.squeeze(
+             mean_pred = np.squeeze(
                 eval(model_path, image, batch_size=1, actmap_save_root_folder=os.path.join('./actmap', str(i))))
 
 
