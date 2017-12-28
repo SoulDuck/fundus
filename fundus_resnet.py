@@ -18,7 +18,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--bottlenect', dest='use_bottlenect', action='store_true')
 parser.add_argument('--no_bottlenect', dest='use_bottlenect', action='store_false')
-parser.add_argument('--ckpt_dir')
+parser.add_argument('--ckpt_dir' , type=str)
 parser.add_argument('--n_filters_per_box', nargs='+', type=int, default=[8, 16, 32, 64])
 parser.add_argument('--n_blocks_per_box', nargs='+', type=int, default=[2, 2, 2, 2])
 parser.add_argument('--stride_per_box', nargs='+', type=int, default=[2, 2, 2, 2])
