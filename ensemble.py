@@ -37,7 +37,6 @@ def get_ensemble_actmap(model_list, actmap_folder):
     tmp_path = os.path.join(actmap_folder, model_list[0])
     _, subfolders, files = os.walk(tmp_path).next()
     act_imgs = []
-    act_imgs = []
     for subfolder in subfolders:
         for i, model in enumerate(model_list):
             print model
@@ -91,6 +90,17 @@ def get_models_paths(dir_path):
 
 
 def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_root_folder='./actmap'):
+    """
+
+    usage:
+    get all combination of models that saved [save_root_folder]
+
+    :param model_paths: 모델이 저장된 장소 입니다
+    :param test_images: 테스트 이미지
+    :param test_labels: 테스트 라벨
+    :param save_root_folder: activation map 이 저장될 장소 입니다
+    :return:
+    """
     max_acc = 0
     max_pred = None
     max_list = []
@@ -102,7 +112,6 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_r
             name = path.split('/')[-1]
             print 'path : ', path
             print 'name : ', name
-
             path = os.path.join(path, 'model')
             # ./models/vgg_11/step_12500_acc_0.841666698456 --> ./models/vgg_11/step_12500_acc_0.841666698456/model
             # activation 이 저장될 세이브 장소를 만든다

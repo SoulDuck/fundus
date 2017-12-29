@@ -111,6 +111,10 @@ class Resnet(object):
         return logit
 
 
+class wide_resnet(object):
+    def __init__(self):
+        pass;
+
 
 if __name__ =='__main__':
     phase_train = tf.placeholder(dtype=tf.bool , name='phase_train')
