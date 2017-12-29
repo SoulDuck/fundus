@@ -188,7 +188,7 @@ if __name__ == '__main__':
     models_paths = get_models_paths(args.models_path)
     print 'number of model paths : {}'.format(len(models_paths))
     train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1(
-        './fundus_300_debug', resize=(299, 299))
+        './fundus_300', resize=(299, 299))
 
     acc, max_list, pred = ensemble_with_all_combibation(models_paths, test_images, test_labels)
     np.save('./best_preds', pred)

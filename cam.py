@@ -23,6 +23,8 @@ def get_class_map(name,x , label , im_width):
 def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, logit, savedir_root='actmap',
                     labels=[[0,1]] , cropped_img_size = (224,224)):
 
+
+
     debug_flag=False
     assert np.ndim(test_imgs) ==4 , "test_imgs's rank must be 4 , test_imgs rank :{}".format(np.ndim(test_imgs))
     num_images, ori_img_h, ori_img_w, ori_img_ch = np.shape(test_imgs)
