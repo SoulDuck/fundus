@@ -115,7 +115,7 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_r
             # 파일 경로는 ./activation_map/model_name/
             if not os.path.isdir(save_root_folder):
                 os.mkdir(save_root_folder)
-            tmp_pred = eval.eval(path, test_images, None ,  batch_size=60, actmap_save_root_folder = save_root_folder)
+            tmp_pred = eval.eval(path, test_images, batch_size=60, actmap_save_root_folder=save_root_folder)
             utils.get_acc(test_labels , tmp_pred)
 
             print 'tmp_pred', tmp_pred
