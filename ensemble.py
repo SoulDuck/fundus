@@ -7,10 +7,10 @@ from skimage import color
 from skimage import io
 
 import matplotlib
-if "DISPLAY" not in os.environ:
-    # remove Travis CI Error
-    print 'DISPLAY not in this enviroment'
-    matplotlib.use('Agg')
+#if "DISPLAY" not in os.environ:
+#    # remove Travis CI Error
+#    print 'DISPLAY not in this enviroment'
+#    matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import eval
