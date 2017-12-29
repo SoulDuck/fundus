@@ -36,10 +36,8 @@ def inspect_cam(sess, cam, top_conv, test_imgs, test_labs, x_, y_, phase_train, 
     for s in range(num_images):
         utils.show_progress(s , num_images)
         save_dir=os.path.join(savedir_root ,'img_{}'.format(s))
-        try:
+        if not os.path.isdir(save_dir):
             os.mkdir(save_dir);
-        except Exception:
-            pass;
         ori_img = test_imgs[s]
         if ori_img.shape[-1]==1: #gray image
             plt.imsave('{}/image_test.png'.format(save_dir), ori_img.reshape([ori_img_h, ori_img_w]))
