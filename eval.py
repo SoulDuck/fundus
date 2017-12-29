@@ -40,7 +40,7 @@ def get_acc(preds , trues):
 
 
 
-def eval(model_path ,test_images , batch_size  , actmap_save_root_folder='./actmap'):
+def eval(model_path ,test_images , test_labels , batch_size  , actmap_save_root_folder='./actmap' , ):
     """
     :param model_path:
     :param test_images:
@@ -120,7 +120,7 @@ def eval_image_with_sparse_croppping(model_path , image , image_size , actmap_sa
                                                           ud_flip=False)
     sparse_cropped_images = fundus_processing.add_padding(sparse_cropped_images, 299, 299)
     #utils.plot_images(sparse_cropped_images)
-    pred = eval(model_path, sparse_cropped_images, batch_size=5, actmap_save_root_folder=actmap_save_folder)
+    pred = eval(model_path, sparse_cropped_images,batch_size=5, actmap_save_root_folder=actmap_save_folder)
     pred_0 = np.sum(pred[:, 0])
     pred_1 = np.sum(pred[:, 1])
     mean_pred = (pred_0 / float(len(pred)) ,pred_1 / float(len(pred)))
@@ -134,7 +134,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
     print 'n images : {} '.format(len(images))
     if cropping_type == 'central':
         mean_pred = np.squeeze(
-            mean_preds=eval(model_path, images, batch_size=60, actmap_save_root_folder=os.path.join('./actmap', 'central')))
+            mean_preds=eval(model_path, images,batch_size=60, actmap_save_root_folder=os.path.join('./actmap', 'central')))
         # 이걸 너무 느리다  batch size  만큼 수정하게 해야 한다
     else:
         for i , image in enumerate(images):

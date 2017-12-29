@@ -2,6 +2,7 @@
 import tensorflow as tf
 from PIL import Image
 import numpy as np
+import utils
 import os, glob
 from skimage import color
 from skimage import io
@@ -115,6 +116,8 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_r
             if not os.path.isdir(save_root_folder):
                 os.mkdir(save_root_folder)
             tmp_pred = eval.eval(path, test_images, batch_size=60, actmap_save_root_folder = save_root_folder)
+            utils.get_acc(test_labels , tmp_pred)
+
             print 'tmp_pred', tmp_pred
             pred_dic[path] = tmp_pred
         # pred_model_path_list=zip(pred_list , model_paths)
