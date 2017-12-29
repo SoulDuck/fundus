@@ -17,10 +17,13 @@ import fundus_processing
 #from tensorflow.examples.tutorials.mnist import input_data
 #mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 """
+
 train_imgs = mnist.train.images.reshape([-1,28,28,1])
 train_labs = mnist.train.labels
 test_imgs = mnist.test.images.reshape([-1,28,28,1])
 test_labs = mnist.test.labels
+
+
 """
 #for Fundus_300
 def get_acc(preds , trues):
@@ -82,7 +85,7 @@ def eval(model_path ,test_images , batch_size  , actmap_save_root_folder='./actm
     except:
         logits = tf.get_default_graph().get_tensor_by_name('y_conv:0')
     cam_ = tf.get_default_graph().get_tensor_by_name('classmap:0')
-    cam.inspect_cam(sess, cam_, top_conv, test_images, test_labels , x_, y_, is_training_, logits,
+    cam.inspect_cam(sess, cam_, top_conv, test_images, None , x_, y_, is_training_, logits,
                     savedir_root=actmap_save_root_folder)
 
 
