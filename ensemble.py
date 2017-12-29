@@ -115,7 +115,7 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_r
             # 파일 경로는 ./activation_map/model_name/
             if not os.path.isdir(save_root_folder):
                 os.mkdir(save_root_folder)
-            tmp_pred = eval.eval(path, test_images, batch_size=60, actmap_save_root_folder = save_root_folder)
+            tmp_pred = eval.eval(path, test_images, None ,  batch_size=60, actmap_save_root_folder = save_root_folder)
             utils.get_acc(test_labels , tmp_pred)
 
             print 'tmp_pred', tmp_pred
@@ -177,28 +177,6 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_r
     f.flush()
 
     return acc, max_list, max_pred
-
-
-def ensemble(model_paths, test_images):
-    """
-    :param models:
-    :return:
-
-    """
-
-    path, subdir_names, _ = os.walk(model_paths).next()
-    subdir_paths = map(lambda name: os.path.join(path, name), subdir_names)
-    print 'model saved folder paths : {}'.format(subdir_paths)
-
-    for i, subdir_path in enumerate(subdir_paths):
-        pred = eval.eval(subdir_path, test_images)
-        if i == 0:
-            pred_sum = pred
-        else:
-            pred_sum += pred
-    pred_sum = pred_sum / float(i + 1)
-
-    return pred_sum
 
 
 if __name__ == '__main__':
