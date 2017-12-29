@@ -40,7 +40,7 @@ def get_acc(preds , trues):
 
 
 
-def eval(model_path ,test_images , test_labels , batch_size  , actmap_save_root_folder='./actmap' , ):
+def eval(model_path ,test_images , batch_size  , actmap_save_root_folder='./actmap' , ):
     """
     :param model_path:
     :param test_images:
