@@ -146,7 +146,7 @@ def eval_image_with_sparse_croppping(model_path , image , label , image_size , a
 def eval_image_with_dense_croppping(model_path , image , image_size , actmap_save_folder):
     pass;
 
-def eval_images(model_path , images , labels, image_size , cropping_type , labels=None ):
+def eval_images(model_path , images , image_size , cropping_type , labels=None ):
     mean_preds=[]
     assert  len(images) > 1
     print 'n images : {} '.format(len(images))
