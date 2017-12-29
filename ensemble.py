@@ -112,7 +112,8 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_r
             # ./models/vgg_11/step_12500_acc_0.841666698456 --> ./models/vgg_11/step_12500_acc_0.841666698456/model
             # activation 이 저장될 세이브 장소를 만든다
             # 파일 경로는 ./activation_map/model_name/
-            os.mkdir(save_root_folder)
+            if not os.path.isdir(save_root_folder):
+                os.mkdir(save_root_folder)
             tmp_pred = eval.eval(path, test_images, batch_size=60, save_root_folder=save_root_folder)
             print 'tmp_pred', tmp_pred
             pred_dic[path] = tmp_pred
