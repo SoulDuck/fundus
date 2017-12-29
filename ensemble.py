@@ -116,8 +116,7 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_r
             if not os.path.isdir(save_root_folder):
                 os.mkdir(save_root_folder)
             tmp_pred = eval.eval(path, test_images, batch_size=60, actmap_save_root_folder=save_root_folder)
-            utils.get_acc(test_labels , tmp_pred)
-
+            #utils.get_acc(test_labels , tmp_pred)
             print 'tmp_pred', tmp_pred
             pred_dic[path] = tmp_pred
         # pred_model_path_list=zip(pred_list , model_paths)
@@ -184,10 +183,12 @@ if __name__ == '__main__':
     parser.add_argument('--models_path')
     args = parser.parse_args()
 
+    args.models_path='./ensemble_models'
+
     models_paths = get_models_paths(args.models_path)
     print 'number of model paths : {}'.format(len(models_paths))
     train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1(
-        './fundus_300', resize=(299, 299))
+        './fundus_300_debug', resize=(299, 299))
 
     acc, max_list, pred = ensemble_with_all_combibation(models_paths, test_images, test_labels)
     np.save('./best_preds', pred)
