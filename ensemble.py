@@ -7,13 +7,12 @@ from skimage import color
 from skimage import io
 
 import matplotlib
-
 if "DISPLAY" not in os.environ:
     # remove Travis CI Error
     print 'DISPLAY not in this enviroment'
     matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
 import eval
 import roc
 import data
@@ -21,9 +20,6 @@ import itertools
 import pickle
 import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--models_path')
-args = parser.parse_args()
 
 
 def get_ensemble_actmap(model_list, actmap_folder):
@@ -95,7 +91,7 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_r
     usage:
     get all combination of models that saved [save_root_folder]
 
-    :param model_paths: 모델이 저장된 장소 입니다
+    :param model_paths: type list [./models/vgg_11/step_12500_acc_0.841666698456/model , , , ]
     :param test_images: 테스트 이미지
     :param test_labels: 테스트 라벨
     :param save_root_folder: activation map 이 저장될 장소 입니다
@@ -202,12 +198,16 @@ def ensemble(model_paths, test_images):
 
 
 if __name__ == '__main__':
-    models_path = get_models_paths(args.models_path)
-    print 'number of model paths : {}'.format(len(models_path))
-    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1(
-        './fundus_300_debug', resize=(299, 299))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--models_path')
+    args = parser.parse_args()
 
-    acc, max_list, pred = ensemble_with_all_combibation(models_path, test_images, test_labels)
+    models_paths = get_models_paths(args.models_path)
+    print 'number of model paths : {}'.format(len(models_paths))
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1(
+        './fundus_300', resize=(299, 299))
+
+    acc, max_list, pred = ensemble_with_all_combibation(models_paths, test_images, test_labels)
     np.save('./best_preds', pred)
     np.save('./test_labels', test_labels)  #
     np.save('./test_images', train_images)
