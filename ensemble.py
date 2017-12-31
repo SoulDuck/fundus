@@ -151,10 +151,10 @@ def ensemble_with_all_combibation(model_paths, test_images, test_labels , save_r
                 else:
                     pred_sum += pred
             """
-            print len(cbn_models)
+            print 'models list : {}'.format(len(cbn_models))
 
             pred_sum = pred_sum / float(len(cbn_models))
-            print 'pred', pred[:10]
+            #print 'pred', pred[:10]
             acc = eval.get_acc(pred_sum, test_labels)
             print 'accuracy : {}'.format(acc)
             # print cbn_models ,':',acc
