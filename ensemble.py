@@ -190,7 +190,7 @@ if __name__ == '__main__':
     train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1(
         './fundus_300', resize=(299, 299))
 
-    acc, max_list, pred = ensemble_with_all_combibation(models_paths, test_images[:2], test_labels)
+    acc, max_list, pred = ensemble_with_all_combibation(models_paths, test_images[:], test_labels)
     np.save('./best_preds', pred)
     np.save('./test_labels', test_labels)  #
     np.save('./test_images', train_images)
