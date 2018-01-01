@@ -136,7 +136,7 @@ class Transfer_inception_v3(object):
 if __name__ =='__main__':
 
     ckpt_dir = 'inception_v3_pretrained'
-    train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug',
+    train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',
                                                                                                save_dir_name=ckpt_dir)
     n_classes=2
     sample_img=Image.open('./pretrained_models/inception_v3/cropped_panda.jpg')
