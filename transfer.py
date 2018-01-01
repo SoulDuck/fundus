@@ -134,6 +134,7 @@ class Transfer_inception_v3(object):
         return obj
 
 if __name__ =='__main__':
+
     download_and_extract_model(url=inception_v3_url , data_dir='./pretrained_models/inception_v3')
     ckpt_dir = 'inception_v3_pretrained'
     train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',
@@ -160,8 +161,7 @@ if __name__ =='__main__':
     logits=affine('fc',x_ , out_ch= n_classes)
     pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(logits, y_=y_, learning_rate=lr_,
                                                                        optimizer='sgd', use_l2_loss=False)
-    print logits.get_shape()
-    exit()
+
 
 
     """----------------------------------------------------------------------------------------------------------------
