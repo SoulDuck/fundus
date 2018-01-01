@@ -6,6 +6,10 @@ import glob
 from PIL import Image
 import random
 import tensorflow as tf
+import pickle
+import urllib
+import tarfile
+import zipfile
 """
 import Image
 
@@ -393,6 +397,54 @@ def restore_model(saver,sess,ckpt_dir):
         print 'No Model , initializing global step to 0'
         global_step=0
     return global_step
+
+
+def cache(cache_path ,  fn , *args , **kwargs):
+    if os.path.exists(cache_path):
+            # Load the cached data from the file.
+            with open(cache_path, mode='rb') as file:
+                obj = pickle.load(file)
+
+            print("- Data loaded from cache-file: " + cache_path)
+    else:
+        # The cache-file does not exist.
+        # Call the function / class-init with the supplied arguments.
+        obj = fn(*args, **kwargs)
+        # Save the data to a cache-file.
+        with open(cache_path, mode='wb') as file:
+            pickle.dump(obj, file)
+        print("- Data saved to cache-file: " + cache_path)
+        return obj
+
+def numpy2pickle(in_path , out_path):
+    data = np.load(in_path)
+    # Save the data using pickle.
+    with open(out_path, mode='wb') as file:
+        pickle.dump(data, file)
+
+
+def donwload(url ,download_dir):
+    if not os.path.isdir(download_dir):
+        os.makedirs(download_dir)
+    filename = url.split('/')[-1]
+    file_path = os.path.join(download_dir, filename)
+    if not os.path.exists(file_path):
+        print 'downloading ...'
+        urllib.urlretrieve(url=url , filename=file_path );
+        print 'Done'
+
+def extract(file_path , out_dir_path):
+    print 'extracting files....'
+    if file_path.endswith(".zip"):
+        zipfile.ZipFile(file=file_path , mode='r').extractall(out_dir_path)
+    if file_path.endswith((".tar.gz" , ".tgz")):
+        tarfile.open(name=file_path, mode="r:gz").extractall(out_dir_path)
+    print("Done.")
+
+
+
+
+
 if __name__=='__main__':
 
     pred=[0,0,0,1]
