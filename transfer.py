@@ -134,7 +134,7 @@ class Transfer_inception_v3(object):
         return obj
 
 if __name__ =='__main__':
-
+    download_and_extract_model(url=inception_v3_url , data_dir='./pretrained_models/inception_v3')
     ckpt_dir = 'inception_v3_pretrained'
     train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',
                                                                                                save_dir_name=ckpt_dir)
@@ -146,7 +146,7 @@ if __name__ =='__main__':
 
     print np.shape(sample_img)
     print np.shape(sample_imgs)
-    download_and_extract_model(url=inception_v3_url , data_dir='./pretrained_models/inception_v3')
+
     model=Transfer_inception_v3(data_dir='./pretrained_models/inception_v3')
     values=model.get_transfer_values(sample_img)
     model.images2caches('pretrained_models/inception_v3/train_cache.pkl' ,train_imgs)
