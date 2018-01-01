@@ -125,7 +125,7 @@ def algorithm(y_conv , y_ , learning_rate , optimizer , use_l2_loss):
     """
     if __debug__ ==True:
         print 'debug start : cnn.py | algorithm'
-        print 'optimizer option : GradientDescentOptimizer(default) | AdamOptimizer | moment | '
+        print 'optimizer option : sgd(default) | adam | moment | '
         print 'selected optimizer : ',optimizer
         print y_conv.get_shape()
         print y_.get_shape()
@@ -143,6 +143,7 @@ def algorithm(y_conv , y_ , learning_rate , optimizer , use_l2_loss):
     correct_pred=tf.equal(tf.argmax(y_conv , 1) , tf.argmax(y_ , 1) , name='correct_pred')
     accuracy =  tf.reduce_mean(tf.cast(correct_pred , dtype=tf.float32) , name='accuracy')
     return pred,pred_cls , cost , train_op,correct_pred ,accuracy
+
 
 
 
