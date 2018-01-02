@@ -137,8 +137,9 @@ class Transfer_inception_v3(object):
     def _build_model(self):
         n_classes=self.out_channels[-1]
         print 'N classes {} :'.format(n_classes)
+        layer=self.x_1
         for i in range(len(self.out_channels)-1):
-            layer = affine('fc_{}'.format(i), self.x_1, out_ch=self.out_channels[i])
+            layer = affine('fc_{}'.format(i), layer, out_ch=self.out_channels[i])
             layer=dropout(layer,self.phase_train , self.keep_prob)
 
         self.logits = affine('logits', layer, out_ch=n_classes)
