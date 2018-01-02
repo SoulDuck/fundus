@@ -1,3 +1,6 @@
 import os
 
-os.makedirs('./tmp/a/a_0/a_0_0')
+
+a=[1,3,4,5,6,7,8,9]
+print a[:-1]
+print a[-1:]

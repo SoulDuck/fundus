@@ -125,7 +125,7 @@ def algorithm(y_conv , y_ , learning_rate , optimizer , use_l2_loss):
     """
     if __debug__ ==True:
         print 'debug start : cnn.py | algorithm'
-        print 'optimizer option : sgd(default) | adam | moment | '
+        print 'optimizer option : sgd(default) | adam | momentum | '
         print 'selected optimizer : ',optimizer
         print y_conv.get_shape()
         print y_.get_shape()

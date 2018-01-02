@@ -11,9 +11,15 @@ from PIL import Image
 from sklearn.decomposition import PCA
 import PIL
 import transfer
+
+"""
+ by re-routing the output of the original model just prior to its classification layers
+ and instead use a new classifier that we had created.
+ Because the original model was 'frozen' its weights could not be further optimized, 
+ 
+"""
+
 inception_v3_url= "http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz"
-
-
 transfer.download_and_extract_model(url=inception_v3_url, data_dir='./pretrained_models/inception_v3')
 ckpt_dir = 'inception_v3_pretrained'
 train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',

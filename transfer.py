@@ -120,6 +120,7 @@ class Transfer_inception_v3(object):
 
     def images2caches(self ,cache_path , images):
         if os.path.exists(cache_path):
+            print 'load saved caches '
             with open(cache_path, mode='rb') as file:
                 obj = pickle.load(file)
         else:
@@ -128,4 +129,17 @@ class Transfer_inception_v3(object):
                 pickle.dump(obj, file)
             print("- Data saved to cache-file: " + cache_path)
         return obj
+    def build_model(self , x_ , out_channels ):
+        """
+        :param x_: placeholder e.g) x_ shape [None , 2048]
+        :param out_channels: e.g) = [1024, 2 ]
+        :return:
+        """
+        n_classes=out_channels[-1]
+        for i, ch in enumerate(out_channels[:-1]):
+            layer = affine('fc_{}'.format(i), x_, out_ch=ch)
+        self.logits = affine('logits', x_, out_ch=n_classes)
+
+
+
 
