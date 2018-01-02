@@ -39,7 +39,7 @@ class Transfer_inception_v3(object):
     """
 
     """
-    def __init__(self , data_dir ,x_ , phase_train , out_channels ):
+    def __init__(self , data_dir ,x_ , phase_train , keep_prob ,out_channels ):
         """
 
         :param data_dir: path for folder saved .pb file
@@ -80,6 +80,7 @@ class Transfer_inception_v3(object):
             self.x_1 = x_
             self.phase_train = phase_train
             self.out_channels = out_channels
+            self.keep_prob = keep_prob
         self._build_model()
 
         #feed dict
