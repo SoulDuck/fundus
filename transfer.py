@@ -146,8 +146,11 @@ if __name__ =='__main__':
 
     model=Transfer_inception_v3(data_dir='./pretrained_models/inception_v3')
     values=model.get_transfer_values(sample_img)
-    model.images2caches('pretrained_models/inception_v3/train_cache.pkl' ,train_imgs)
-    model.images2caches('pretrained_models/inception_v3/test_cache.pkl', test_imgs)
+    train_imgs=model.images2caches('pretrained_models/inception_v3/train_cache.pkl' ,train_imgs)
+    test_imgs=model.images2caches('pretrained_models/inception_v3/test_cache.pkl', test_imgs)
+
+    print 'training data shape : {}'.format(np.shape(train_imgs))
+    print 'test data shape : {}'.format(np.shape(test_imgs))
 
     x_ = tf.placeholder(dtype=tf.float32 , shape = [None , 2048])
     y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes], name='y_')
