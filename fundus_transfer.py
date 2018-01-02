@@ -19,6 +19,11 @@ import transfer
  
 """
 
+
+"""----------------------------------------------------------------------------------------------------------------
+                                                Input Data
+----------------------------------------------------------------------------------------------------------------"""
+
 inception_v3_url= "http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz"
 transfer.download_and_extract_model(url=inception_v3_url, data_dir='./pretrained_models/inception_v3')
 ckpt_dir = 'inception_v3_pretrained'
@@ -31,16 +36,18 @@ y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes], name='y_')
 phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
 lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 
+
+
+"""----------------------------------------------------------------------------------------------------------------
+                                                define Model 
+----------------------------------------------------------------------------------------------------------------"""
+
+
 model = transfer.Transfer_inception_v3('./pretrained_models/inception_v3' , x_ , phase_train ,[1024,n_classes] )
 train_imgs = model.images2caches('./pretrained_models/inception_v3/train_cache.pkl', train_imgs)
 test_imgs = model.images2caches('./pretrained_models/inception_v3/test_cache.pkl', test_imgs)
-print 'training data shape : {}'.format(np.shape(train_imgs))
-print 'test data shape : {}'.format(np.shape(test_imgs))
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
-
-
-logits = affine('fc', x_, out_ch=n_classes)
 pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(model.logits, y_=y_, learning_rate=lr_,
                                                                    optimizer='sgd', use_l2_loss=False)
 
