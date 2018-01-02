@@ -6,7 +6,7 @@ import os
 import utils
 import data
 import glob
-from cnn import affine , algorithm ,lr_schedule
+from cnn import affine  ,dropout
 from PIL import Image
 from sklearn.decomposition import PCA
 import PIL
@@ -39,7 +39,7 @@ class Transfer_inception_v3(object):
     """
 
     """
-    def __init__(self , data_dir ,x_ , out_channels ):
+    def __init__(self , data_dir ,x_ , phase_train , out_channels ):
         """
 
         :param data_dir: path for folder saved .pb file
@@ -78,7 +78,9 @@ class Transfer_inception_v3(object):
             self.sess= tf.Session(graph=self.graph) # import graph to session
             self.transfer_layer_len=self.transfer_layer.get_shape()[3] #transfer layer shape : [1,1,1,2048]
             self.x_1 = x_
-        self._build_model(self.x_1 ,out_channels)
+            self.phase_train = phase_train
+            self.out_channels = out_channels
+        self._build_model()
 
         #feed dict
         # Image is passed in as a 4-dimension
@@ -131,12 +133,15 @@ class Transfer_inception_v3(object):
                 pickle.dump(obj, file)
             print("- Data saved to cache-file: " + cache_path)
         return obj
-    def _build_model(self , x_ , out_channels ):
-        n_classes=out_channels[-1]
+    def _build_model(self):
+        n_classes=self.out_channels[-1]
         print 'N classes {} :'.format(n_classes)
-        for i, ch in enumerate(out_channels[:-1]):
-            layer = affine('fc_{}'.format(i), x_, out_ch=ch)
+        for i, ch in enumerate(self.out_channels[:-1]):
+            layer = affine('fc_{}'.format(i), self.x_1, out_ch=ch)
+            layer=dropout(layer,self.phase_train , self.keep_prob)
+
         self.logits = affine('logits', layer, out_ch=n_classes)
+
 
 
 
