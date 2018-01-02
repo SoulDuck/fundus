@@ -148,7 +148,8 @@ if __name__ =='__main__':
     values=model.get_transfer_values(sample_img)
     train_imgs = model.images2caches('pretrained_models/inception_v3/train_cache.pkl', train_imgs)
     test_imgs = model.images2caches('pretrained_models/inception_v3/test_cache.pkl', test_imgs)
-
+    train_imgs = train_imgs / 255.
+    test_imgs = test_imgs / 255.
     print 'training data shape : {}'.format(np.shape(train_imgs))
     print 'test data shape : {}'.format(np.shape(test_imgs))
 
