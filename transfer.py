@@ -192,7 +192,7 @@ if __name__ =='__main__':
     ----------------------------------------------------------------------------------------------------------------"""
     batch_size=60
     lr_iters = [2000, 50000]
-    lr_values=[0.0007 , 0.0001]
+    lr_values=[0.0003 , 0.0001]
     max_acc, min_loss = 0, 10000000
     max_iter=1000000
     for step in range( start_step, max_iter):
@@ -206,7 +206,7 @@ if __name__ =='__main__':
             # Get Validation Accuracy and Loss
             pred_list, cost_list = [], []
             val_pred, val_cost = sess.run(fetches=[pred, cost],
-                                              feed_dict={x_: batch_xs, y_: batch_ys, phase_train: False})
+                                              feed_dict={x_: test_imgs, y_: test_labs, phase_train: False})
             val_acc = utils.get_acc(val_pred, test_labs)
             val_cost = np.sum(cost_list) / float(len(cost_list))
             max_acc, min_loss = utils.save_model(sess, saver, max_acc, min_loss, val_acc, val_cost, best_acc_ckpt_dir,
