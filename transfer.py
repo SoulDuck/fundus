@@ -205,11 +205,10 @@ if __name__ =='__main__':
         if step % 100 == 0:
 
             # Get Validation Accuracy and Loss
-            pred_list, cost_list = [], []
             val_pred, val_cost = sess.run(fetches=[pred, cost],
                                               feed_dict={x_: test_imgs, y_: test_labs, phase_train: False})
             val_acc = utils.get_acc(val_pred, test_labs)
-            val_cost = np.sum(cost_list) / float(len(cost_list))
+
             max_acc, min_loss = utils.save_model(sess, saver, max_acc, min_loss, val_acc, val_cost, best_acc_ckpt_dir,
                                                  best_loss_ckpt_dir,
                                                  step)
