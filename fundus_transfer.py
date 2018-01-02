@@ -26,13 +26,14 @@ train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = 
                                                                                            save_dir_name=ckpt_dir)
 n_classes = 2
 model = transfer.Transfer_inception_v3(data_dir='./pretrained_models/inception_v3')
+
 train_imgs = model.images2caches('pretrained_models/inception_v3/train_cache.pkl', train_imgs)
 test_imgs = model.images2caches('pretrained_models/inception_v3/test_cache.pkl', test_imgs)
+print 'training data shape : {}'.format(np.shape(train_imgs))
+print 'test data shape : {}'.format(np.shape(test_imgs))
 exit()
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
-print 'training data shape : {}'.format(np.shape(train_imgs))
-print 'test data shape : {}'.format(np.shape(test_imgs))
 
 x_ = tf.placeholder(dtype=tf.float32, shape=[None, 2048])
 y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes], name='y_')

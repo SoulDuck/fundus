@@ -74,13 +74,9 @@ class Transfer_inception_v3(object):
             self.sess= tf.Session(graph=self.graph) # import graph to session
             self.transfer_layer_len=self.transfer_layer.get_shape()[3] #transfer layer shape : [1,1,1,2048]
 
-
-
-
         #feed dict
         # Image is passed in as a 4-dimension
         # The pixels MUST be values between 0 and 255 (float or int).
-
 
     def _create_feed_dict(self , image ):
         feed_dict = {self.x_: image}
@@ -119,7 +115,6 @@ class Transfer_inception_v3(object):
         return multiple_values
 
     def images2caches(self ,cache_path , images):
-
         if os.path.isfile(cache_path):
             print 'load saved caches '
             with open(cache_path, mode='rb') as file:
