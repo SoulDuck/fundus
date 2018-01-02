@@ -40,7 +40,6 @@ class Transfer_inception_v3(object):
     conv1 --> conv2 --> -->
 
     """
-
     def __init__(self , data_dir):
 
         # inception
@@ -54,6 +53,7 @@ class Transfer_inception_v3(object):
         # load graph ,variable and initialize session
         self.graph = tf.Graph() #make graph
         with self.graph.as_default() :#set graph to default
+            #만약 여기서 with 을 주지 않으면 , 아래 그래프을 복원하는 것들은 실행 되지 않는다.
             self.data_dir=data_dir
             pb_path_list=glob.glob(os.path.join(data_dir , '*.pb'))
             assert len(pb_path_list) ==1 , 'the number of protobuffer has to be 1 , {}'.format(len(pb_path_list))
@@ -65,11 +65,7 @@ class Transfer_inception_v3(object):
             graph_def.ParseFromString(gfile.read())  # load pb file to into graph_def
             tf.import_graph_def(graph_def, name='')  # import graph_def into tensorflow graph
 
-
-        # Get x_, y_
-
             self.x_ = tf.get_default_graph().get_tensor_by_name(x_name)
-
             # Get tensor name from inception v3 graph
             self.pred = tf.get_default_graph().get_tensor_by_name(softmax)
             self.logits = tf.get_default_graph().get_tensor_by_name(logits)
@@ -123,12 +119,12 @@ class Transfer_inception_v3(object):
         return multiple_values
 
     def images2caches(self ,cache_path , images):
-        obj=self.images_to_transfer_values(images)
         if os.path.exists(cache_path):
             with open(cache_path, mode='rb') as file:
                 obj = pickle.load(file)
         else:
             with open(cache_path, mode='wb') as file:
+                obj = self.images_to_transfer_values(images)
                 pickle.dump(obj, file)
             print("- Data saved to cache-file: " + cache_path)
         return obj
@@ -162,8 +158,6 @@ if __name__ =='__main__':
     pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(logits, y_=y_, learning_rate=lr_,
                                                                        optimizer='sgd', use_l2_loss=False)
 
-
-
     """----------------------------------------------------------------------------------------------------------------
                                                     Make Session                                 
     ----------------------------------------------------------------------------------------------------------------"""
@@ -181,7 +175,6 @@ if __name__ =='__main__':
     best_loss_ckpt_dir = os.path.join('./model', ckpt_dir, 'best_loss')
     last_model_ckpt_dir = os.path.join('./model', ckpt_dir, 'last_model')
     last_model_ckpt_path = os.path.join(last_model_ckpt_dir, 'model')
-
     try:
         os.makedirs(last_model_ckpt_dir)
     except Exception as e:
@@ -195,8 +188,7 @@ if __name__ =='__main__':
                                                     Training Model                                  
     ----------------------------------------------------------------------------------------------------------------"""
     batch_size=60
-
-    lr_iters=[2000 ,50000 ]
+    lr_iters = [2000, 50000]
     lr_values=[0.0007 , 0.0001]
     max_acc, min_loss = 0, 10000000
     max_iter=1000000
@@ -207,6 +199,7 @@ if __name__ =='__main__':
                                 feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True, lr_: lr})
         last_model_saver.save(sess, save_path=last_model_ckpt_path, global_step=step)
         if step % 100 == 0:
+
             # Get Validation Accuracy and Loss
             pred_list, cost_list = [], []
             val_pred, val_cost = sess.run(fetches=[pred, cost],
