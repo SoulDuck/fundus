@@ -192,8 +192,8 @@ if __name__ =='__main__':
                                                     Training Model                                  
     ----------------------------------------------------------------------------------------------------------------"""
     batch_size=120
-    lr_iters = [2000, 50000]
-    lr_values=[0.5 , 0.3]
+    lr_iters = [5000, 10000]
+    lr_values=[1 , 0.7]
     max_acc, min_loss = 0, 10000000
     max_iter=1000000
     for step in range( start_step, max_iter):
