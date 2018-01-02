@@ -119,8 +119,8 @@ class Transfer_inception_v3(object):
         return multiple_values
 
     def images2caches(self ,cache_path , images):
-        print os.path.exists(cache_path)
-        if os.path.exists(cache_path):
+
+        if os.path.isfile(cache_path):
             print 'load saved caches '
             with open(cache_path, mode='rb') as file:
                 obj = pickle.load(file)
