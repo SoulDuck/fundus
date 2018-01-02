@@ -28,6 +28,7 @@ n_classes = 2
 model = transfer.Transfer_inception_v3(data_dir='./pretrained_models/inception_v3')
 train_imgs = model.images2caches('pretrained_models/inception_v3/train_cache.pkl', train_imgs)
 test_imgs = model.images2caches('pretrained_models/inception_v3/test_cache.pkl', test_imgs)
+exit()
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
 print 'training data shape : {}'.format(np.shape(train_imgs))
@@ -70,7 +71,7 @@ start_step = utils.restore_model(saver=last_model_saver, sess=sess, ckpt_dir=las
 ----------------------------------------------------------------------------------------------------------------"""
 batch_size = 120
 lr_iters = [5000, 10000]
-lr_values = [1, 1]
+lr_values = [1, 1.3]
 max_acc, min_loss = 0, 10000000
 max_iter = 1000000
 for step in range(start_step, max_iter):
