@@ -43,7 +43,7 @@ lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 ----------------------------------------------------------------------------------------------------------------"""
 
 
-model = transfer.Transfer_inception_v3('./pretrained_models/inception_v3' , x_ , phase_train ,[1024,n_classes] )
+model = transfer.Transfer_inception_v3('./pretrained_models/inception_v3' , x_ , phase_train , 1.0 , [1024,n_classes] )
 train_imgs = model.images2caches('./pretrained_models/inception_v3/train_cache.pkl', train_imgs)
 test_imgs = model.images2caches('./pretrained_models/inception_v3/test_cache.pkl', test_imgs)
 train_imgs = train_imgs / 255.
