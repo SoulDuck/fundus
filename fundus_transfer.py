@@ -25,8 +25,15 @@ ckpt_dir = 'inception_v3_pretrained'
 train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',
                                                                                            save_dir_name=ckpt_dir)
 n_classes = 2
-model = transfer.Transfer_inception_v3(data_dir='./pretrained_models/inception_v3')
 
+x_ = tf.placeholder(dtype=tf.float32, shape=[None, 2048])
+y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes], name='y_')
+phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
+lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
+
+model = transfer.Transfer_inception_v3('./pretrained_models/inception_v3' , x_ , [1024,n_classes])
+print np.shape(pickle.load('pretrained_models/inception_v3/train_cache.pkl'))
+exit()
 train_imgs = model.images2caches('pretrained_models/inception_v3/train_cache.pkl', train_imgs)
 test_imgs = model.images2caches('pretrained_models/inception_v3/test_cache.pkl', test_imgs)
 print 'training data shape : {}'.format(np.shape(train_imgs))
@@ -35,13 +42,9 @@ exit()
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
 
-x_ = tf.placeholder(dtype=tf.float32, shape=[None, 2048])
-y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes], name='y_')
-phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
-lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 
 logits = affine('fc', x_, out_ch=n_classes)
-pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(logits, y_=y_, learning_rate=lr_,
+pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(model.logits, y_=y_, learning_rate=lr_,
                                                                    optimizer='sgd', use_l2_loss=False)
 
 """----------------------------------------------------------------------------------------------------------------

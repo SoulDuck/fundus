@@ -37,10 +37,14 @@ class Transfer
 
 class Transfer_inception_v3(object):
     """
-    conv1 --> conv2 --> -->
 
     """
-    def __init__(self , data_dir):
+    def __init__(self , data_dir ,x_ , out_channels ):
+        """
+
+        :param data_dir: path for folder saved .pb file
+        :param out_channels:  [1024 , n_classes]
+        """
 
         # inception
         x_jpeg_name = "DecodeJpeg/contents:0"  # input image for jpeg format
@@ -73,6 +77,8 @@ class Transfer_inception_v3(object):
             self.transfer_layer = tf.get_default_graph().get_tensor_by_name(transfer_layer)
             self.sess= tf.Session(graph=self.graph) # import graph to session
             self.transfer_layer_len=self.transfer_layer.get_shape()[3] #transfer layer shape : [1,1,1,2048]
+            self.x_1 = x_
+        self._build_model(self.x_1 ,out_channels)
 
         #feed dict
         # Image is passed in as a 4-dimension
@@ -125,16 +131,12 @@ class Transfer_inception_v3(object):
                 pickle.dump(obj, file)
             print("- Data saved to cache-file: " + cache_path)
         return obj
-    def build_model(self , x_ , out_channels ):
-        """
-        :param x_: placeholder e.g) x_ shape [None , 2048]
-        :param out_channels: e.g) = [1024, 2 ]
-        :return:
-        """
+    def _build_model(self , x_ , out_channels ):
         n_classes=out_channels[-1]
+        print 'N classes {} :'.format(n_classes)
         for i, ch in enumerate(out_channels[:-1]):
             layer = affine('fc_{}'.format(i), x_, out_ch=ch)
-        self.logits = affine('logits', x_, out_ch=n_classes)
+        self.logits = affine('logits', layer, out_ch=n_classes)
 
 
 
