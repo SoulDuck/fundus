@@ -32,14 +32,10 @@ phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
 lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 
 model = transfer.Transfer_inception_v3('./pretrained_models/inception_v3' , x_ , [1024,n_classes])
-print os.path.exists('pretrained_models/inception_v3/train_cache.pkl')
-print np.shape(pickle.load('pretrained_models/inception_v3/train_cache.pkl'))
-exit()
 train_imgs = model.images2caches('./pretrained_models/inception_v3/train_cache.pkl', train_imgs)
 test_imgs = model.images2caches('./pretrained_models/inception_v3/test_cache.pkl', test_imgs)
 print 'training data shape : {}'.format(np.shape(train_imgs))
 print 'test data shape : {}'.format(np.shape(test_imgs))
-exit()
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
 
