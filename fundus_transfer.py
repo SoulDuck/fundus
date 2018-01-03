@@ -79,9 +79,9 @@ start_step = utils.restore_model(saver=last_model_saver, sess=sess, ckpt_dir=las
 ----------------------------------------------------------------------------------------------------------------"""
 batch_size = 120
 lr_iters = [5000, 10000]
-lr_values = [1, 1.3]
+lr_values = [1, 1.7]
 max_acc, min_loss = 0, 10000000
-max_iter = 1000000
+max_iter = 2000000
 for step in range(start_step, max_iter):
     lr = lr_schedule(step, lr_iters, lr_values)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=batch_size)

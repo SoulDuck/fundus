@@ -15,7 +15,7 @@ import PIL
  1.inception v3 model """
 
 inception_v3_url= "http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz"
-
+vgg16_url = "https://s3.amazonaws.com/cadl/models/vgg16.tfmodel"
 
 def download_and_extract_model(url , data_dir):
 
@@ -146,5 +146,25 @@ class Transfer_inception_v3(object):
 
 
 
+class Transfer_vgg16(object):
+    tensor_name_input_image = "images:0"
 
+    # Names of the tensors for the dropout random-values..
+    tensor_name_dropout = 'dropout/random_uniform:0'
+    tensor_name_dropout1 = 'dropout_1/random_uniform:0'
 
+    # Names for the convolutional layers in the model for use in Style Transfer.
+    layer_names = ['conv1_1/conv1_1', 'conv1_2/conv1_2',
+                   'conv2_1/conv2_1', 'conv2_2/conv2_2',
+                   'conv3_1/conv3_1', 'conv3_2/conv3_2', 'conv3_3/conv3_3',
+                   'conv4_1/conv4_1', 'conv4_2/conv4_2', 'conv4_3/conv4_3',
+                   'conv5_1/conv5_1', 'conv5_2/conv5_2', 'conv5_3/conv5_3']
+
+    def __init__(self):
+        self.graph = tf.Graph()
+        with self.graph.as_default():
+            path = os.path.join(data_dir, path_graph_def)
+            with tf.gfile.FastGFile(path, 'rb') as file:
+                graph_def = tf.GraphDef()
+                graph_def.ParseFromString(file.read())
+                tf.import_graph_def(graph_def, name='')
