@@ -11,7 +11,11 @@ from PIL import Image
 from sklearn.decomposition import PCA
 import PIL
 import transfer
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--max_iter' , type=int);
+args = parser.parse_args()
 """
  by re-routing the output of the original model just prior to its classification layers
  and instead use a new classifier that we had created.
@@ -81,7 +85,7 @@ batch_size = 120
 lr_iters = [5000, 10000]
 lr_values = [1, 1.7]
 max_acc, min_loss = 0, 10000000
-max_iter = 2000000
+max_iter = args.max_iter;
 for step in range(start_step, max_iter):
     lr = lr_schedule(step, lr_iters, lr_values)
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=batch_size)
