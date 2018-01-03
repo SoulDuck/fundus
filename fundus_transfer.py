@@ -15,6 +15,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--max_iter' , type=int);
+parser.add_argument('--optimizer' , type=str);
 args = parser.parse_args()
 """
  by re-routing the output of the original model just prior to its classification layers
@@ -30,7 +31,7 @@ args = parser.parse_args()
 
 inception_v3_url= "http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz"
 transfer.download_and_extract_model(url=inception_v3_url, data_dir='./pretrained_models/inception_v3')
-ckpt_dir = 'inception_v3_pretrained'
+ckpt_dir = 'inception_v3_pretrained_dropout_0_8'
 train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',
                                                                                            save_dir_name=ckpt_dir)
 n_classes = 2
@@ -47,13 +48,13 @@ lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 ----------------------------------------------------------------------------------------------------------------"""
 
 
-model = transfer.Transfer_inception_v3('./pretrained_models/inception_v3' , x_ , phase_train , 1.0 , [n_classes] )
+model = transfer.Transfer_inception_v3('./pretrained_models/inception_v3' , x_ , phase_train , 0.8 , [n_classes])
 train_imgs = model.images2caches('./pretrained_models/inception_v3/train_cache.pkl', train_imgs)
 test_imgs = model.images2caches('./pretrained_models/inception_v3/test_cache.pkl', test_imgs)
 train_imgs = train_imgs / 255.
 test_imgs = test_imgs / 255.
 pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(model.logits, y_=y_, learning_rate=lr_,
-                                                                   optimizer='sgd', use_l2_loss=False)
+                                                                   optimizer=args.optimizer, use_l2_loss=False)
 
 """----------------------------------------------------------------------------------------------------------------
                                                 Make Session                                 
@@ -83,7 +84,7 @@ start_step = utils.restore_model(saver=last_model_saver, sess=sess, ckpt_dir=las
 ----------------------------------------------------------------------------------------------------------------"""
 batch_size = 120
 lr_iters = [5000, 10000]
-lr_values = [1, 1.7]
+lr_values = [1, 1.0]
 max_acc, min_loss = 0, 10000000
 max_iter = args.max_iter;
 for step in range(start_step, max_iter):
