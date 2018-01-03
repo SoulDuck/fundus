@@ -123,15 +123,21 @@ class Transfer_inception_v3(object):
         return multiple_values
 
     def images2caches(self ,cache_path , images , new_flag=True):
-        if os.path.isfile(cache_path):
+        """if os.path.isfile(cache_path):
             print 'load saved caches '
             with open(cache_path, mode='rb') as file:
                 obj = pickle.load(file)
         elif not os.path.isfile(cache_path) or new_flag:
-            print("- create Data and saved to cache-file: " + cache_path)
+            print("- create Data and csaved to cache-file: " + cache_path)
             with open(cache_path, mode='wb') as file:
                 obj = self.images_to_transfer_values(images)
                 pickle.dump(obj, file)
+        """
+        print("- create Data and csaved to cache-file: " + cache_path)
+        with open(cache_path, mode='wb') as file:
+            obj = self.images_to_transfer_values(images)
+            pickle.dump(obj, file)
+
         return obj
     def _build_model(self):
         n_classes=self.out_channels[-1]
