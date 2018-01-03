@@ -117,22 +117,21 @@ class Transfer_inception_v3(object):
         transfer_values=np.squeeze(transfer_values)
         return transfer_values
     def images_to_transfer_values(self , images):
-        n_images=len(images)
         multiple_values=map(lambda image : self.get_transfer_values(image) , images )
         multiple_values=np.asarray(multiple_values)
         print 'multiple values shape {}'.format(np.shape(multiple_values))
         return multiple_values
 
-    def images2caches(self ,cache_path , images):
+    def images2caches(self ,cache_path , images , new_flag=True):
         if os.path.isfile(cache_path):
             print 'load saved caches '
             with open(cache_path, mode='rb') as file:
                 obj = pickle.load(file)
-        else:
+        elif not os.path.isfile(cache_path) or new_flag:
+            print("- create Data and saved to cache-file: " + cache_path)
             with open(cache_path, mode='wb') as file:
                 obj = self.images_to_transfer_values(images)
                 pickle.dump(obj, file)
-            print("- Data saved to cache-file: " + cache_path)
         return obj
     def _build_model(self):
         n_classes=self.out_channels[-1]
