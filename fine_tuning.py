@@ -7,9 +7,12 @@ import utils
 import os
 from cnn import gap , algorithm
 import argparse
+import data
+import aug
 parser=argparse.ArgumentParser()
 parser.add_argument('--ckpt_dir' , type=str)
 args=parser.parse_args()
+
 
 """
 The difference between Transfer Learning and Fine-Tuning is that in Transfer Learning we only optimize the weights of
@@ -78,12 +81,15 @@ class vgg_16(object):
             graph_def.ParseFromString(gfile.read())
             tf.import_graph_def(graph_def ,name='')
             """------------------------------------------------------------------------------
-                                            session setting
+                                                build model
             -------------------------------------------------------------------------------"""
+
             self.sess = tf.Session(graph=self.graph)
             self._reconstruct_layers()
             self._build_model()
-
+            """------------------------------------------------------------------------------
+                                                session setting
+            -------------------------------------------------------------------------------"""
             self.saver = tf.train.Saver(max_to_keep=10000000)
             self.last_model_saver = tf.train.Saver(max_to_keep=1)
             config = tf.ConfigProto()
@@ -92,9 +98,7 @@ class vgg_16(object):
             init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
             self.sess.run(init)
 
-            #img = np.asarray(Image.open('debug/0.png').convert('RGB'))
-            #re_img = np.expand_dims(img, axis=0)
-            #init= tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
+
     def _reconstruct_layers(self):
         """------------------------------------------------------------------------------
                  Naming rule :
@@ -117,9 +121,14 @@ class vgg_16(object):
 
 
     def _build_model(self):
+        """------------------------------------------------------------------------------
+                                        Input Data
+        -------------------------------------------------------------------------------"""
+
         self.x_ = tf.placeholder(dtype = tf.float32 , shape = [None , self.img_h , self.img_w , self.img_ch ])
         self.y_ = tf.placeholder(dtype=tf.int32, shape=[None, self.n_classes], name='y_')
         self.lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
+        self.phase_trin = tf.placeholder(dtpye=tf.bool)
         layer=self.x_
         # data augmentation
         """------------------------------------------------------------------------------
@@ -143,14 +152,21 @@ class vgg_16(object):
                                                                                                          self.optimizer,
                                                                                                          self.use_l2_loss)
 if '__main__' == __name__ :
-    #image, label = utils.read_one_example('./fundus_300_debug/debug_cataract_glaucoma_test.tfrecord',(299, 299))
 
+    #image, label = utils.read_one_example('./fundus_300_debug/debug_cataract_glaucoma_test.tfrecord',(299, 299))
+    train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug',
+                                                                                               save_dir_name=args.ckpt_dir)
+    test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)
+    test_imgs_labs = zip(test_imgs_list, test_labs_list)
+
+    train_imgs=train_imgs/255.
+    test_imgs = test_imgs/255.
     model=vgg_16(n_classes=2 , optimizer='sgd' , input_shape=(300,300,3) ,use_l2_loss=True)
     img=np.asarray(Image.open('debug/0.png').convert('RGB'))
     re_img= np.expand_dims(img, axis=0)
     print model.sess.run(model.logits , feed_dict = {model.x_ : re_img})
     """------------------------------------------------------------------------------
-                                        Dir Setting                         
+                                        Dir Setting                    
     -------------------------------------------------------------------------------"""
     logs_path = os.path.join('./logs', 'fundus_fine_tuning', args.ckpt_dir)
     tb_writer = tf.summary.FileWriter(logs_path)
@@ -164,27 +180,29 @@ if '__main__' == __name__ :
     except Exception as e:
         pass;
     start_step = utils.restore_model(saver=model.last_model_saver, sess=model.sess, ckpt_dir=last_model_ckpt_dir)
-    for i in range(start_step , 100 ):
-        _ , pred =model.sess.run([model.train_op, model.pred], feed_dict={model.x_: re_img, model.y_: [[0, 1]], model.lr_: 0.1})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    max_acc, min_loss = 0, 10000000
+    for step in range(start_step , 100 ):
+        batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
+        rotate_imgs = map(lambda batch_x: aug.random_rotate(batch_x), batch_xs)
+        _, loss, acc = model.sess.run(fetches=[model.train_op, model.cost, model.accuracy],
+                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: 0.01})
+        model.last_model_saver.save(model.sess, save_path=last_model_ckpt_path, global_step=step)
+        if step % 100 ==0:
+            pred_list, cost_list = [], []
+            for batch_xs, batch_ys in test_imgs_labs:
+                batch_pred, batch_cost = model.sess.run(fetches=[model.pred, model.cost],
+                                                  feed_dict={model.x_: batch_xs, model.y_: batch_ys, })
+                pred_list.extend(batch_pred)
+                cost_list.append(batch_cost)
+            val_acc = utils.get_acc(pred_list, test_labs)
+            val_cost = np.sum(cost_list) / float(len(cost_list))
+            max_acc, min_loss = utils.save_model(model.sess, model.saver, max_acc, min_loss, val_acc, val_cost, best_acc_ckpt_dir,
+                                                 best_loss_ckpt_dir,
+                                                 step)
+            utils.write_acc_loss(tb_writer, prefix='test', loss=val_cost, acc=val_acc, step=step)
+            utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
+            #lr_summary = tf.Summary(value=[tf.Summary.Value(tag='learning_rate', simple_value=float(lr))])
+            #tb_writer.add_summary(lr_summary, step)
+            print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc, loss,
+                                                                                                            val_acc,
+                                                                                                            val_cost)
