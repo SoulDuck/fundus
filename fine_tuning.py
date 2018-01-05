@@ -5,7 +5,12 @@ import PIL
 from PIL import Image
 import utils
 import os
-from cnn import gap , algorithm , convolution2d
+from cnn import gap , algorithm
+import argparse
+parser=argparse.ArgumentParser()
+parser.add_argument('--ckpt_dir' , type=str)
+args=parser.parse_args()
+
 """
 The difference between Transfer Learning and Fine-Tuning is that in Transfer Learning we only optimize the weights of
  the new classification layers we have added, while we keep the weights of the original VGG16 model.
@@ -72,10 +77,18 @@ class vgg_16(object):
             graph_def = tf.GraphDef();
             graph_def.ParseFromString(gfile.read())
             tf.import_graph_def(graph_def ,name='')
+            """------------------------------------------------------------------------------
+                                            session setting
+            -------------------------------------------------------------------------------"""
             self.sess = tf.Session(graph=self.graph)
             self._reconstruct_layers()
             self._build_model()
-            self.sess = tf.Session(graph=self.graph)
+
+            self.saver = tf.train.Saver(max_to_keep=10000000)
+            self.last_model_saver = tf.train.Saver(max_to_keep=1)
+            config = tf.ConfigProto()
+            config.gpu_options.allow_growth = True
+            self.sess = tf.Session(graph=self.graph , config=config)
             init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
             self.sess.run(init)
 
@@ -83,6 +96,11 @@ class vgg_16(object):
             #re_img = np.expand_dims(img, axis=0)
             #init= tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
     def _reconstruct_layers(self):
+        """------------------------------------------------------------------------------
+                 Naming rule :
+                     conv1_1/w:0 ~ conv5_3/w:0
+                     conv1_1/b:0 ~ conv5_3/b:0
+        -------------------------------------------------------------------------------"""
         self.weights_list = []
         self.biases_list = []
         print "trying reconstruct weights and biases..."
@@ -97,11 +115,6 @@ class vgg_16(object):
             self.weights_list.append(tf.Variable(w_, name=w_name.replace("filter:0", 'w')))
             self.biases_list.append(tf.Variable(b_, name=b_name.replace("biases:0", 'b')))
 
-            """------------------------------------------------------------------------------
-            Naming rule :
-                conv1_1/w:0 ~ conv5_3/w:0
-                conv1_1/b:0 ~ conv5_3/b:0
-            -------------------------------------------------------------------------------"""
 
     def _build_model(self):
         self.x_ = tf.placeholder(dtype = tf.float32 , shape = [None , self.img_h , self.img_w , self.img_ch ])
@@ -131,17 +144,28 @@ class vgg_16(object):
                                                                                                          self.use_l2_loss)
 if '__main__' == __name__ :
     #image, label = utils.read_one_example('./fundus_300_debug/debug_cataract_glaucoma_test.tfrecord',(299, 299))
+
     model=vgg_16(n_classes=2 , optimizer='sgd' , input_shape=(300,300,3) ,use_l2_loss=True)
     img=np.asarray(Image.open('debug/0.png').convert('RGB'))
     re_img= np.expand_dims(img, axis=0)
     print model.sess.run(model.logits , feed_dict = {model.x_ : re_img})
-
     """------------------------------------------------------------------------------
-                                    training 
+                                        Dir Setting                         
     -------------------------------------------------------------------------------"""
-    for i in range(10):
+    logs_path = os.path.join('./logs', 'fundus_fine_tuning', args.ckpt_dir)
+    tb_writer = tf.summary.FileWriter(logs_path)
+    tb_writer.add_graph(tf.get_default_graph())
+    best_acc_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'best_acc')
+    best_loss_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'best_loss')
+    last_model_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'last_model')
+    last_model_ckpt_path = os.path.join(last_model_ckpt_dir, 'model')
+    try:
+        os.makedirs(last_model_ckpt_dir)
+    except Exception as e:
+        pass;
+    start_step = utils.restore_model(saver=model.last_model_saver, sess=model.sess, ckpt_dir=last_model_ckpt_dir)
+    for i in range(start_step , 100 ):
         _ , pred =model.sess.run([model.train_op, model.pred], feed_dict={model.x_: re_img, model.y_: [[0, 1]], model.lr_: 0.1})
-        print pred
 
 
 

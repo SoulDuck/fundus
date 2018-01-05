@@ -57,7 +57,6 @@ class Resnet(object):
 
     def _box(self, x,n_block , block_out_ch , block_stride):
         """
-
         :param x:
         :param n_block: 5  , dtype = int
         :param block_out_ch: 32 , dtype = int
