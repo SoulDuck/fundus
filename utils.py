@@ -424,13 +424,22 @@ def numpy2pickle(in_path , out_path):
 
 
 def donwload(url ,download_dir):
+    def _print_download_progress(count, block_size, total_size):
+        # Percentage completion.
+        pct_complete = float(count * block_size) / total_size
+        # Status-message. Note the \r which means the line should overwrite itself.
+        msg = "\r- Download progress: {0:.1%}".format(pct_complete)
+        # Print it.
+        sys.stdout.write(msg)
+        sys.stdout.flush()
+
     if not os.path.isdir(download_dir):
         os.makedirs(download_dir)
     filename = url.split('/')[-1]
     file_path = os.path.join(download_dir, filename)
     if not os.path.exists(file_path):
         print 'downloading ...'
-        urllib.urlretrieve(url=url , filename=file_path );
+        urllib.urlretrieve(url=url , filename=file_path ,reporthook=_print_download_progress);
         print 'Done'
 
 def extract(file_path , out_dir_path):
@@ -441,9 +450,47 @@ def extract(file_path , out_dir_path):
         tarfile.open(name=file_path, mode="r:gz").extractall(out_dir_path)
     print("Done.")
 
+"""----------------------------------------------------------------------------------------------------------------
+                                                Tensorflow Record
+----------------------------------------------------------------------------------------------------------------"""
 
 
+def read_one_example( tfrecord_path  , resize ):
+    filename_queue = tf.train.string_input_producer([tfrecord_path] , num_epochs=10)
+    reader = tf.TFRecordReader()
+    _ , serialized_example = reader.read(filename_queue)
+    features = tf.parse_single_example(serialized_example,
+      # Defaults are not specified since both keys are required.
+      features={
+        'height': tf.FixedLenFeature([], tf.int64),
+        'width': tf.FixedLenFeature([], tf.int64),
+        'raw_image': tf.FixedLenFeature([], tf.string),
+        'label' : tf.FixedLenFeature([] , tf.int64)
+        })
+    image = tf.decode_raw(features['raw_image'], tf.uint8)
+    height= tf.cast(features['height'] , tf.int32)
+    width = tf.cast(features['width'] , tf.int32)
+    label = tf.cast(features['label'] , tf.int32)
+    image_shape = tf.stack([height , width , 3 ])
+    image=tf.reshape(image ,  image_shape)
+    if not resize == None :
+        resize_height , resize_width  = resize
+        image_size_const = tf.constant((resize_height , resize_width , 3) , dtype = tf.int32)
+        image = tf.image.resize_image_with_crop_or_pad(image=image,
+                                               target_height=resize_height,
+                                               target_width=resize_width)
+#    images  = tf.train.shuffle_batch([image ] , batch_size =batch_size  , capacity =30 ,num_threads=3 , min_after_dequeue=10)
+    return image,label
+"""----------------------------------------------------------------------------------------------------------------
+                                                Tensorflow Utils
+----------------------------------------------------------------------------------------------------------------"""
 
+def show_tensorflow_op():
+    for op in tf.get_default_graph().get_operations():
+        print op.name
+
+def get_op_name(op):
+    return op.name
 
 if __name__=='__main__':
 

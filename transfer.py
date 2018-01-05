@@ -70,6 +70,7 @@ class Transfer_inception_v3(object):
             tf.import_graph_def(graph_def, name='')  # import graph_def into tensorflow graph
 
             self.x_ = tf.get_default_graph().get_tensor_by_name(x_name)
+
             # Get tensor name from inception v3 graph
             self.pred = tf.get_default_graph().get_tensor_by_name(softmax)
             self.logits = tf.get_default_graph().get_tensor_by_name(logits)
@@ -81,6 +82,8 @@ class Transfer_inception_v3(object):
             self.phase_train = phase_train
             self.out_channels = out_channels
             self.keep_prob = keep_prob
+            for op in tf.get_default_graph().get_operations():
+                print op.name
         self._build_model()
 
         #feed dict
@@ -151,25 +154,19 @@ class Transfer_inception_v3(object):
 
 
 
-class Transfer_vgg16(object):
-    tensor_name_input_image = "images:0"
+if __name__ =='__main__':
+    inception_v3_url = "http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz"
+    download_and_extract_model(url=inception_v3_url, data_dir='./pretrained_models/inception_v3')
+    ckpt_dir = 'inception_v3_pretrained_dropout_0_8'
+    n_classes = 2
 
-    # Names of the tensors for the dropout random-values..
-    tensor_name_dropout = 'dropout/random_uniform:0'
-    tensor_name_dropout1 = 'dropout_1/random_uniform:0'
+    x_ = tf.placeholder(dtype=tf.float32, shape=[None, 2048])
+    y_ = tf.placeholder(dtype=tf.float32, shape=[None, n_classes], name='y_')
+    phase_train = tf.placeholder(dtype=tf.bool, name='phase_train')
+    lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 
-    # Names for the convolutional layers in the model for use in Style Transfer.
-    layer_names = ['conv1_1/conv1_1', 'conv1_2/conv1_2',
-                   'conv2_1/conv2_1', 'conv2_2/conv2_2',
-                   'conv3_1/conv3_1', 'conv3_2/conv3_2', 'conv3_3/conv3_3',
-                   'conv4_1/conv4_1', 'conv4_2/conv4_2', 'conv4_3/conv4_3',
-                   'conv5_1/conv5_1', 'conv5_2/conv5_2', 'conv5_3/conv5_3']
+    """----------------------------------------------------------------------------------------------------------------
+                                                    define Model 
+    ----------------------------------------------------------------------------------------------------------------"""
 
-    def __init__(self):
-        self.graph = tf.Graph()
-        with self.graph.as_default():
-            path = os.path.join(data_dir, path_graph_def)
-            with tf.gfile.FastGFile(path, 'rb') as file:
-                graph_def = tf.GraphDef()
-                graph_def.ParseFromString(file.read())
-                tf.import_graph_def(graph_def, name='')
+    model =Transfer_inception_v3('./pretrained_models/inception_v3', x_, phase_train, 0.8, [n_classes])

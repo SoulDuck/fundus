@@ -81,7 +81,7 @@ def gap(name,x , n_classes ):
     gap_x=tf.reduce_mean(x, (1,2) ,name='global_average_pooling')
     with tf.variable_scope(name) as scope:
         gap_w=tf.get_variable('w' , shape=[in_ch , n_classes] , initializer=tf.random_normal_initializer(0,0.01) , trainable=True)
-    y_conv=tf.matmul(gap_x, gap_w , name='y_conv')
+    y_conv=tf.matmul(gap_x, gap_w , name='logits')
     return y_conv
 
 def lr_schedule(step ,lr_iters , lr_values):
