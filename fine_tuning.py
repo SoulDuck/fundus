@@ -178,7 +178,7 @@ if '__main__' == __name__ :
         pass;
     start_step = utils.restore_model(saver=model.last_model_saver, sess=model.sess, ckpt_dir=last_model_ckpt_dir)
     max_acc, min_loss = 0, 10000000
-    for step in range(start_step , 100 ):
+    for step in range(start_step , 1000000000 ):
         batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
         rotate_imgs = map(lambda batch_x: aug.random_rotate(batch_x), batch_xs)
         _, loss, acc = model.sess.run(fetches=[model.train_op, model.cost, model.accuracy],
