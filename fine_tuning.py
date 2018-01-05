@@ -93,7 +93,7 @@ class vgg_16(object):
             self.saver = tf.train.Saver(max_to_keep=10000000)
             self.last_model_saver = tf.train.Saver(max_to_keep=1)
             config = tf.ConfigProto()
-            config.gpu_options.allow_growth = True
+            config.gpu_options.allow_growth = False
             self.sess = tf.Session(graph=self.graph , config=config)
             init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
             self.sess.run(init)
