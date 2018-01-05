@@ -11,6 +11,7 @@ import data
 import aug
 parser=argparse.ArgumentParser()
 parser.add_argument('--ckpt_dir' , type=str)
+parser.add_argument('--batch_size' , type=int , default=10)
 args=parser.parse_args()
 
 
@@ -83,7 +84,6 @@ class vgg_16(object):
             """------------------------------------------------------------------------------
                                                 build model
             -------------------------------------------------------------------------------"""
-
             self.sess = tf.Session(graph=self.graph)
             self._reconstruct_layers()
             self._build_model()
@@ -128,7 +128,7 @@ class vgg_16(object):
         self.x_ = tf.placeholder(dtype = tf.float32 , shape = [None , self.img_h , self.img_w , self.img_ch ])
         self.y_ = tf.placeholder(dtype=tf.int32, shape=[None, self.n_classes], name='y_')
         self.lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
-        self.phase_trin = tf.placeholder(dtpye=tf.bool)
+        self.phase_trin = tf.placeholder(dtype=tf.bool)
         layer=self.x_
         # data augmentation
         """------------------------------------------------------------------------------
@@ -154,17 +154,14 @@ class vgg_16(object):
 if '__main__' == __name__ :
 
     #image, label = utils.read_one_example('./fundus_300_debug/debug_cataract_glaucoma_test.tfrecord',(299, 299))
-    train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug',
+    train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',
                                                                                                save_dir_name=args.ckpt_dir)
     test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)
     test_imgs_labs = zip(test_imgs_list, test_labs_list)
 
     train_imgs=train_imgs/255.
     test_imgs = test_imgs/255.
-    model=vgg_16(n_classes=2 , optimizer='sgd' , input_shape=(300,300,3) ,use_l2_loss=True)
-    img=np.asarray(Image.open('debug/0.png').convert('RGB'))
-    re_img= np.expand_dims(img, axis=0)
-    print model.sess.run(model.logits , feed_dict = {model.x_ : re_img})
+    model=vgg_16(n_classes=2 , optimizer='sgd' , input_shape=(299,299,3) ,use_l2_loss=True)
     """------------------------------------------------------------------------------
                                         Dir Setting                    
     -------------------------------------------------------------------------------"""
