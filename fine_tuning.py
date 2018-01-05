@@ -184,7 +184,7 @@ if '__main__' == __name__ :
         batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
         rotate_imgs = map(lambda batch_x: aug.random_rotate(batch_x), batch_xs)
         _, loss, acc = model.sess.run(fetches=[model.train_op, model.cost, model.accuracy],
-                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: 0.001})
+                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: 0.0001})
         model.last_model_saver.save(model.sess, save_path=last_model_ckpt_path, global_step=step)
         if step % 100 ==0:
             pred_list, cost_list = [], []
