@@ -160,8 +160,8 @@ class vgg_16(object):
         for i , name in enumerate(self.layer_names):
             w=self.weights_list[i]
             b=self.biases_list[i]
-            layer=aug.aug_tensor_images(self.x_, phase_train=self.phase_trin, img_size_cropped=self.img_size_cropped,
-                                  color_aug=self.color_aug)
+            layer = aug.aug_tensor_images(self.x_, phase_train=self.phase_trin, img_size_cropped=self.img_size_cropped,
+                                          color_aug=self.color_aug)
             with tf.variable_scope('layer_'+str(i)):
                 conv_name=name.split('/')[0]
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
