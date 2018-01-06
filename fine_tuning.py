@@ -11,7 +11,7 @@ import data
 import aug
 parser=argparse.ArgumentParser()
 parser.add_argument('--ckpt_dir' , type=str)
-parser.add_argument('--batch_size' , type=int , default=10)
+parser.add_argument('--batch_size' , type=int , default=40)
 args=parser.parse_args()
 
 
