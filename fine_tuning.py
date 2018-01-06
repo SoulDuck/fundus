@@ -49,7 +49,7 @@ class fine_tuning(object):
 
 
 class vgg_16(object):
-    def __init__(self , n_classes , optimizer , input_shape , use_l2_loss ): # pb  = ProtoBuffer
+    def __init__(self , n_classes , optimizer , input_shape , use_l2_loss ,cropped_img_size , color_aug ): # pb  = ProtoBuffer
         self.input_shape = input_shape #input shape = ( h ,w, ch )
         self.img_h,self.img_w,self.img_ch = self.input_shape
         self.n_classes=n_classes
@@ -57,6 +57,9 @@ class vgg_16(object):
         self.use_l2_loss = use_l2_loss
 
         self.weights_saved_dir=os.path.join('pretrained_models' , 'vgg_16' , 'model_weights') #
+
+        self.cropped_img_size = cropped_img_size
+        self.color_aug = color_aug
 
         self.vgg16_pretrained_data_url = "https://s3.amazonaws.com/cadl/models/vgg16.tfmodel"
         self.data_dir = 'pretrained_models/vgg_16'
@@ -155,6 +158,8 @@ class vgg_16(object):
         for i , name in enumerate(self.layer_names):
             w=self.weights_list[i]
             b=self.biases_list[i]
+            layer=aug.aug_tensor_images(self.x_, phase_train=self.phase_trin, img_size_cropped=self.img_size_cropped,
+                                  color_aug=self.color_aug)
             with tf.variable_scope('layer_'+str(i)):
                 conv_name=name.split('/')[0]
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
