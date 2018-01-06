@@ -161,11 +161,11 @@ if '__main__' == __name__ :
 
     train_imgs=train_imgs/255.
     test_imgs = test_imgs/255.
-    model=vgg_16(n_classes=2 , optimizer='sgd' , input_shape=(299,299,3) ,use_l2_loss=True)
+    model=vgg_16(n_classes=2 , optimizer='momentum' , input_shape=(299,299,3) ,use_l2_loss=True)
     """------------------------------------------------------------------------------
                                         Dir Setting                    
     -------------------------------------------------------------------------------"""
-    logs_path = os.path.join('./logs', 'fundus_fine_tuning', args.ckpt_dir)
+    logs_path = os.path.join('./logs', 'fundus_fine_tuning_0', args.ckpt_dir)
     tb_writer = tf.summary.FileWriter(logs_path)
     tb_writer.add_graph(tf.get_default_graph())
     best_acc_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'best_acc')
