@@ -152,7 +152,7 @@ class vgg_16(object):
         self.x_ = tf.placeholder(dtype = tf.float32 , shape = [None , self.img_h , self.img_w , self.img_ch ])
         self.y_ = tf.placeholder(dtype=tf.int32, shape=[None, self.n_classes], name='y_')
         self.lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
-        self.phase_trin = tf.placeholder(dtype=tf.bool)
+        self.phase_train = tf.placeholder(dtype=tf.bool)
         layer=self.x_
         # data augmentation
 
@@ -160,7 +160,7 @@ class vgg_16(object):
                                         VGG 16 network
         -------------------------------------------------------------------------------"""
         max_pool_idx=[1,3,6,9,12]
-        layer = aug.aug_tensor_images(self.x_, phase_train=self.phase_trin, img_size_cropped=self.img_size_cropped,
+        layer = aug.aug_tensor_images(self.x_, phase_train=self.phase_train, img_size_cropped=self.img_size_cropped,
                                       color_aug=self.color_aug)
         for i , name in enumerate(self.layer_names):
             w=self.weights_list[i]
@@ -215,14 +215,14 @@ if '__main__' == __name__ :
         rotate_imgs = map(lambda batch_x: aug.random_rotate(batch_x), batch_xs)
         #training
         _, loss, acc = model.sess.run(fetches=[model.train_op, model.cost, model.accuracy],
-                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: lr , model.phase_trin:True})
+                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: lr , model.phase_train:True})
         model.last_model_saver.save(model.sess, save_path=last_model_ckpt_path, global_step=step)
         #validation
         if step % 100 ==0:
             pred_list, cost_list = [], []
             for batch_xs, batch_ys in test_imgs_labs:
                 batch_pred, batch_cost = model.sess.run(fetches=[model.pred, model.cost],
-                                                  feed_dict={model.x_: batch_xs, model.y_: batch_ys,model.phase_trin:False})
+                                                  feed_dict={model.x_: batch_xs, model.y_: batch_ys,model.phase_train:False})
                 pred_list.extend(batch_pred)
                 cost_list.append(batch_cost)
             val_acc = utils.get_acc(pred_list, test_labs)
