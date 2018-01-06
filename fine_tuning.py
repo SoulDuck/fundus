@@ -13,8 +13,10 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--ckpt_dir' , type=str  ) #default='finetuning_vgg_16'
 parser.add_argument('--batch_size' , type=int , default=40)
 parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[5000 ,15000 , 40000 , 80000] )
-parser.add_argument('--lr_values',nargs='+', type=float, default=[0.01 , 0.007 , 0.004 , 0.0001])
+parser.add_argument('--lr_values',nargs='+', type=float, default=[0.1 , 0.07 , 0.04 , 0.001])
 args=parser.parse_args()
+
+
 
 
 """
@@ -153,6 +155,7 @@ class vgg_16(object):
         self.phase_trin = tf.placeholder(dtype=tf.bool)
         layer=self.x_
         # data augmentation
+
         """------------------------------------------------------------------------------
                                         VGG 16 network
         -------------------------------------------------------------------------------"""
