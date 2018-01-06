@@ -5,13 +5,15 @@ import PIL
 from PIL import Image
 import utils
 import os
-from cnn import gap , algorithm
+from cnn import gap , algorithm , lr_schedule
 import argparse
 import data
 import aug
 parser=argparse.ArgumentParser()
 parser.add_argument('--ckpt_dir' , type=str  ) #default='finetuning_vgg_16'
 parser.add_argument('--batch_size' , type=int , default=40)
+parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[2000 ,10000 , 40000 , 80000] )
+parser.add_argument('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.00001])
 args=parser.parse_args()
 
 
@@ -183,7 +185,7 @@ if '__main__' == __name__ :
 
     train_imgs=train_imgs/255.
     test_imgs = test_imgs/255.
-    model = vgg_16(n_classes=2, optimizer='momentum', input_shape=(299, 299, 3), use_l2_loss=True, cropped_img_size=224,
+    model = vgg_16(n_classes=2, optimizer='sgd', input_shape=(299, 299, 3), use_l2_loss=True, cropped_img_size=224,
                    color_aug=False)
     """------------------------------------------------------------------------------
                                         Dir Setting                    
@@ -203,7 +205,7 @@ if '__main__' == __name__ :
     max_acc, min_loss = 0, 10000000
     max_iter=10000000
     for step in range(start_step , max_iter):
-        lr=0.001
+        lr = lr_schedule(step, args.lr_iters, args.lr_values)
         utils.show_progress(step , max_iter)
         batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
         rotate_imgs = map(lambda batch_x: aug.random_rotate(batch_x), batch_xs)
