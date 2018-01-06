@@ -183,7 +183,8 @@ if '__main__' == __name__ :
 
     train_imgs=train_imgs/255.
     test_imgs = test_imgs/255.
-    model=vgg_16(n_classes=2 , optimizer='momentum' , input_shape=(299,299,3) ,use_l2_loss=True)
+    model = vgg_16(n_classes=2, optimizer='momentum', input_shape=(299, 299, 3), use_l2_loss=True, cropped_img_size=224,
+                   color_aug=False)
     """------------------------------------------------------------------------------
                                         Dir Setting                    
     -------------------------------------------------------------------------------"""
