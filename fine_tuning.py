@@ -10,7 +10,7 @@ import argparse
 import data
 import aug
 parser=argparse.ArgumentParser()
-parser.add_argument('--ckpt_dir' , type=str)
+parser.add_argument('--ckpt_dir' , type=str  ) #default='finetuning_vgg_16'
 parser.add_argument('--batch_size' , type=int , default=40)
 args=parser.parse_args()
 
@@ -56,6 +56,8 @@ class vgg_16(object):
         self.optimizer = optimizer  # build_model에서 사용된다
         self.use_l2_loss = use_l2_loss
 
+        self.weights_saved_dir=os.path.join('pretrained_models' , 'vgg_16' , 'model_weights') #
+
         self.vgg16_pretrained_data_url = "https://s3.amazonaws.com/cadl/models/vgg16.tfmodel"
         self.data_dir = 'pretrained_models/vgg_16'
         self.name_pb = 'vgg16.tfmodel'
@@ -85,28 +87,28 @@ class vgg_16(object):
                                                 build model
             -------------------------------------------------------------------------------"""
             self.sess = tf.Session(graph=self.graph)
-            self._reconstruct_layers()
-            self._build_model()
-            """------------------------------------------------------------------------------
-                                                session setting
-            -------------------------------------------------------------------------------"""
-            self.saver = tf.train.Saver(max_to_keep=10000000)
-            self.last_model_saver = tf.train.Saver(max_to_keep=1)
-            config = tf.ConfigProto()
-            config.gpu_options.allow_growth = False
-            self.sess = tf.Session(graph=self.graph , config=config)
-            init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
-            self.sess.run(init)
+            self._save_pretrained_weights()
+        tf.reset_default_graph() # reset pretrained train graph and load saved weights and re-draw graph
+        self._load_pretrained_weights()
+        self._build_model()
+        """------------------------------------------------------------------------------
+                                            session setting
+        -------------------------------------------------------------------------------"""
+        self.saver = tf.train.Saver(max_to_keep=10000000)
+        self.last_model_saver = tf.train.Saver(max_to_keep=1)
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        self.sess = tf.Session(config=config)
+        init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
+        self.sess.run(init)
 
 
-    def _reconstruct_layers(self):
+    def _save_pretrained_weights(self):
         """------------------------------------------------------------------------------
                  Naming rule :
                      conv1_1/w:0 ~ conv5_3/w:0
                      conv1_1/b:0 ~ conv5_3/b:0
         -------------------------------------------------------------------------------"""
-        self.weights_list = []
-        self.biases_list = []
         print "trying reconstruct weights and biases..."
         for i, name in enumerate(self.layer_names):
             utils.show_progress(i, len(self.layer_names))
@@ -116,9 +118,24 @@ class vgg_16(object):
             b_name = name + '/biases:0'
 
             w_, b_ = self.sess.run([w_name, b_name])
-            self.weights_list.append(tf.Variable(w_, name=w_name.replace("filter:0", 'w')))
-            self.biases_list.append(tf.Variable(b_, name=b_name.replace("biases:0", 'b')))
+            w_name = w_name.replace("/filter:0", '_w')
+            b_name = b_name.replace("/biases:0", '_b')
+            np.save(os.path.join(self.weights_saved_dir,w_name),w_) #conv filter save
+            np.save( os.path.join(self.weights_saved_dir, b_name),b_) #conv biases save
+        print 'save complete!'
 
+    def _load_pretrained_weights(self ):
+        self.weights_list=[]
+        self.biases_list=[]
+        for i , name in enumerate(self.layer_names):
+            utils.show_progress(i, len(self.layer_names))
+            name = name.split('/')[0]
+            w_path = os.path.join(self.weights_saved_dir, name +'_w.npy')
+            b_path = os.path.join(self.weights_saved_dir, name+ '_b.npy')
+            w = np.load(w_path)
+            b = np.load(b_path)
+            self.weights_list.append(w)
+            self.biases_list.append(b)
 
     def _build_model(self):
         """------------------------------------------------------------------------------
@@ -135,11 +152,11 @@ class vgg_16(object):
                                         VGG 16 network
         -------------------------------------------------------------------------------"""
         max_pool_idx=[1,3,6,9,12]
-        for i in range(len(self.weights_list)):
+        for i , name in enumerate(self.layer_names):
             w=self.weights_list[i]
             b=self.biases_list[i]
             with tf.variable_scope('layer_'+str(i)):
-                conv_name=w.name.split('/')[0]
+                conv_name=name.split('/')[0]
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
                 layer=tf.nn.relu(layer , name='activation')
                 if i in max_pool_idx:
@@ -154,7 +171,7 @@ class vgg_16(object):
 if '__main__' == __name__ :
 
     #image, label = utils.read_one_example('./fundus_300_debug/debug_cataract_glaucoma_test.tfrecord',(299, 299))
-    train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',
+    train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug',
                                                                                                save_dir_name=args.ckpt_dir)
     test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)
     test_imgs_labs = zip(test_imgs_list, test_labs_list)
@@ -180,11 +197,12 @@ if '__main__' == __name__ :
     max_acc, min_loss = 0, 10000000
     max_iter=10000000
     for step in range(start_step , max_iter):
+        lr=0.001
         utils.show_progress(step , max_iter)
         batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
         rotate_imgs = map(lambda batch_x: aug.random_rotate(batch_x), batch_xs)
         _, loss, acc = model.sess.run(fetches=[model.train_op, model.cost, model.accuracy],
-                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: 0.0001})
+                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: lr})
         model.last_model_saver.save(model.sess, save_path=last_model_ckpt_path, global_step=step)
         if step % 100 ==0:
             pred_list, cost_list = [], []
@@ -200,8 +218,8 @@ if '__main__' == __name__ :
                                                  step)
             utils.write_acc_loss(tb_writer, prefix='test', loss=val_cost, acc=val_acc, step=step)
             utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
-            #lr_summary = tf.Summary(value=[tf.Summary.Value(tag='learning_rate', simple_value=float(lr))])
-            #tb_writer.add_summary(lr_summary, step)
+            lr_summary = tf.Summary(value=[tf.Summary.Value(tag='learning_rate', simple_value=float(lr))])
+            tb_writer.add_summary(lr_summary, step)
             print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc, loss,
                                                                                                             val_acc,
                                                                                                             val_cost)
