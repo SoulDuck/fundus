@@ -160,7 +160,7 @@ class vgg_16(object):
         for i , name in enumerate(self.layer_names):
             w=self.weights_list[i]
             b=self.biases_list[i]
-
+            print np.shape(w)
             layer = aug.aug_tensor_images(self.x_, phase_train=self.phase_trin, img_size_cropped=self.img_size_cropped,
                                           color_aug=self.color_aug)
             with tf.variable_scope('layer_'+str(i)):
