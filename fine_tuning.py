@@ -210,14 +210,16 @@ if '__main__' == __name__ :
         utils.show_progress(step , max_iter)
         batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
         rotate_imgs = map(lambda batch_x: aug.random_rotate(batch_x), batch_xs)
+        #training
         _, loss, acc = model.sess.run(fetches=[model.train_op, model.cost, model.accuracy],
-                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: lr})
+                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: lr , model.phase_trin:True})
         model.last_model_saver.save(model.sess, save_path=last_model_ckpt_path, global_step=step)
+        #validation
         if step % 100 ==0:
             pred_list, cost_list = [], []
             for batch_xs, batch_ys in test_imgs_labs:
                 batch_pred, batch_cost = model.sess.run(fetches=[model.pred, model.cost],
-                                                  feed_dict={model.x_: batch_xs, model.y_: batch_ys, })
+                                                  feed_dict={model.x_: batch_xs, model.y_: batch_ys,model.phase_trin:False})
                 pred_list.extend(batch_pred)
                 cost_list.append(batch_cost)
             val_acc = utils.get_acc(pred_list, test_labs)
