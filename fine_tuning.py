@@ -157,12 +157,12 @@ class vgg_16(object):
                                         VGG 16 network
         -------------------------------------------------------------------------------"""
         max_pool_idx=[1,3,6,9,12]
+        layer = aug.aug_tensor_images(self.x_, phase_train=self.phase_trin, img_size_cropped=self.img_size_cropped,
+                                      color_aug=self.color_aug)
         for i , name in enumerate(self.layer_names):
             w=self.weights_list[i]
             b=self.biases_list[i]
             print np.shape(w)
-            layer = aug.aug_tensor_images(self.x_, phase_train=self.phase_trin, img_size_cropped=self.img_size_cropped,
-                                          color_aug=self.color_aug)
             with tf.variable_scope('layer_'+str(i)):
                 conv_name=name.split('/')[0]
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
