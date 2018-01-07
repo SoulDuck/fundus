@@ -492,6 +492,19 @@ def show_tensorflow_op():
 def get_op_name(op):
     return op.name
 
+def search_best_acc_model(self, model_dir):
+    max_acc = 0;
+    best_model_name = ''
+    list_acc = []
+    model_name_list = os.listdir(os.path.join(model_dir, 'best_acc'))
+    for dir_name in model_name_list:
+        acc = int(dir_name.split('_')[-1])
+        if max_acc < acc:
+            best_model_name = dir_name
+            max_acc = acc
+    return best_model_name
+
+
 if __name__=='__main__':
 
     pred=[0,0,0,1]

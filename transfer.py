@@ -35,6 +35,7 @@ class Transfer
     |-vgg net
 """
 
+
 class Transfer_inception_v3(object):
     """
 

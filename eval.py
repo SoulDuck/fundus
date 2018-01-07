@@ -61,7 +61,6 @@ def eval(model_path ,test_images , batch_size  , actmap_save_root_folder='./actm
     if np.max(test_images) > 1:
         test_images = test_images / 255.
     sess = tf.Session()
-
     saver = tf.train.import_meta_graph(meta_graph_or_file=model_path+'.meta') #example model path ./models/fundus_300/5/model_1.ckpt
     saver.restore(sess, save_path=model_path) # example model path ./models/fundus_300/5/model_1.ckpt
     try:

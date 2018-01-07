@@ -59,17 +59,19 @@ def batch_norm_layer(x,phase_train,scope_bn):
     scope=scope_bn)
     z = tf.cond(phase_train, lambda: bn_train, lambda: bn_inference)
     return z
-def affine(name,x,out_ch):
+def affine(name,x,out_ch , trainable=True):
     with tf.variable_scope(name) as scope:
         if len(x.get_shape())==4:
             batch, height , width , in_ch=x.get_shape().as_list()
-            w_fc=tf.get_variable('w' , [height*width*in_ch ,out_ch] , initializer= tf.contrib.layers.xavier_initializer())
+            w_fc = tf.get_variable('w', [height * width * in_ch, out_ch],
+                                   initializer=tf.contrib.layers.xavier_initializer(), trainable=trainable)
             x = tf.reshape(x, (-1, height * width * in_ch))
         elif len(x.get_shape())==2:
             batch, in_ch = x.get_shape().as_list()
-            w_fc=tf.get_variable('w' ,[in_ch ,out_ch] ,initializer=tf.contrib.layers.xavier_initializer())
+            w_fc = tf.get_variable('w', [in_ch, out_ch], initializer=tf.contrib.layers.xavier_initializer(),
+                                   trainable=trainable)
 
-        b_fc=tf.Variable(tf.constant(0.1 ), out_ch)
+        b_fc = tf.Variable(tf.constant(0.1), out_ch, trainable=trainable , name='b')
         layer=tf.matmul(x , w_fc) + b_fc
         layer=tf.nn.relu(layer)
 

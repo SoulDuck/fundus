@@ -39,20 +39,75 @@ The difference between Transfer Learning and Fine-Tuning is that in Transfer Lea
 
 
 class fine_tuning(object):
-    def __init__(self , model_name):
-        self.model_name = model_name
 
-    def _build_models(self):
-        if self.model_name =='vgg16':
-            model=vgg_16('./pretrained_model/vgg16')
-        elif self.model_name == 'inception_v3':
-            model = ('./pretrained_model/vgg16')
+    def __init__(self , model_dir , logits_type , weight_saved_dir):
+        self.logits_type = logits_type
+        self.model_dir = model_dir
+        # create Session
+        self.sess = tf.Session()
+        # restore model
+        self._restore_best_model()
+        # save parameters
+        self._save_pretrained_weights()
+        self._build_models()
+        self._restore_best_model()
+        self.weight_saved_dir = weight_saved_dir
+
+    def _restore_best_model(self):
+        self.saver = tf.train.import_meta_graph(
+            meta_graph_or_file=self.best_model_dirpath + '.meta')  # example model path ./models/fundus_300/5/model_1.ckpt
+        self.saver.restore(self.sess, save_path=self.best_model_dirpath)  # example model path ./models/fundus_300/5/model_1.ckpt
+
+    def _save_pretrained_weights(self):
+        """------------------------------------------------------------------------------
+                 Naming rule :
+                     conv1_1/w:0 ~ conv5_3/w:0
+                     conv1_1/b:0 ~ conv5_3/b:0
+        -------------------------------------------------------------------------------"""
+        print "trying reconstruct weights and biases..."
+        # convolution hpyer parameter save
+        for i, name in enumerate(self.layer_names):
+            #customizing 한 weights 와 biases 들을 구별할려고 filters -->  w  \ biases -->b 로 바꿨당
+            utils.show_progress(i, len(self.layer_names))
+            layer_name = layer_name.split('/')[0]
+            w_name = layer_name + '/filter:0'
+            b_name = layer_name + '/biases:0'
+
+            w_, b_ = self.sess.run([w_name, b_name])
+            w_name = w_name.replace("/filter:0", '_w')
+            b_name = b_name.replace("/biases:0", '_b')
+            np.save(os.path.join(self.weights_saved_dir,w_name),w_) #conv filter save
+            np.save( os.path.join(self.weights_saved_dir, b_name),b_) #conv biases save
+        # fully connected hyper parameter save
+        if self.logits_type =='gap':
+            w_name = os.path.join(self.logits_type + 'w') #'gap/w' or 'gap/b'
+            b_name = os.path.join(self.logits_type + 'b')  # 'gap/w' or 'gap/b'
+            w_ ,b_=self.sess.run(w_name , b_name)
+            np.save(os.path.join(self.weights_saved_dir, w_name), w_)  # conv filter save
+            np.save(os.path.join(self.weights_saved_dir, b_name), b_)  # conv biases save
+
+        elif self.logits_type =='fc':
+            # fc_0 --> fc_1--> logits
+            count =1
+            while(True):
+                try:
+                    w_name = os.path.join(self.logits_type + '_{}'.format(count), 'w')  # fc_0/w
+                    b_name = os.path.join(self.logits_type + '_{}'.format(count), 'b')  # fc_0/b
+                    w_, b_ = self.sess.run(w_name, b_name)
+                    np.save(os.path.join(self.weights_saved_dir, w_name), w_)  # conv filter save
+                    np.save(os.path.join(self.weights_saved_dir, b_name), b_)  # conv biases save
+                except Exception:
+                    w_name = os.path.join('logits', 'w')  # fc_0/w
+                    b_name = os.path.join('logits', 'b')  # fc_0/b
+                    w_, b_ = self.sess.run(w_name, b_name)
+                    np.save(os.path.join(self.weights_saved_dir, w_name), w_)  # conv filter save
+                    np.save(os.path.join(self.weights_saved_dir, b_name), b_)  # conv biases save
         else:
-            raise AssertionError
-
+            raise NotImplementedError
 
 class vgg_16(object):
-    def __init__(self , n_classes , optimizer , input_shape , use_l2_loss ,img_size_cropped  , color_aug ): # pb  = ProtoBuffer
+    def __init__(self, n_classes, optimizer, input_shape, use_l2_loss, img_size_cropped, color_aug,
+                 training_type):  # pb  = ProtoBuffer
         self.input_shape = input_shape #input shape = ( h ,w, ch )
         self.img_h,self.img_w,self.img_ch = self.input_shape
         self.n_classes=n_classes
@@ -60,9 +115,9 @@ class vgg_16(object):
         self.use_l2_loss = use_l2_loss
 
         self.weights_saved_dir=os.path.join('pretrained_models' , 'vgg_16' , 'model_weights') #
-
         self.img_size_cropped  = img_size_cropped
         self.color_aug = color_aug
+        self.training_type = training_type
 
         self.vgg16_pretrained_data_url = "https://s3.amazonaws.com/cadl/models/vgg16.tfmodel"
         self.data_dir = 'pretrained_models/vgg_16'
@@ -75,6 +130,7 @@ class vgg_16(object):
                        'conv3_1/conv3_1', 'conv3_2/conv3_2', 'conv3_3/conv3_3',
                        'conv4_1/conv4_1', 'conv4_2/conv4_2', 'conv4_3/conv4_3',
                        'conv5_1/conv5_1', 'conv5_2/conv5_2', 'conv5_3/conv5_3']
+
         self.path_pb = os.path.join(self.data_dir , self.name_pb)
         if not os.path.exists(os.path.join(self.data_dir , self.name_pb)):
             utils.donwload(self.vgg16_pretrained_data_url  ,download_dir=self.data_dir)
@@ -108,7 +164,6 @@ class vgg_16(object):
         init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
         self.sess.run(init)
 
-
     def _save_pretrained_weights(self):
         """------------------------------------------------------------------------------
                  Naming rule :
@@ -117,6 +172,7 @@ class vgg_16(object):
         -------------------------------------------------------------------------------"""
         print "trying reconstruct weights and biases..."
         for i, name in enumerate(self.layer_names):
+            #customizing 한 weights 와 biases 들을 구별할려고 filters -->  w  \ biases -->b 로 바꿨당
             utils.show_progress(i, len(self.layer_names))
             conv_name = name.replace(":0", '')
             name = name.split('/')[0]
@@ -128,7 +184,6 @@ class vgg_16(object):
             b_name = b_name.replace("/biases:0", '_b')
             np.save(os.path.join(self.weights_saved_dir,w_name),w_) #conv filter save
             np.save( os.path.join(self.weights_saved_dir, b_name),b_) #conv biases save
-
         print 'save complete!'
 
     def _load_pretrained_weights(self ):
@@ -152,28 +207,33 @@ class vgg_16(object):
         self.y_ = tf.placeholder(dtype=tf.int32, shape=[None, self.n_classes], name='y_')
         self.lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
         self.phase_train = tf.placeholder(dtype=tf.bool)
-        layer=self.x_
         # data augmentation
         """------------------------------------------------------------------------------
-                                        VGG 16 network
+                                        Build Up VGG 16 network
         -------------------------------------------------------------------------------"""
         max_pool_idx=[1,3,6,9,12]
         layer = aug.aug_tensor_images(self.x_, phase_train=self.phase_train, img_size_cropped=self.img_size_cropped,
                                       color_aug=self.color_aug)
+        tl_flag=True # TL = Transfer_learning
         for i , name in enumerate(self.layer_names):
             w=self.weights_list[i]
             b=self.biases_list[i]
             #print np.shape(w)
-            with tf.variable_scope('layer_'+str(i)):
-                conv_name=name.split('/')[0]
-                w_name=os.path.join(conv_name , 'w')
-                b_name = os.path.join(conv_name, 'b')
-                w = tf.Variable(w , name=w_name , trainable=True)
-                b = tf.Variable(b, name=b_name, trainable=True)
+            conv_name=name.split('/')[0] # conv1_1
+            with tf.variable_scope(conv_name):
+                w_name=os.path.join(conv_name , 'filters') # /conv1_1/filters
+                b_name = os.path.join(conv_name, 'biases')
+                if self.training_type == 'transfer'
+                    w = tf.Variable(w , name=w_name , trainable=False)
+                    b = tf.Variable(b, name=b_name, trainable=False)
+                elif self.training_type == 'finetuning'
+                    w = tf.Variable(w, name=w_name, trainable=True)
+                    b = tf.Variable(b, name=b_name, trainable=True)
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
                 layer=tf.nn.relu(layer , name='activation')
                 if i in max_pool_idx:
                     layer=tf.nn.max_pool(layer , ksize=[1,2,2,1] ,strides=[1,2,2,1], padding ='SAME' , name='pool')
+
         top_conv = tf.identity(layer, 'top_conv')
         if args.logits_type=='gap':
             self.logits=gap('gap' , top_conv , self.n_classes)
@@ -189,6 +249,8 @@ class vgg_16(object):
                                                                                                          self.lr_,
                                                                                                          self.optimizer,
                                                                                                          self.use_l2_loss)
+
+
 
 if '__main__' == __name__ :
     #image, label = utils.read_one_example('./fundus_300_debug/debug_cataract_glaucoma_test.tfrecord',(299, 299))
@@ -217,6 +279,10 @@ if '__main__' == __name__ :
     start_step = utils.restore_model(saver=model.last_model_saver, sess=model.sess, ckpt_dir=last_model_ckpt_dir)
     max_acc, min_loss = 0, 10000000
     max_iter=10000000
+    """------------------------------------------------------------------------------
+                                Transfer Learning Stage                     
+    -------------------------------------------------------------------------------"""
+
     for step in range(start_step , max_iter):
         lr = lr_schedule(step, args.lr_iters, args.lr_values)
         utils.show_progress(step , max_iter)
@@ -246,5 +312,3 @@ if '__main__' == __name__ :
             print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc, loss,
                                                                                                             val_acc,
                                                                                                             val_cost)
-                        
-
