@@ -5,7 +5,7 @@ import PIL
 from PIL import Image
 import utils
 import os
-from cnn import gap , algorithm , lr_schedule
+from cnn import gap , algorithm , lr_schedule , affine , dropout
 import argparse
 import data
 import aug
@@ -14,6 +14,7 @@ parser.add_argument('--ckpt_dir' , type=str  ) #default='finetuning_vgg_16'
 parser.add_argument('--batch_size' , type=int , default=40)
 parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[5000 ,15000 , 40000 , 80000] )
 parser.add_argument('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.0001])
+parser.add_argument('--logits_type', type=str, default='gap')
 args=parser.parse_args()
 
 
@@ -147,14 +148,12 @@ class vgg_16(object):
         """------------------------------------------------------------------------------
                                         Input Data
         -------------------------------------------------------------------------------"""
-
         self.x_ = tf.placeholder(dtype = tf.float32 , shape = [None , self.img_h , self.img_w , self.img_ch ])
         self.y_ = tf.placeholder(dtype=tf.int32, shape=[None, self.n_classes], name='y_')
         self.lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
         self.phase_train = tf.placeholder(dtype=tf.bool)
         layer=self.x_
         # data augmentation
-
         """------------------------------------------------------------------------------
                                         VGG 16 network
         -------------------------------------------------------------------------------"""
@@ -171,19 +170,26 @@ class vgg_16(object):
                 b_name = os.path.join(conv_name, 'b')
                 w = tf.Variable(w , name=w_name , trainable=True)
                 b = tf.Variable(b, name=b_name, trainable=True)
-
-
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
                 layer=tf.nn.relu(layer , name='activation')
                 if i in max_pool_idx:
                     layer=tf.nn.max_pool(layer , ksize=[1,2,2,1] ,strides=[1,2,2,1], padding ='SAME' , name='pool')
         top_conv = tf.identity(layer, 'top_conv')
-        self.logits=gap('gap' , top_conv , self.n_classes)
+        if args.logits_type=='gap':
+            self.logits=gap('gap' , top_conv , self.n_classes)
+        elif args.logits_type=='fc':
+            fc_filters=[4096 , 4096]
+            for i,out_ch in enumerate(fc_filters):
+                layer=affine('fc_{}'.format(i) , layer, out_ch)
+                layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
+                print 'fc_{} dropout applied'.format(i)
+            self.logits=affine('logits'.format(i) , layer, self.n_classes)
         self.pred, self.pred_cls, self.cost, self.train_op, self.correct_pred, self.accuracy = algorithm(self.logits,
                                                                                                          self.y_,
                                                                                                          self.lr_,
                                                                                                          self.optimizer,
                                                                                                          self.use_l2_loss)
+
 if '__main__' == __name__ :
     #image, label = utils.read_one_example('./fundus_300_debug/debug_cataract_glaucoma_test.tfrecord',(299, 299))
     train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',
@@ -240,3 +246,5 @@ if '__main__' == __name__ :
             print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc, loss,
                                                                                                             val_acc,
                                                                                                             val_cost)
+                        
+
