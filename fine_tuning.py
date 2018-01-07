@@ -223,8 +223,8 @@ class vgg_16(object):
                 w_name=os.path.join(conv_name , 'filters') # /conv1_1/filters
                 b_name = os.path.join(conv_name, 'biases')
                 if self.training_type == 'transfer':
-                    w = tf.Variable(w , name=w_name , trainable=False)
-                    b = tf.Variable(b, name=b_name, trainable=False)
+                    w = tf.Variable(w , name=w_name , trainable=False) #frozen convolution weight
+                    b = tf.Variable(b, name=b_name, trainable=False) #frozen convolution weight
                 elif self.training_type == 'finetuning':
                     w = tf.Variable(w, name=w_name, trainable=True)
                     b = tf.Variable(b, name=b_name, trainable=True)
