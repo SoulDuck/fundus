@@ -297,7 +297,7 @@ if '__main__' == __name__ :
     test_imgs_labs = zip(test_imgs_list, test_labs_list)
     train_imgs=train_imgs/255.
     test_imgs = test_imgs/255.
-    model = Transfer_vgg_16(n_classes=2, optimizer='sgd', input_shape=(299, 299, 3), use_l2_loss=True,
+    model = Transfer_vgg_16(n_classes=2, optimizer='adam', input_shape=(299, 299, 3), use_l2_loss=True,
                             img_size_cropped=224,
                             color_aug=False)
 
