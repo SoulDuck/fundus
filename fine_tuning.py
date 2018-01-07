@@ -38,7 +38,7 @@ The difference between Transfer Learning and Fine-Tuning is that in Transfer Lea
 """
 
 
-class fine_tuning(object):
+class FineTuning_vgg_16(object):
     def __init__(self , model_dir , logits_type , weight_saved_dir):
         self.logits_type = logits_type
         self.model_dir = model_dir
@@ -102,9 +102,15 @@ class fine_tuning(object):
                     np.save(os.path.join(self.weights_saved_dir, w_name), w_)  # conv filter save
                     np.save(os.path.join(self.weights_saved_dir, b_name), b_)  # conv biases save
         else:
-            raise NotImplementedError
+            raise NotImplementedError()
 
-class vgg_16(object):
+
+
+
+
+
+
+class Transfer_vgg_16(object):
     def __init__(self, n_classes, optimizer, input_shape, use_l2_loss, img_size_cropped, color_aug,
                  training_type):  # pb  = ProtoBuffer
         self.input_shape = input_shape #input shape = ( h ,w, ch )
@@ -259,8 +265,10 @@ if '__main__' == __name__ :
     test_imgs_labs = zip(test_imgs_list, test_labs_list)
     train_imgs=train_imgs/255.
     test_imgs = test_imgs/255.
-    model = vgg_16(n_classes=2, optimizer='sgd', input_shape=(299, 299, 3), use_l2_loss=True, img_size_cropped =224,
-                   color_aug=False)
+    model = Transfer_vgg_16(n_classes=2, optimizer='sgd', input_shape=(299, 299, 3), use_l2_loss=True,
+                            img_size_cropped=224,
+                            color_aug=False)
+
     """------------------------------------------------------------------------------
                                         Dir Setting                    
     -------------------------------------------------------------------------------"""
