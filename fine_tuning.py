@@ -324,7 +324,7 @@ if '__main__' == __name__ :
         pass;
     start_step = utils.restore_model(saver=model.last_model_saver, sess=model.sess, ckpt_dir=last_model_ckpt_dir)
     max_acc, min_loss = 0, 10000000
-    max_iter=10000000
+    max_iter=3000
     """------------------------------------------------------------------------------
                                 Transfer Learning Stage                     
     -------------------------------------------------------------------------------"""
