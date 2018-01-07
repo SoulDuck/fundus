@@ -39,7 +39,6 @@ The difference between Transfer Learning and Fine-Tuning is that in Transfer Lea
 
 
 class fine_tuning(object):
-
     def __init__(self , model_dir , logits_type , weight_saved_dir):
         self.logits_type = logits_type
         self.model_dir = model_dir
@@ -223,10 +222,10 @@ class vgg_16(object):
             with tf.variable_scope(conv_name):
                 w_name=os.path.join(conv_name , 'filters') # /conv1_1/filters
                 b_name = os.path.join(conv_name, 'biases')
-                if self.training_type == 'transfer'
+                if self.training_type == 'transfer':
                     w = tf.Variable(w , name=w_name , trainable=False)
                     b = tf.Variable(b, name=b_name, trainable=False)
-                elif self.training_type == 'finetuning'
+                elif self.training_type == 'finetuning':
                     w = tf.Variable(w, name=w_name, trainable=True)
                     b = tf.Variable(b, name=b_name, trainable=True)
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
