@@ -17,8 +17,6 @@ parser.add_argument('--lr_values',nargs='+', type=float, default=[1 , 0.7 , 0.4 
 args=parser.parse_args()
 
 
-
-
 """
 The difference between Transfer Learning and Fine-Tuning is that in Transfer Learning we only optimize the weights of
  the new classification layers we have added, while we keep the weights of the original VGG16 model.
@@ -129,6 +127,7 @@ class vgg_16(object):
             b_name = b_name.replace("/biases:0", '_b')
             np.save(os.path.join(self.weights_saved_dir,w_name),w_) #conv filter save
             np.save( os.path.join(self.weights_saved_dir, b_name),b_) #conv biases save
+
         print 'save complete!'
 
     def _load_pretrained_weights(self ):
@@ -165,9 +164,15 @@ class vgg_16(object):
         for i , name in enumerate(self.layer_names):
             w=self.weights_list[i]
             b=self.biases_list[i]
-            print np.shape(w)
+            #print np.shape(w)
             with tf.variable_scope('layer_'+str(i)):
                 conv_name=name.split('/')[0]
+                w_name=os.path.join(conv_name , 'w')
+                b_name = os.path.join(conv_name, 'b')
+                w = tf.Variable(w , name=w_name , trainable=True)
+                b = tf.Variable(b, name=b_name, trainable=True)
+
+
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
                 layer=tf.nn.relu(layer , name='activation')
                 if i in max_pool_idx:
@@ -180,13 +185,11 @@ class vgg_16(object):
                                                                                                          self.optimizer,
                                                                                                          self.use_l2_loss)
 if '__main__' == __name__ :
-
     #image, label = utils.read_one_example('./fundus_300_debug/debug_cataract_glaucoma_test.tfrecord',(299, 299))
-    train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300',
+    train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug',
                                                                                                save_dir_name=args.ckpt_dir)
     test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)
     test_imgs_labs = zip(test_imgs_list, test_labs_list)
-
     train_imgs=train_imgs/255.
     test_imgs = test_imgs/255.
     model = vgg_16(n_classes=2, optimizer='sgd', input_shape=(299, 299, 3), use_l2_loss=True, img_size_cropped =224,
