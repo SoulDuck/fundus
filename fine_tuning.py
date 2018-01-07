@@ -150,8 +150,7 @@ class FineTuning_vgg_16(object):
 
 
 class Transfer_vgg_16(object):
-    def __init__(self, n_classes, optimizer, input_shape, use_l2_loss, img_size_cropped, color_aug,
-                 training_type):  # pb  = ProtoBuffer
+    def __init__(self, n_classes, optimizer, input_shape, use_l2_loss, img_size_cropped, color_aug):  # pb  = ProtoBuffer
         self.input_shape = input_shape #input shape = ( h ,w, ch )
         self.img_h,self.img_w,self.img_ch = self.input_shape
         self.n_classes=n_classes
@@ -161,7 +160,6 @@ class Transfer_vgg_16(object):
         self.weights_saved_dir=os.path.join('pretrained_models' , 'vgg_16' , 'model_weights') #
         self.img_size_cropped  = img_size_cropped
         self.color_aug = color_aug
-        self.training_type = training_type
 
         self.vgg16_pretrained_data_url = "https://s3.amazonaws.com/cadl/models/vgg16.tfmodel"
         self.data_dir = 'pretrained_models/vgg_16'
@@ -267,17 +265,12 @@ class Transfer_vgg_16(object):
             with tf.variable_scope(conv_name):
                 w_name=os.path.join(conv_name , 'filters') # /conv1_1/filters
                 b_name = os.path.join(conv_name, 'biases')
-                if self.training_type == 'transfer':
-                    w = tf.Variable(w , name=w_name , trainable=False) #frozen convolution weight
-                    b = tf.Variable(b, name=b_name, trainable=False) #frozen convolution weight
-                elif self.training_type == 'finetuning':
-                    w = tf.Variable(w, name=w_name, trainable=True)
-                    b = tf.Variable(b, name=b_name, trainable=True)
+                w = tf.Variable(w , name=w_name , trainable=False) #frozen convolution weight
+                b = tf.Variable(b, name=b_name, trainable=False) #frozen convolution weight
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
                 layer=tf.nn.relu(layer , name='activation')
                 if i in max_pool_idx:
                     layer=tf.nn.max_pool(layer , ksize=[1,2,2,1] ,strides=[1,2,2,1], padding ='SAME' , name='pool')
-
         top_conv = tf.identity(layer, 'top_conv')
         if args.logits_type=='gap':
             self.logits=gap('gap' , top_conv , self.n_classes)
