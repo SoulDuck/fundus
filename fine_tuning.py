@@ -12,8 +12,8 @@ import aug
 parser=argparse.ArgumentParser()
 parser.add_argument('--ckpt_dir' , type=str  ) #default='finetuning_vgg_16'
 parser.add_argument('--batch_size' , type=int , default=40)
-parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[5000 ,15000 , 40000 , 80000] )
-parser.add_argument('--lr_values',nargs='+', type=float, default=[0.0001 , 0.00007 , 0.00004 , 0.00001])
+parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[5000 ] )
+parser.add_argument('--lr_values',nargs='+', type=float, default=[1e-7])
 args=parser.parse_args()
 
 
