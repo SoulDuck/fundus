@@ -71,7 +71,7 @@ def affine(name,x,out_ch , trainable=True):
             w_fc = tf.get_variable('w', [in_ch, out_ch], initializer=tf.contrib.layers.xavier_initializer(),
                                    trainable=trainable)
 
-        b_fc = tf.Variable(tf.constant(0.1), out_ch, trainable=True , name='b')
+        b_fc = tf.Variable(tf.constant(0.1), out_ch,  name='b')
         layer=tf.matmul(x , w_fc) + b_fc
         layer=tf.nn.relu(layer)
 
