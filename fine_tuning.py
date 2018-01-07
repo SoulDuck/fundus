@@ -51,6 +51,11 @@ class FineTuning_vgg_16(object):
         self._build_models()
         self._restore_best_model()
         self.weight_saved_dir = weight_saved_dir
+        self.layer_names = ['conv1_1/conv1_1', 'conv1_2/conv1_2',
+                            'conv2_1/conv2_1', 'conv2_2/conv2_2',
+                            'conv3_1/conv3_1', 'conv3_2/conv3_2', 'conv3_3/conv3_3',
+                            'conv4_1/conv4_1', 'conv4_2/conv4_2', 'conv4_3/conv4_3',
+                            'conv5_1/conv5_1', 'conv5_2/conv5_2', 'conv5_3/conv5_3']
 
     def _restore_best_model(self):
         self.saver = tf.train.import_meta_graph(
@@ -79,35 +84,69 @@ class FineTuning_vgg_16(object):
             np.save( os.path.join(self.weights_saved_dir, b_name),b_) #conv biases save
         # fully connected hyper parameter save
         if self.logits_type =='gap':
-            w_name = os.path.join(self.logits_type + 'w') #'gap/w' or 'gap/b'
-            b_name = os.path.join(self.logits_type + 'b')  # 'gap/w' or 'gap/b'
+            w_name = os.path.join(self.logits_type + 'w').replace('/w:0' , '_w') #'gap/w' or 'gap/b'
+            b_name = os.path.join(self.logits_type + 'b').replace('/b:0' , '_b')  # 'gap/w' or 'gap/b'
             w_ ,b_=self.sess.run(w_name , b_name)
             np.save(os.path.join(self.weights_saved_dir, w_name), w_)  # conv filter save
             np.save(os.path.join(self.weights_saved_dir, b_name), b_)  # conv biases save
 
         elif self.logits_type =='fc':
             # fc_0 --> fc_1--> logits
-            count =1
+            count =0 # for counting the fully connected layer number
             while(True):
                 try:
-                    w_name = os.path.join(self.logits_type + '_{}'.format(count), 'w')  # fc_0/w
-                    b_name = os.path.join(self.logits_type + '_{}'.format(count), 'b')  # fc_0/b
+                    w_name = os.path.join(self.logits_type + '_{}'.format(count), 'w').replace('/w:0' , '_w')
+                    # fc_0/w -->fc_0_w
+                    b_name = os.path.join(self.logits_type + '_{}'.format(count), 'b').replace('/b:0' , '_b')
+                    # fc_0/b --> fc_0_b
                     w_, b_ = self.sess.run(w_name, b_name)
                     np.save(os.path.join(self.weights_saved_dir, w_name), w_)  # conv filter save
                     np.save(os.path.join(self.weights_saved_dir, b_name), b_)  # conv biases save
                 except Exception:
-                    w_name = os.path.join('logits', 'w')  # fc_0/w
-                    b_name = os.path.join('logits', 'b')  # fc_0/b
+                    w_name = os.path.join('logits', 'w').replace('/w:0' , '_w')  # fc_0/w
+                    b_name = os.path.join('logits', 'b').replace('/b:0' , '_b')  # fc_0/b
                     w_, b_ = self.sess.run(w_name, b_name)
                     np.save(os.path.join(self.weights_saved_dir, w_name), w_)  # conv filter save
                     np.save(os.path.join(self.weights_saved_dir, b_name), b_)  # conv biases save
+                    break;
         else:
             raise NotImplementedError()
 
+    def _load_pretrained_weights(self):
+        self.conv_weights_list = []
+        self.conv_biases_list = []
+        self.fc_weights_list = []
+        self.fc_biases_list = []
+        for i, name in enumerate(self.layer_names):
+            utils.show_progress(i, len(self.layer_names))
+            name = name.split('/')[0]
+            w_path = os.path.join(self.weights_saved_dir, name + '_w.npy')
+            b_path = os.path.join(self.weights_saved_dir, name + '_b.npy')
+            w = np.load(w_path)
+            b = np.load(b_path)
+            self.conv_weights_list.append(w)
+            self.conv_biases_list.append(b)
 
+        if self.logits_type == 'gap':
+            w_path = os.path.join(self.weights_saved_dir, self.logits_type + '_w.npy')
+            b_path = os.path.join(self.weights_saved_dir, self.logits_type + '_b.npy')
+            w = np.load(w_path)
+            b = np.load(b_path)
+            self.conv_weights_list.append(w)
+            self.conv_biases_list.append(b)
+        elif self.logits_type == 'fc':
+            count=0; # for counting the fully connected layer number
+            while(True):
+                w_path = os.path.join(self.weights_saved_dir, self.logits_type + '_{}'.format(count) + '_w.npy')
+                #_save_pretrained_weights 에 저장된 형태를 불러오기 위해서.
+                b_path = os.path.join(self.weights_saved_dir, self.logits_type + '_{}'.format(count) + '_b.npy')
 
+                w = np.load(w_path)
+                b = np.load(b_path)
+                self.conv_weights_list.append(w)
+                self.conv_biases_list.append(b)
 
-
+            # fc_0 --> fc_1--> logits
 
 
 class Transfer_vgg_16(object):
