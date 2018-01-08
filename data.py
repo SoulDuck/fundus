@@ -741,8 +741,9 @@ def type2(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True 
     np.save(os.path.join(f_path, 'train_fnames.npy'), train_filenames)
     return train_images, train_labels, train_filenames, test_images, test_labels, test_filenames
 
-def type3(tfrecords_dir, onehot=True, resize=(299, 299) , random_shuffle = True ,limits = [6000 , 2000 , 2000 , 2000]):
-    return type2(tfrecords_dir, onehot=onehot, resize=resize, random_shuffle = random_shuffle ,limits = limits)
+
+
+
 
 
 
