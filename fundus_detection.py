@@ -76,7 +76,13 @@ def get_roi_from_csv(ori_image, mask_csv_path, root_data_dir):
                 print e
 
 def get_all_roi_from_csv(csv_dir, data_dir):
-    csv_list=glob.glob(csv_dir+'*.csv') # get csv list from data_dir
+    """
+
+    :param csv_dir: csv 파일이 저장된 장소
+    :param data_dir: roi 가 저장될 장소
+    :return:
+    """
+    csv_list=glob.glob(os.path.join(csv_dir,'*.csv')) # get csv list from data_dir
     #./roi/diabetic_roi/csv/4052347_20160920_L.csv --> 4052347_20160920_L
     print 'the number of csv : {}'.format(len(csv_list))
     for csv in csv_list:
@@ -105,19 +111,23 @@ def get_rectangle_size(data_dir):
     for path in subdir_paths:
         img_path_list=glob.glob(os.path.join(path, '*.png'))
         roi_size_list.extend( map(lambda path : np.shape(np.asarray(Image.open(path)))[:2] , img_path_list))
-    return list(set(roi_size_list))
+        roi_size_list=list(set(roi_size_list))
+
+    for roi_coord in roi_size_list:
+        x = roi_coord[0]
+        y = roi_coord[1]
+        plt.scatter(x, y)
+    plt.show()
+
+    return roi_size_list
 
 def merge_roi_size(roi_size_list , n_roi_size):
     pass;
+#roi_size_list=get_rectangle_size(data_dir='./roi/masked_images')
+
+csv_dir='/Users/seongjungkim/PycharmProjects/fundus/roi/csv'
+data_dir='/Users/seongjungkim/PycharmProjects/fundus/roi/masked_images'
+#get_all_roi_from_csv(csv_dir , data_dir)
 roi_size_list=get_rectangle_size(data_dir='./roi/masked_images')
-for roi_coord in roi_size_list:
-    x=roi_coord[0]
-    y=roi_coord[1]
-    plt.scatter(x,y)
-plt.show()
-
-
-
-
 
 
