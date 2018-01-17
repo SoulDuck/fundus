@@ -116,7 +116,7 @@ def expand_bbox(bboxes, max_shape, factor=1.5):
     return expanded_bboxes
 
 
-def generate_anchors(img_shape, feat_shape, scale, ratio, factor=1.5):
+def generate_anchors(img_shape, feat_shape, scale, ratio, factor=1.5): #e.g)[640 640] [40 40] 50 [0.7071067811865475, 1.4142135623730951] 1.5
     """ Generate the anchors. """
     ih, iw = img_shape
     fh, fw = feat_shape
@@ -133,19 +133,32 @@ def generate_anchors(img_shape, feat_shape, scale, ratio, factor=1.5):
     i = np.tile(i, (fh, 1))
     i = i.reshape((-1))
 
-    s = np.ones((n)) * scale
-    r0 = np.ones((n)) * ratio[0]
-    r1 = np.ones((n)) * ratio[1]
+    """ summary 
+    [0,1,2,3 .... 39] --> # [0,1,2,3 .... 39] | --> [0,0,0...0 ,1,1,1...1, ... 39,39,39...39] # len -->1600
+                                [0,1,2,3 .... 39] |
+                                        :         40
+                                        :         |
+                                [0,1,2,3 .... 39] |
+    """
 
-    h = s * r0
-    w = s * r1
-    y = (j + 0.5) * ih / fh - h * 0.5
-    x = (i + 0.5) * iw / fw - w * 0.5
+    s = np.ones((n)) * scale # e.g [50 , 50 ... ,50]
+    r0 = np.ones((n)) * ratio[0] # e.g [0.7071067811865475 , 0.7071067811865475 ... ,0.7071067811865475]
+    r1 = np.ones((n)) * ratio[1] # e.g [1.4142135623730951 , 1.4142135623730951 ... ,1.4142135623730951]
+    h = s * r0 # e.g [ 35.35533906  35.35533906  35.35533906 ...,  35.35533906  35.35533906 35.35533906] 1600
+    w = s * r1 # e.g [ 70.71067812  70.71067812  70.71067812 ...,  70.71067812  70.71067812 70.71067812] 1600
 
-    ph = h * factor
-    pw = w * factor
-    py = y - h * (factor * 0.5 - 0.5)
-    px = x - w * (factor * 0.5 - 0.5)
+    y = (j + 0.5) * ih / fh - h * 0.5 #[  -9.67766953   -9.67766953   -9.67766953 ...,  614.32233047  614.32233047 614.32233047]
+    #print y
+    x = (i + 0.5) * iw / fw - w * 0.5 #[ -27.35533906  -11.35533906    4.64466094 ...,  564.64466094  580.64466094 596.64466094]
+
+    ph = h * factor # [ 53.03300859  53.03300859  53.03300859 ...,  53.03300859  53.03300859 53.03300859]
+    #print ph
+    pw = w * factor #[ 106.06601718  106.06601718  106.06601718 ...,  106.06601718  106.06601718 106.06601718]
+    #print pw
+    py = y - h * (factor * 0.5 - 0.5)#[ -18.51650429  -18.51650429  -18.51650429 ...,  605.48349571  605.48349571 605.48349571]
+    #print py
+    px = x - w * (factor * 0.5 - 0.5) #[ -45.03300859  -29.03300859  -13.03300859 ...,  546.96699141  562.96699141 578.96699141]
+    #print px
 
     # Determine if the anchors cross the boundary
     anchor_is_untruncated = np.ones((n), np.int32)
@@ -154,6 +167,27 @@ def generate_anchors(img_shape, feat_shape, scale, ratio, factor=1.5):
     anchor_is_untruncated[np.where(h + y > ih)[0]] = 0
     anchor_is_untruncated[np.where(w + x > iw)[0]] = 0
 
+    #print np.where(y < 0)
+    """#(array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
+       17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
+       34, 35, 36, 37, 38, 39]),)
+    """
+    #print np.where(y < 0)[0]
+    """
+    [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+    25 26 27 28 29 30 31 32 33 34 35 36 37 38 39]
+    """
+    #print anchor_is_untruncated[np.where(y < 0)[0]]
+    """
+    [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1]
+    """
+    #print anchor_is_untruncated[np.where(x < 0)]
+    """
+    [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+     1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+     1 1 1 1 1 1]
+     """
     parent_anchor_is_untruncated = np.ones((n), np.int32)
     parent_anchor_is_untruncated[np.where(py < 0)[0]] = 0
     parent_anchor_is_untruncated[np.where(px < 0)[0]] = 0
@@ -175,6 +209,7 @@ def generate_anchors(img_shape, feat_shape, scale, ratio, factor=1.5):
     x = np.expand_dims(x, 1)
     h = np.expand_dims(h, 1)
     w = np.expand_dims(w, 1)
+
     anchors = np.concatenate((y, x, h, w), axis=1)
     anchors = np.array(anchors, np.int32)
 
@@ -186,9 +221,9 @@ def generate_anchors(img_shape, feat_shape, scale, ratio, factor=1.5):
     parent_anchors = np.array(parent_anchors, np.int32)
 
     # Count the number of untruncated anchors
-    num_anchor = np.array([n], np.int32)
+    num_anchor = np.array([n], np.int32) # [ 1600 ]
     num_untruncated_anchor = np.sum(anchor_is_untruncated)
-    num_untruncated_anchor = np.array([num_untruncated_anchor], np.int32)
+    num_untruncated_anchor = np.array([num_untruncated_anchor], np.int32) #1368
     num_untruncated_parent_anchor = np.sum(parent_anchor_is_untruncated)
     num_untruncated_parent_anchor = np.array([num_untruncated_parent_anchor], np.int32)
 

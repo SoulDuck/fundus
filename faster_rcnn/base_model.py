@@ -9,8 +9,8 @@ from tqdm import tqdm
 
 from dataset import *
 from bbox import *
-from utils.coco.coco import *
-from utils.coco.cocoeval import *
+#from utils.coco.coco import *
+#from utils.coco.cocoeval import *
 
 
 class ImageLoader(object):
@@ -48,26 +48,20 @@ class ImageLoader(object):
 class BaseModel(object):
     def __init__(self, params, mode):
         self.params = params
-
         self.mode = mode
         self.batch_size = params.batch_size if mode == 'train' else 1
         self.batch_norm = params.batch_norm
 
-        if params.dataset == 'coco':
-            self.type = 'coco'
-            self.num_class = coco_num_class
-            self.class_names = coco_class_names
-            self.class_colors = coco_class_colors
-            self.class_to_category = coco_class_to_category
-            self.category_to_class = coco_category_to_class
-            self.background_id = self.num_class - 1
-        else:
+
+        if params.dataset == 'pascal':
             self.type = 'pascal'
             self.num_class = pascal_num_class
             self.class_names = pascal_class_names
             self.class_colors = pascal_class_colors
             self.class_ids = pascal_class_ids
             self.background_id = self.num_class - 1
+        else:
+            raise AssertionError
 
         self.basic_model = params.basic_model
         self.num_roi = params.num_roi
@@ -91,7 +85,6 @@ class BaseModel(object):
                 self.anchor_shapes.append([int(s * r[0]), int(s * r[1])])
 
         self.anchor_stat_file = self.type + '_anchor_stats.npz'
-
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
         self.build()
         self.saver = tf.train.Saver(max_to_keep=100)
@@ -186,71 +179,7 @@ class BaseModel(object):
                     self.save(sess)
 
             train_dataset.reset()
-
         print("Model trained.")
-
-    def val_coco(self, sess, val_coco, val_dataset):
-        """ Validate the model on COCO dataset. """
-        print("Validating the model...")
-        num_roi = self.num_roi
-        det_scores = []
-        det_classes = []
-        det_bboxes = []
-
-        for k in tqdm(list(range(val_dataset.count))):
-            batch = val_dataset.next_batch()
-            img_files = batch
-            img_file = img_files[0]
-            H, W = val_dataset.img_heights[k], val_dataset.img_widths[k]
-
-            # Propose the RoIs
-            imgs = self.img_loader.load_imgs(img_files)
-            feats = sess.run(self.conv_feats, feed_dict={self.imgs: imgs, self.is_train: False})
-
-            feed_dict = self.get_feed_dict_for_rpn(batch, is_train=False, feats=feats)
-            scores, regs = sess.run([self.rpn_scores, self.rpn_regs], feed_dict=feed_dict)
-
-            rois = unparam_bbox(regs.squeeze(), self.anchors, self.img_shape[:2])
-            num_real_roi, real_rois = self.process_rpn_result(scores.squeeze(), rois)
-
-            # Add dummy RoIs if necessary
-            rois = np.ones((num_roi, 4), np.int32) * 3
-            rois[:num_real_roi] = real_rois
-            expanded_rois = expand_bbox(rois, self.img_shape[:2])
-            expanded_rois = np.expand_dims(expanded_rois, 0)
-
-            masks = np.zeros((num_roi), np.float32)
-            masks[:num_real_roi] = 1.0
-            masks = np.expand_dims(masks, 0)
-
-            # Classify the RoIs
-            feed_dict = self.get_feed_dict_for_rcn(batch, is_train=False, feats=feats, rois=expanded_rois, masks=masks)
-            scores, classes, regs = sess.run([self.res_scores, self.res_classes, self.res_regs], feed_dict=feed_dict)
-            bboxes = unparam_bbox(regs.squeeze(), rois)
-
-            # Postprocess
-            num_det, scores, classes, bboxes = self.process_rcn_result(scores.squeeze(), classes.squeeze(), bboxes, H,
-                                                                       W)
-
-            det_scores.append(scores)
-            det_classes.append(classes)
-            det_bboxes.append(bboxes)
-
-        val_dataset.reset()
-
-        # Evaluate the results
-        results = []
-        for i in range(val_dataset.count):
-            for s, c, b in zip(det_scores[i], det_classes[i], det_bboxes[i]):
-                results.append({'image_id': val_dataset.img_ids[i], 'category_id': self.class_to_category[c],
-                                'bbox': [b[1], b[0], b[3] - 1, b[2] - 1], 'score': s})
-
-        res_coco = val_coco.loadRes2(results)
-        E = COCOeval(val_coco, res_coco)
-        E.evaluate()
-        E.accumulate()
-        E.summarize()
-        print("Validation complete.")
 
     def val_pascal(self, sess, val_pascal, val_dataset):
         """ Validate the model on PASCAL dataset. """

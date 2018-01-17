@@ -1,13 +1,15 @@
+#-*- coding:utf-8 -*-
 import math
 import numpy as np
 import tensorflow as tf
 import time
 from tqdm import tqdm
+from nn import *
+
 
 from base_model import *
 from bbox import *
-from utils.nn import *
-
+from nn import *
 
 class ObjectDetector(BaseModel):
     def build(self):
@@ -24,9 +26,10 @@ class ObjectDetector(BaseModel):
         else:
             self.build_basic_resnet152()
 
+
         self.build_anchors()
-        self.build_rpn()
-        self.build_rcn()
+        self.build_rpn() #region_proposal_network
+        self.build_rcn() #region_classification_network
         self.build_final()
 
     def build_basic_vgg16(self):
@@ -34,9 +37,9 @@ class ObjectDetector(BaseModel):
         print("Building the basic VGG16 net...")
         bn = self.batch_norm
 
-        imgs = tf.placeholder(tf.float32, [self.batch_size] + self.img_shape)
+        imgs = tf.placeholder(tf.float32, [self.batch_size] + self.img_shape) # 8, 640, 640, 3
+        print "input shape : {} ".format(imgs.get_shape())
         is_train = tf.placeholder(tf.bool)
-
         conv1_1_feats = convolution(imgs, 3, 3, 64, 1, 1, 'conv1_1')
         conv1_1_feats = batch_norm(conv1_1_feats, 'bn1_1', is_train, bn, 'relu')
         conv1_2_feats = convolution(conv1_1_feats, 3, 3, 64, 1, 1, 'conv1_2')
@@ -242,12 +245,25 @@ class ObjectDetector(BaseModel):
         print("Basic ResNet152 net built.")
 
     def build_anchors(self):
+
+        """
+        anchor box  sliding window의 각 위치에서 Bounding Box의 후보로 사용되는 상자다
+        동일한 크기의 sliding window를 이동시키며 window의 위치를 중심으로 사전에 정의된 다양한 비율/크기의 anchor box들을 적용하여 feature를 추출하는 것이다.
+        총 9개의 anchor box들을 사용하였다.
+
+        1.가장 높은 Intersection-over-Union(IoU)을 가지고 있는 anchor.
+        2.IoU > 0.7 을 만족하는 anchor.
+         IoU가 0.3보다 낮은 anchor에 대해선 non-positive anchor로 간주한다.
+        :return:
+        """
         """ Build the anchors and their parents which include the surrounding contexts. """
         print("Building the anchors...")
-        img_shape = np.array(self.img_shape[:2], np.int32)
-
+        img_shape = np.array(self.img_shape[:2], np.int32) # e.g) pascal [640 , 640]
         # Build small anchors
         current_feat_shape = np.array(self.conv_feat_shape[:2], np.int32)
+        print 'current feature shape : {}'.format(current_feat_shape)
+        print 'anchor_scales : {}'.format(self.anchor_scales)
+        print 'anchor ratio : {} '.format(self.anchor_ratios)
         for i in range(3):
             for j in range(3):
                 num_anchor, anchors, anchor_is_untruncated, num_untruncated_anchor, parent_anchors, parent_anchor_is_untruncated, num_untruncated_parent_anchor = generate_anchors(
@@ -270,9 +286,36 @@ class ObjectDetector(BaseModel):
                         (self.parent_anchor_is_untruncated, parent_anchor_is_untruncated))
                     self.num_untruncated_parent_anchor = np.concatenate(
                         (self.num_untruncated_parent_anchor, num_untruncated_parent_anchor))
-
+        #print 'num anchor ', self.num_anchor #[1600 1600 1600 1600 1600 1600 1600 1600 1600]
+        #print self.anchors
+        """
+        shape :(14400, 4)
+        [[  0   0  35  70]
+         [  0   0  35  70]
+         [  0   4  35  70]
+         ..., 
+         [490 529 149 110]
+         [490 545 149  94]
+         [490 561 149  78]]       
+        """
+        #print self.anchor_is_untruncated #[0 0 0 ..., 0 0 0]
+        #print self.num_untruncated_anchor #[1368 1296 1368 1152 1156 1152  704  784  704]
+        #print self.parent_anchors
+        #print np.shape(self.parent_anchors)
+        """
+        shape : (14400, 4)
+        [[  0   0  53 106]
+         [  0   0  53 106]
+         [  0   0  53 106]
+         ..., 
+         [419 493 220 146]
+         [419 509 220 130]
+         [419 525 220 114]]
+        """
+        #print self.parent_anchor_is_untruncated # [0 0 0 ..., 0 0 0]
+        #print self.num_untruncated_parent_anchor #[1224 1296 1224  884  900  884  364  484  364]
         # Build large anchors
-        current_feat_shape = (current_feat_shape / 2).astype(np.int32)
+        current_feat_shape = (current_feat_shape / 2).astype(np.int32) #[20 20]
         for i in range(3, 6):
             for j in range(3):
                 num_anchor, anchors, anchor_is_untruncated, num_untruncated_anchor, parent_anchors, parent_anchor_is_untruncated, num_untruncated_parent_anchor = generate_anchors(
@@ -287,16 +330,22 @@ class ObjectDetector(BaseModel):
                 self.num_untruncated_parent_anchor = np.concatenate(
                     (self.num_untruncated_parent_anchor, num_untruncated_parent_anchor))
 
+        #print len(self.anchors) #18000
+        #print len(self.anchor_is_untruncated) #18000
+        #print len(self.parent_anchors) #18000
+        #print len(self.parent_anchor_is_untruncated) #18000
+        #print len(self.num_untruncated_parent_anchor) #18
+
         self.total_num_anchor = np.sum(self.num_anchor)
         self.total_num_untruncated_anchor = np.sum(self.num_untruncated_anchor)
         self.total_num_truncated_anchor = self.total_num_anchor - self.total_num_untruncated_anchor
+        assert self.total_num_anchor == self.total_num_untruncated_anchor + self.total_num_truncated_anchor
 
         # Show the statistics of anchors
         for i in range(self.num_anchor_type):
             print("Anchor type [%d, %d]: %d untruncated, %d truncated" % (
             self.anchor_shapes[i][0], self.anchor_shapes[i][1], self.num_untruncated_anchor[i],
             self.num_anchor[i] - self.num_untruncated_anchor[i]))
-
         print("Anchors built.")
 
     def build_rpn(self):
@@ -309,9 +358,9 @@ class ObjectDetector(BaseModel):
         feats = tf.placeholder(tf.float32, [self.batch_size] + self.conv_feat_shape)
         gt_anchor_labels = tf.placeholder(tf.int32, [self.batch_size, self.total_num_anchor])
         gt_anchor_regs = tf.placeholder(tf.float32, [self.batch_size, self.total_num_anchor, 4])
-        anchor_masks = tf.placeholder(tf.float32, [self.batch_size, self.total_num_anchor])
-        anchor_weights = tf.placeholder(tf.float32, [self.batch_size, self.total_num_anchor])
-        anchor_reg_masks = tf.placeholder(tf.float32, [self.batch_size, self.total_num_anchor])
+        anchor_masks = tf.placeholder(tf.float32, [self.batch_size, self.total_num_anchor]) #shape = 8 , 18000
+        anchor_weights = tf.placeholder(tf.float32, [self.batch_size, self.total_num_anchor]) #shape = 8 , 18000
+        anchor_reg_masks = tf.placeholder(tf.float32, [self.batch_size, self.total_num_anchor]) #shape = 8 , 18000
 
         self.feats = feats
         self.gt_anchor_labels = gt_anchor_labels
@@ -332,40 +381,45 @@ class ObjectDetector(BaseModel):
             kernel_sizes = [5, 5]
 
         for i in range(2):
+            """
+            conv feat 의 사이즈가 40 , 40 일때와 20,20 일때 2번 한다
+            build_anchor 에서 currnet feat_shape 을 1/2로 줄여 anchor 을 만들었다  
+            """
             label_i = '_' + str(i)
-            rpn1 = convolution(current_feats, kernel_sizes[0], kernel_sizes[1], 512, 1, 1, 'rpn1' + label_i, group_id=1)
+            rpn1 = convolution(current_feats, kernel_sizes[0], kernel_sizes[1], 512, 1, 1, 'rpn1' + label_i, group_id=1) # stride 1,1
             rpn1 = nonlinear(rpn1, 'relu')
             rpn1 = dropout(rpn1, 0.5, is_train)
 
             for j in range(9):
+                """ 각각의 anchor 마다 logits 과 regression 을 한다"""
+                """ reg 나 logits 하는 방식은 똑같은데 이름이 다를 뿐이다. 즉 학습시키는 방법은 똑같다"""
                 label_ij = str(i) + '_' + str(j)
-
-                rpn_logits = convolution(rpn1, 1, 1, 2, 1, 1, 'rpn_logits' + label_ij, group_id=1)
-                rpn_logits = tf.reshape(rpn_logits, [self.batch_size, -1, 2])
+                rpn_logits = convolution(rpn1, 1, 1, 2, 1, 1, 'rpn_logits' + label_ij, group_id=1) # 2v=> object / Non-Object # 8 ,40, 40 , 2
+                rpn_logits = tf.reshape(rpn_logits, [self.batch_size, -1, 2]) # shape=(8, 1600, 2)
                 all_rpn_logits.append(rpn_logits)
 
-                rpn_regs = convolution(rpn1, 1, 1, 4, 1, 1, 'rpn_regs' + label_ij, group_id=1)
-                rpn_regs = tf.clip_by_value(rpn_regs, -0.2, 0.2)
+                rpn_regs = convolution(rpn1, 1, 1, 4, 1, 1, 'rpn_regs' + label_ij, group_id=1) # 4 => x,y,h,w # 8 ,40, 40 , 4
+                rpn_regs = tf.clip_by_value(rpn_regs, -0.2, 0.2) ## shape=(8, 1600, 4)
                 rpn_regs = tf.reshape(rpn_regs, [self.batch_size, -1, 4])
                 all_rpn_regs.append(rpn_regs)
 
-            if i < 1:
-                current_feats = max_pool(current_feats, 2, 2, 2, 2, 'rpn_pool' + label_i)
+            if i < 1: #if i ==0 c
+                current_feats = max_pool(current_feats, 2, 2, 2, 2, 'rpn_pool' + label_i)  # 이미지를 1/4로 축소시킨다 #(8, 20, 20, 512)
+        #len(all_rpn_logits) # 18 = 9*2
+        #(all_rpn_logits) # shape=(8, 1600, 2) ...
+        gt_anchor_labels = tf.reshape(gt_anchor_labels, [-1]) #(144000,),
+        gt_anchor_regs = tf.reshape(gt_anchor_regs, [-1, 4]) #(144000, 4)
+        anchor_masks = tf.reshape(anchor_masks, [-1])#(144000,),
+        anchor_weights = tf.reshape(anchor_weights, [-1])#(144000,),
+        anchor_reg_masks = tf.reshape(anchor_reg_masks, [-1])#(144000,),
 
-        all_rpn_logits = tf.concat(1, all_rpn_logits)
-        all_rpn_regs = tf.concat(1, all_rpn_regs)
-
-        all_rpn_logits = tf.reshape(all_rpn_logits, [-1, 2])
-        all_rpn_regs = tf.reshape(all_rpn_regs, [-1, 4])
-
+        all_rpn_logits = tf.concat(axis=1, values=all_rpn_logits) #(8, 18000, 2)
+        all_rpn_regs = tf.concat(axis=1, values=all_rpn_regs)# (8, 18000, 4)
+        all_rpn_logits = tf.reshape(all_rpn_logits, [-1, 2]) # shape=(144000, 2)
+        all_rpn_regs = tf.reshape(all_rpn_regs, [-1, 4]) # shape=(144000, 4)
         # Compute the loss function
-        gt_anchor_labels = tf.reshape(gt_anchor_labels, [-1])
-        gt_anchor_regs = tf.reshape(gt_anchor_regs, [-1, 4])
-        anchor_masks = tf.reshape(anchor_masks, [-1])
-        anchor_weights = tf.reshape(anchor_weights, [-1])
-        anchor_reg_masks = tf.reshape(anchor_reg_masks, [-1])
 
-        loss0 = tf.nn.sparse_softmax_cross_entropy_with_logits(all_rpn_logits, gt_anchor_labels) * anchor_masks
+        loss0 = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=all_rpn_logits, labels=gt_anchor_labels) * anchor_masks
         loss0 = tf.reduce_sum(loss0 * anchor_weights) / tf.reduce_sum(anchor_weights)
 
         w = self.l2_loss(all_rpn_regs, gt_anchor_regs) * anchor_reg_masks
@@ -396,7 +450,6 @@ class ObjectDetector(BaseModel):
         self.rpn_loss0 = loss0
         self.rpn_loss1 = loss1
         self.rpn_opt_op = opt_op
-
         self.rpn_scores = rpn_scores
         self.rpn_regs = rpn_regs
         print("RPN built.")
@@ -458,7 +511,7 @@ class ObjectDetector(BaseModel):
             useful_regs = regs
 
         # Compute the loss function
-        loss0 = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, gt_roi_classes) * roi_masks
+        loss0 = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=gt_roi_classes) * roi_masks
         loss0 = tf.reduce_sum(loss0 * roi_weights) / tf.reduce_sum(roi_weights)
 
         w = self.l2_loss(useful_regs, gt_roi_regs) * roi_reg_masks
@@ -848,8 +901,8 @@ class ObjectDetector(BaseModel):
 
         anchor_iou_freq = np.zeros((t, 6, 6), np.float32)
         class_iou_freq = np.zeros((r, 6, 6), np.float32)
-
-        for i in tqdm(list(range(dataset.count))):
+        print dataset.count
+        for i in range(dataset.count):
             img_file = dataset.img_files[i]
             H, W = dataset.img_heights[i], dataset.img_widths[i]
             gt_classes = np.array(dataset.gt_classes[i])

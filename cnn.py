@@ -3,13 +3,16 @@ from tensorflow.contrib.layers.python.layers import batch_norm as batch_norm
 
 
 
-def convolution2d(name,x,out_ch,k=3 , s=2 , padding='SAME'):
+def convolution2d(name,x,out_ch,k=3 , s=2 , padding='SAME' , act=tf.nn.relu):
     with tf.variable_scope(name) as scope:
         in_ch=x.get_shape()[-1]
         filter=tf.get_variable("w" , [k,k,in_ch , out_ch] , initializer=tf.contrib.layers.xavier_initializer())
         bias=tf.Variable(tf.constant(0.1) , out_ch)
         layer=tf.nn.conv2d(x , filter ,[1,s,s,1] , padding)+bias
-        layer=tf.nn.relu(layer , name='relu')
+        if not act is None:
+            layer=act(layer , name='relu')
+        else:
+            print 'activation None'
         if __debug__ == True:
             print 'layer name : ' ,name
             print 'layer shape : ' ,layer.get_shape()
