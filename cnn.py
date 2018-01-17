@@ -62,7 +62,7 @@ def batch_norm_layer(x,phase_train,scope_bn):
     scope=scope_bn)
     z = tf.cond(phase_train, lambda: bn_train, lambda: bn_inference)
     return z
-def affine(name,x,out_ch , trainable=True):
+def affine(name,x,out_ch , trainable=True , activation=tf.nn.relu):
     with tf.variable_scope(name) as scope:
         if len(x.get_shape())==4:
             batch, height , width , in_ch=x.get_shape().as_list()
@@ -76,7 +76,10 @@ def affine(name,x,out_ch , trainable=True):
 
         b_fc = tf.Variable(tf.constant(0.1), out_ch,  name='b')
         layer=tf.matmul(x , w_fc) + b_fc
-        layer=tf.nn.relu(layer)
+        if not activation is None:
+            layer=activation(layer)
+        else:
+            print 'Activation is None'
 
         print 'layer name : {}'.format(name)
         print 'layer shape :',layer.get_shape()
