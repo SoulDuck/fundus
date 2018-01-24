@@ -23,11 +23,13 @@ import numpy as np
 import numpy.random as npr
 import tensorflow as tf
 
-import configure as cfg
-import bbox_overlays
+from configure import cfg
+import bbox_overlaps
 import bbox_transform
+import generate_anchor
 
 
+#py_func은 session 이 실행되고 나서 검사된다. 그 전에는 그냥 검사만 추가한다.
 def anchor_target_layer(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anchor_scales):
     '''
     Make Python version of _anchor_target_layer_py below Tensorflow compatible
@@ -43,11 +45,10 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anchor_s
 
     return rpn_labels, rpn_bbox_targets, rpn_bbox_inside_weights, rpn_bbox_outside_weights
 
-
 def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anchor_scales):
     """
     Python version    
-
+    이해가 안가는게 ... 가끔 겹치지 않는 sample들이 있는데 그게 불가능 한데...뭐지....
     Assign anchors to ground-truth targets. Produces anchor classification
     labels and bounding-box regression targets.
 
@@ -60,9 +61,8 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     # measure GT overlap
     """
     im_dims = im_dims[0]
-    _anchors = generate_anchors(scales=np.array(anchor_scales))
+    _anchors = generate_anchor.generate_anchors(scales=np.array(anchor_scales)) #_anchors ( 9, 4 )
     _num_anchors = _anchors.shape[0]
-
     # allow boxes to sit over the edge by a small amount
     _allowed_border = 0
 
@@ -72,48 +72,67 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
 
     # map of shape (..., H, W)
     height, width = rpn_cls_score.shape[1:3]
-
     # 1. Generate proposals from bbox deltas and shifted anchors
+
     shift_x = np.arange(0, width) * _feat_stride
     shift_y = np.arange(0, height) * _feat_stride
     shift_x, shift_y = np.meshgrid(shift_x, shift_y)
     shifts = np.vstack((shift_x.ravel(), shift_y.ravel(),
-                        shift_x.ravel(), shift_y.ravel())).transpose()
-
+                        shift_x.ravel(), shift_y.ravel())).transpose() # 4,88 을 88,4 로 바꾼다
+    # shifts (91 ,4)
     # add A anchors (1, A, 4) to
     # cell K shifts (K, 1, 4) to get
     # shift anchors (K, A, 4)
     # reshape to (K*A, 4) shifted anchors
-    A = _num_anchors
-    K = shifts.shape[0]
-    all_anchors = (_anchors.reshape((1, A, 4)) +
-                   shifts.reshape((1, K, 4)).transpose((1, 0, 2)))
+
+    A = _num_anchors # 9
+    K = shifts.shape[0] # 88
+
+    #all_anchors = (_anchors.reshape((1, A, 4)) +shifts.reshape((1, K, 4)).transpose((1, 0, 2)))
+    all_anchors=np.array([])
+    for i in range(len(_anchors)):
+        if i ==0 :
+            all_anchors=np.add(shifts , _anchors[i])
+        else:
+            all_anchors=np.concatenate((all_anchors , np.add(shifts , _anchors[i])) ,axis=0)
+    #print 'all anchors:' ,np.shape(all_anchors)
+    #print all_anchors
+
+    all_anchors=all_anchors.reshape([1,K*A,4]).transpose((1,0,2))
     all_anchors = all_anchors.reshape((K * A, 4))
     total_anchors = int(K * A)
+    #print 'total anchors : {}'.format(total_anchors)
+    # anchors inside the imageprint all_anchors
+    #print _anchors.reshape(1,A,4)
+    #print shifts.reshape(1,K,4)
 
-    # anchors inside the image
     inds_inside = np.where(
         (all_anchors[:, 0] >= -_allowed_border) &
         (all_anchors[:, 1] >= -_allowed_border) &
         (all_anchors[:, 2] < im_dims[1] + _allowed_border) &  # width
         (all_anchors[:, 3] < im_dims[0] + _allowed_border)  # height
-    )[0]
+)[0] # - 좌표를 포함하고 있는 anchor 들을 지워버린다
 
     # keep only inside anchors
-    anchors = all_anchors[inds_inside, :]
-
-    # label: 1 is positive, 0 is negative, -1 is dont care
+    anchors = all_anchors[inds_inside]
     labels = np.empty((len(inds_inside),), dtype=np.float32)
     labels.fill(-1)
-
     # overlaps between the anchors and the gt boxes
     # overlaps (ex, gt)
-    overlaps = bbox_overlaps(
+    overlaps = bbox_overlaps.bbox_overlaps(
         np.ascontiguousarray(anchors, dtype=np.float),
-        np.ascontiguousarray(gt_boxes, dtype=np.float))
-    argmax_overlaps = overlaps.argmax(axis=1)
-    max_overlaps = overlaps[np.arange(len(inds_inside)), argmax_overlaps]
+        np.ascontiguousarray(gt_boxes, dtype=np.float)) #anchor 별로 얼마나 겹치는지 확인해준다
+
+    # overlaps 가 겹치지 않는 문제가 있다
+    # overlaps shape : # ? , 2 왜 2개가 나오는거지
+
+    argmax_overlaps = overlaps.argmax(axis=1) # 여러 gt box 중에 가장 많이 겹치는 gt 을 가져온다
+    max_overlaps = overlaps[np.arange(len(inds_inside)), argmax_overlaps] # inds_inside 갯수 만큼 overlaps에서 가장 높은 overlays
     gt_argmax_overlaps = overlaps.argmax(axis=0)
+    #print gt_argmax_overlaps # gt_argmax_overlap 이 empty가 뜨는데 어떻게 해결해야 하지.....
+
+
+
     gt_max_overlaps = overlaps[gt_argmax_overlaps,
                                np.arange(overlaps.shape[1])]
     gt_argmax_overlaps = np.where(overlaps == gt_max_overlaps)[0]
@@ -123,7 +142,7 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
         labels[max_overlaps < cfg.TRAIN.RPN_NEGATIVE_OVERLAP] = 0
 
     # fg label: for each gt, anchor with highest overlap
-    labels[gt_argmax_overlaps] = 1
+    labels[gt_argmax_overlaps] = 1 # 가장 높은 anchor의 라벨은 1로 준다
 
     # fg label: above threshold IOU
     labels[max_overlaps >= cfg.TRAIN.RPN_POSITIVE_OVERLAP] = 1
@@ -132,14 +151,14 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
         # assign bg labels last so that negative labels can clobber positives
         labels[max_overlaps < cfg.TRAIN.RPN_NEGATIVE_OVERLAP] = 0
 
+    #print 'labels :',labels
     # subsample positive labels if we have too many
-    num_fg = int(cfg.TRAIN.RPN_FG_FRACTION * cfg.TRAIN.RPN_BATCHSIZE)
+    num_fg = int(cfg.TRAIN.RPN_FG_FRACTION * cfg.TRAIN.RPN_BATCHSIZE) # fg 와 bg 을 1:1 로 맞추어야 한다 .
     fg_inds = np.where(labels == 1)[0]
     if len(fg_inds) > num_fg:
         disable_inds = npr.choice(
-            fg_inds, size=(len(fg_inds) - num_fg), replace=False)
+            fg_inds, size=(len(fg_inds) - num_fg), replace=False) # replace = False --> 겹치지 않게 한다
         labels[disable_inds] = -1
-
     # subsample negative labels if we have too many
     num_bg = cfg.TRAIN.RPN_BATCHSIZE - np.sum(labels == 1)
     bg_inds = np.where(labels == 0)[0]
@@ -148,19 +167,29 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
             bg_inds, size=(len(bg_inds) - num_bg), replace=False)
         labels[disable_inds] = -1
 
+    # bg or fg 가 지정한 갯수보다 많으면 -1 라벨해서 선택되지 않게 한다
     # bbox_targets: The deltas (relative to anchors) that Faster R-CNN should 
     # try to predict at each anchor
     # TODO: This "weights" business might be deprecated. Requires investigation
-    bbox_targets = np.zeros((len(inds_inside), 4), dtype=np.float32)
-    bbox_targets = _compute_targets(anchors, gt_boxes[argmax_overlaps, :])
+
+    #bbox_targets = np.zeros((len(inds_inside), 4), dtype=np.float32) 이게 왜 필요하지
+
+    bbox_targets = _compute_targets(anchors, gt_boxes[argmax_overlaps, :]) #  bbox_targets = dx , dy , dw , dh
 
     bbox_inside_weights = np.zeros((len(inds_inside), 4), dtype=np.float32)
-    bbox_inside_weights[labels == 1, :] = np.array(cfg.TRAIN.RPN_BBOX_INSIDE_WEIGHTS)
+    #print labels == 1
+    #print bbox_inside_weights[labels == 1, :]
+    bbox_inside_weights[labels == 1, :] = np.array(cfg.TRAIN.RPN_BBOX_INSIDE_WEIGHTS) #(1.0, 1.0, 1.0, 1.0)
+    #print 'bbox_targets : ',bbox_targets
+    #print 'bbox_inside_weights',bbox_inside_weights
+    # Give the positive RPN examples weight of p * 1 / {num positives}
+    # and give negatives a weight of (1 - p)
+    # Set to -1.0 to use uniform example weighting
 
     bbox_outside_weights = np.zeros((len(inds_inside), 4), dtype=np.float32)
-    if cfg.TRAIN.RPN_POSITIVE_WEIGHT < 0:
+    if cfg.TRAIN.RPN_POSITIVE_WEIGHT < 0: #TRAIN.RPN_POSITIVE_WEIGHT = -1
         # uniform weighting of examples (given non-uniform sampling)
-        num_examples = np.sum(labels >= 0)
+        num_examples = np.sum(labels >= 0) # get positive label
         positive_weights = np.ones((1, 4)) * 1.0 / num_examples
         negative_weights = np.ones((1, 4)) * 1.0 / num_examples
     else:
@@ -170,6 +199,9 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
                             np.sum(labels == 1))
         negative_weights = ((1.0 - cfg.TRAIN.RPN_POSITIVE_WEIGHT) /
                             np.sum(labels == 0))
+
+    #print 'positive weight : ', positive_weights
+    #print 'negative weight : ', negative_weights
     bbox_outside_weights[labels == 1, :] = positive_weights
     bbox_outside_weights[labels == 0, :] = negative_weights
 
@@ -180,18 +212,21 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     bbox_outside_weights = _unmap(bbox_outside_weights, total_anchors, inds_inside, fill=0)
 
     # labels
-    labels = labels.reshape((1, height, width, A)).transpose(0, 3, 1, 2)
+    labels = labels.reshape((1, height, width, A)).transpose(0, 3, 1, 2) # A = 9
     labels = labels.reshape((1, 1, A * height, width))
     rpn_labels = labels
 
     # bbox_targets
     rpn_bbox_targets = bbox_targets.reshape((1, height, width, A * 4)).transpose(0, 3, 1, 2)
-
     # bbox_inside_weights
     rpn_bbox_inside_weights = bbox_inside_weights.reshape((1, height, width, A * 4)).transpose(0, 3, 1, 2)
 
     # bbox_outside_weights
     rpn_bbox_outside_weights = bbox_outside_weights.reshape((1, height, width, A * 4)).transpose(0, 3, 1, 2)
+    #print 'rpn_label ',np.shape(rpn_bbox_inside_weights)
+    #print 'rpn_bbox_targets ', np.shape(rpn_bbox_targets)
+    #print 'rpn_bbox_inside_weights ', np.shape(rpn_bbox_inside_weights)
+    #print 'rpn_bbox_outside_weights ', np.shape(rpn_bbox_outside_weights)
 
     return rpn_labels, rpn_bbox_targets, rpn_bbox_inside_weights, rpn_bbox_outside_weights
 
@@ -217,4 +252,4 @@ def _compute_targets(ex_rois, gt_rois):
     assert ex_rois.shape[1] == 4
     assert gt_rois.shape[1] == 5
 
-    return bbox_transform(ex_rois, gt_rois[:, :4]).astype(np.float32, copy=False)
+    return bbox_transform.bbox_transform(ex_rois, gt_rois[:, :4]).astype(np.float32, copy=False)

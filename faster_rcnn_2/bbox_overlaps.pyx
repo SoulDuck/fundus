@@ -18,7 +18,7 @@ cimport numpy as np
 
 DTYPE = np.float
 ctypedef np.float_t DTYPE_t
-
+print 'bbox_overlaps imported'
 def bbox_overlaps(
         np.ndarray[DTYPE_t, ndim=2] boxes,
         np.ndarray[DTYPE_t, ndim=2] query_boxes):
@@ -37,6 +37,10 @@ def bbox_overlaps(
     cdef DTYPE_t iw, ih, box_area
     cdef DTYPE_t ua
     cdef unsigned int k, n
+    print '### bbox_overlaps.pyx ###'
+    print 'K : ',K
+    print 'N : ',N
+
     for k in range(K):
         box_area = (
             (query_boxes[k, 2] - query_boxes[k, 0] + 1) *
@@ -58,5 +62,6 @@ def bbox_overlaps(
                         (boxes[n, 3] - boxes[n, 1] + 1) +
                         box_area - iw * ih
                     )
+                    #print 'iw * ih / ua : {}'.format(iw * ih / ua )
                     overlaps[n, k] = iw * ih / ua
     return overlaps
