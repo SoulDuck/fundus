@@ -241,6 +241,7 @@ class FasterRcnnConv5():
         flips[0] = np.random.binomial(1,0.5)
         img = image_preprocessing.image_preprocessing(img)
         if np.max(img) > 1 :
+            print 'max value : ',np.max(img)
             img=img/255.
         feed_dict = {self.x_: img, self.im_dims: im_dims, self.gt_boxes : gt_bbox}
         return feed_dict
