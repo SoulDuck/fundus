@@ -80,14 +80,14 @@ class FasterRcnnConv5():
         """
         rpn_out_ch = 512
         rpn_k=3
-        anchor_scales = [4, 8, 16]  # original anchor_scales
+        anchor_scales = [1, 2, 4]  # original anchor_scales
         n_anchors = len(anchor_scales) * 3 # len(ratio) =3
         #_n_anchors =len(self.anchor_scales)*3
         top_conv = self.top_conv
         with tf.variable_scope('rpn'):
             self.rpn_layer = convolution2d('conv', top_conv, out_ch= rpn_out_ch , k=rpn_k  , s=1 ,padding="SAME") #shape=(1, ?, ?, 512)
             with tf.variable_scope('cls'):
-                    rpn_cls_layer = convolution2d('conv' ,self.rpn_layer, out_ch= n_anchors*2 , k=1 , act=None)
+                    rpn_cls_layer = convolution2d('conv' ,self.rpn_layer, out_ch= n_anchors*2 , k=1 , act=None , s=1)
                     self.rpn_cls_layer  = tf.identity(rpn_cls_layer , name='cls_output')
                     print '** cls layer shape : {}'.format(np.shape(rpn_cls_layer )) #(1, ?, ?, 18)
             with tf.variable_scope('target'):
@@ -113,11 +113,10 @@ class FasterRcnnConv5():
                 # img_dim : ? 2
             with tf.variable_scope('bbox'):
                 # Bounding-Box regression layer (bounding box predictions)
-                rpn_bbox_layer = convolution2d('conv', self.rpn_layer, out_ch=n_anchors * 4, k=1,
+                rpn_bbox_layer = convolution2d('conv', self.rpn_layer, out_ch=n_anchors * 4, k=1, s=1,
                                                act=None)  # (1, ?, ?, 36)
             self.rpn_bbox_layer = tf.identity(rpn_bbox_layer , 'bbox_output')
             print '** bbox_layer shape : {}'.format(np.shape(self.rpn_bbox_layer ))
-            #'rpn fileter size ?' rpn output channel?
             print
     def _roi_proposal(self):
         print '###### ROI Proposal Network building.... '
@@ -232,8 +231,18 @@ class FasterRcnnConv5():
         img_path=os.path.join(self.data_dir , 'Images' ,self.train_names[image_idx]+cfg.IMAGE_FORMAT  )
         annotation_path = os.path.join(self.data_dir, 'Annotations', self.train_names[image_idx] + '.txt')
         img = imread(img_path)
+
         gt_bbox = np.loadtxt(annotation_path , ndmin=2)
         im_dims = np.array(img.shape[:2]).reshape([1,2])
+
+        print 'gt_boxx',gt_bbox
+        print 'image dimension',im_dims
+
+
+
+
+
+
         flips = [0, 0]
         flips[0] = np.random.binomial(1,0.5)
         img = image_preprocessing.image_preprocessing(img)

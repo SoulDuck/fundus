@@ -79,64 +79,40 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     shift_x, shift_y = np.meshgrid(shift_x, shift_y)
     shifts = np.vstack((shift_x.ravel(), shift_y.ravel(),
                         shift_x.ravel(), shift_y.ravel())).transpose() # 4,88 을 88,4 로 바꾼다
-    #print shifts
-    # shifts (91 ,4)
-    # add A anchors (1, A, 4) to
-    # cell K shifts (K, 1, 4) to get
-    # shift anchors (K, A, 4)
-    # reshape to (K*A, 4) shifted anchors
-
     A = _num_anchors # 9
     K = shifts.shape[0] # 88
 
-    #all_anchors = (_anchors.reshape((1, A, 4)) +shifts.reshape((1, K, 4)).transpose((1, 0, 2)))
     all_anchors=np.array([])
     for i in range(len(_anchors)):
         if i ==0 :
-            all_anchors=np.add(shifts , _anchors[i])
+            all_anchors=np.add(shifts , _anchors[i] )
         else:
             all_anchors=np.concatenate((all_anchors , np.add(shifts , _anchors[i])) ,axis=0)
-    #print 'all anchors:' ,np.shape(all_anchors)
-    #print all_anchors
+            #print _anchors[i]
+
 
     all_anchors = all_anchors.reshape((K * A, 4))
     total_anchors = int(K * A)
-
-    #print 'total anchors : {}'.format(total_anchors)
-    # anchors inside the imageprint all_anchors
-    #print _anchors.reshape(1,A,4)
-    #print shifts.reshape(1,K,4)
 
     inds_inside = np.where(
         (all_anchors[:, 0] >= -_allowed_border) &
         (all_anchors[:, 1] >= -_allowed_border) &
         (all_anchors[:, 2] < im_dims[1] + _allowed_border) &  # <-- width
         (all_anchors[:, 3] < im_dims[0] + _allowed_border))[0] # <-- height
-
-    # keep only inside anchors
     anchors = all_anchors[inds_inside]
     labels = np.empty((len(inds_inside),), dtype=np.float32)
     labels.fill(-1)
-    # overlaps between the anchors and the gt boxes
-    # overlaps (ex, gt)
-
-    import matplotlib.pyplot as plt
 
     overlaps = bbox_overlaps.bbox_overlaps(
         np.ascontiguousarray(anchors, dtype=np.float),
         np.ascontiguousarray(gt_boxes, dtype=np.float)) #anchor 별로 얼마나 겹치는지 확인해준다
-    # overlaps 가 겹치지 않는 문제가 있다
-    # overlaps shape : # ? , 2 왜 2개가 나오는거지
-
     argmax_overlaps = overlaps.argmax(axis=1) # 여러 gt box 중에 가장 많이 겹치는 gt 을 가져온다
     max_overlaps = overlaps[np.arange(len(inds_inside)), argmax_overlaps] # inds_inside 갯수 만큼 overlaps에서 가장 높은 overlays
     gt_argmax_overlaps = overlaps.argmax(axis=0)
     #print gt_argmax_overlaps # gt_argmax_overlap 이 empty가 뜨는데 어떻게 해결해야 하지.....
 
-
-
     gt_max_overlaps = overlaps[gt_argmax_overlaps,
-                               np.arange(overlaps.shape[1])]
+                               np.arange(overlaps.shape[1])] #[ 0.63559322  0.39626705]
     gt_argmax_overlaps = np.where(overlaps == gt_max_overlaps)[0]
 
     if not cfg.TRAIN.RPN_CLOBBER_POSITIVES:
@@ -148,15 +124,13 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
 
     # fg label: above threshold IOU
     labels[max_overlaps >= cfg.TRAIN.RPN_POSITIVE_OVERLAP] = 1
-
     if cfg.TRAIN.RPN_CLOBBER_POSITIVES:
         # assign bg labels last so that negative labels can clobber positives
         labels[max_overlaps < cfg.TRAIN.RPN_NEGATIVE_OVERLAP] = 0
 
-    #print 'labels :',labels
-    # subsample positive labels if we have too many
     num_fg = int(cfg.TRAIN.RPN_FG_FRACTION * cfg.TRAIN.RPN_BATCHSIZE) # fg 와 bg 을 1:1 로 맞추어야 한다 .
     fg_inds = np.where(labels == 1)[0]
+
     if len(fg_inds) > num_fg:
         disable_inds = npr.choice(
             fg_inds, size=(len(fg_inds) - num_fg), replace=False) # replace = False --> 겹치지 않게 한다
@@ -168,6 +142,7 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
         disable_inds = npr.choice(
             bg_inds, size=(len(bg_inds) - num_bg), replace=False)
         labels[disable_inds] = -1
+    # fg 는 무조건 하나 포함되는데 그 이유는 max IOU을 가지고 있는건 무조건 FG로 보게 한다
 
     # bg or fg 가 지정한 갯수보다 많으면 -1 라벨해서 선택되지 않게 한다
     # bbox_targets: The deltas (relative to anchors) that Faster R-CNN should 
@@ -175,15 +150,9 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     # TODO: This "weights" business might be deprecated. Requires investigation
 
     #bbox_targets = np.zeros((len(inds_inside), 4), dtype=np.float32) 이게 왜 필요하지
-
     bbox_targets = _compute_targets(anchors, gt_boxes[argmax_overlaps, :]) #  bbox_targets = dx , dy , dw , dh
-
     bbox_inside_weights = np.zeros((len(inds_inside), 4), dtype=np.float32)
-    #print labels == 1
-    #print bbox_inside_weights[labels == 1, :]
     bbox_inside_weights[labels == 1, :] = np.array(cfg.TRAIN.RPN_BBOX_INSIDE_WEIGHTS) #(1.0, 1.0, 1.0, 1.0)
-    #print 'bbox_targets : ',bbox_targets
-    #print 'bbox_inside_weights',bbox_inside_weights
     # Give the positive RPN examples weight of p * 1 / {num positives}
     # and give negatives a weight of (1 - p)
     # Set to -1.0 to use uniform example weighting
@@ -201,13 +170,13 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
                             np.sum(labels == 1))
         negative_weights = ((1.0 - cfg.TRAIN.RPN_POSITIVE_WEIGHT) /
                             np.sum(labels == 0))
-
-    #print 'positive weight : ', positive_weights
-    #print 'negative weight : ', negative_weights
     bbox_outside_weights[labels == 1, :] = positive_weights
     bbox_outside_weights[labels == 0, :] = negative_weights
 
     # map up to original set of anchors
+
+
+    #ins_inside
     labels = _unmap(labels, total_anchors, inds_inside, fill=-1)
     bbox_targets = _unmap(bbox_targets, total_anchors, inds_inside, fill=0)
     bbox_inside_weights = _unmap(bbox_inside_weights, total_anchors, inds_inside, fill=0)
@@ -222,13 +191,8 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     rpn_bbox_targets = bbox_targets.reshape((1, height, width, A * 4)).transpose(0, 3, 1, 2)
     # bbox_inside_weights
     rpn_bbox_inside_weights = bbox_inside_weights.reshape((1, height, width, A * 4)).transpose(0, 3, 1, 2)
-
     # bbox_outside_weights
     rpn_bbox_outside_weights = bbox_outside_weights.reshape((1, height, width, A * 4)).transpose(0, 3, 1, 2)
-    #print 'rpn_label ',np.shape(rpn_bbox_inside_weights)
-    #print 'rpn_bbox_targets ', np.shape(rpn_bbox_targets)
-    #print 'rpn_bbox_inside_weights ', np.shape(rpn_bbox_inside_weights)
-    #print 'rpn_bbox_outside_weights ', np.shape(rpn_bbox_outside_weights)
 
     return rpn_labels, rpn_bbox_targets, rpn_bbox_inside_weights, rpn_bbox_outside_weights
 

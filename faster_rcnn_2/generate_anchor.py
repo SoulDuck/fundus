@@ -48,7 +48,7 @@ import numpy as np
 #       [ -79., -167.,   96.,  184.],
 #       [-167., -343.,  184.,  360.]])
 
-def generate_anchors(base_size=16, ratios=[0.5, 1, 2],scales=2**np.arange(3, 6)):
+def generate_anchors(base_size=8, ratios=[0.5, 1, 2],scales=2**np.arange(3, 6)):
     """
     Generate anchor (reference) windows by enumerating aspect ratios X
     scales wrt a reference (0, 0, 15, 15) window.
@@ -99,12 +99,7 @@ def _ratio_enum(anchor, ratios):
     ws = np.round(np.sqrt(size_ratios)) # ws [ 23.  16.  11.]
     hs = np.round(ws * ratios) # hs [ 12.  16.  22.]
 
-    #print 'ws' ,ws
-    #print 'hs' ,hs
-    #print 'x_ctr',x_ctr
-    #print 'y_ctr', y_ctr
     anchors = _mkanchors(ws, hs, x_ctr, y_ctr)
-    #print 'ratio enum shape : {}'.format(np.shape(anchors)) # 3,4
 
     return anchors
 

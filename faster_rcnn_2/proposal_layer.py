@@ -55,9 +55,6 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # the first set of _num_anchors channels are bg probs
     # the second set are the fg probs, which we want
     scores = rpn_bbox_cls_prob[:, _num_anchors:, :, :]
-    #print 'scores shape : {}'.format(np.shape(scores))
-    #print 'rpn_bbox_pred {} '.format(rpn_bbox_pred)
-    #print 'rpn shape {}'.format(np.shape(rpn_bbox_pred))
     bbox_deltas = rpn_bbox_pred
 
     # 1. Generate proposals from bbox deltas and shifted anchors
@@ -94,23 +91,15 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # reshape to (1 * H * W * A, 4) where rows are ordered by (h, w, a)
     # in slowest to fastest order
 
-    #print 'bbox_delta',bbox_deltas
-    #print 'bbox_delta shape {}'.format(np.shape(bbox_deltas))
     bbox_deltas = bbox_deltas.transpose((0, 2, 3, 1)).reshape((-1, 4))
-    #print 'bbox_deltas shape : ',np.shape(bbox_deltas)
     # Same story for the scores:
     #
     # scores are (1, A, H, W) format
     # transpose to (1, H, W, A)
     # reshape to (1 * H * W * A, 1) where rows are ordered by (h, w, a)
     scores = scores.transpose((0, 2, 3, 1)).reshape((-1, 1)) # (h * w * A , 1)
-    # Convert anchors into proposals via bbox transformations
     proposals = bbox_transform_inv(anchors, bbox_deltas)
-    # 2. clip predicted boxes to image
     proposals = clip_boxes(proposals, im_dims)
-
-    # 3. remove predicted boxes with either height or width < threshold
-
     keep = _filter_boxes(proposals, min_size) # min size = 16 # min보다 큰 놈들만 살아남았다
     proposals = proposals[keep, :]
     scores = scores[keep]
