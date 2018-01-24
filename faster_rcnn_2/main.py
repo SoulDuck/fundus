@@ -1,5 +1,6 @@
 #-*- coding:utf-8 -*-
 import sys
+sys.path.insert(0, '../')
 from cnn import convolution2d , affine
 import os
 import os.path as osp
