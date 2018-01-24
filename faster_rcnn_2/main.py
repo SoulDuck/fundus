@@ -253,7 +253,7 @@ class FasterRcnnConv5():
 
 
 if __name__ == '__main__':
-    data_dir ='/Users/seongjungkim/PycharmProjects/fundus/faster_rcnn_2/clutteredMNIST'
+    data_dir ='./clutteredMNIST'
     model=FasterRcnnConv5(10 , eval_mode=False , data_dir=data_dir)
     model.train(1)
 
