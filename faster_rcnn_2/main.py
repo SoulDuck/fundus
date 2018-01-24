@@ -156,7 +156,7 @@ class FasterRcnnConv5():
 
     def _optimizer(self):
 
-        self.lr=0.01
+        self.lr=0.0001
         self.step=0
         # rpn optimzer
         self.rpn_cls_loss=loss_functions.rpn_cls_loss(self.rpn_cls_layer,self.rpn_labels)
@@ -240,6 +240,8 @@ class FasterRcnnConv5():
         flips = [0, 0]
         flips[0] = np.random.binomial(1,0.5)
         img = image_preprocessing.image_preprocessing(img)
+        if np.max(img) > 1 :
+            img=img/255.
         feed_dict = {self.x_: img, self.im_dims: im_dims, self.gt_boxes : gt_bbox}
         return feed_dict
 
