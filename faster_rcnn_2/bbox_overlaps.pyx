@@ -21,7 +21,7 @@ ctypedef np.float_t DTYPE_t
 print 'bbox_overlaps imported'
 def bbox_overlaps(
         np.ndarray[DTYPE_t, ndim=2] boxes,
-        np.ndarray[DTYPE_t, ndim=2] query_boxes):
+        np.ndarray[DTYPE_t, ndim=2] query_boxes)     :
     """
     Parameters
     ----------
@@ -40,6 +40,8 @@ def bbox_overlaps(
     #print '### bbox_overlaps.pyx ###'
     #print 'K : ',K
     #print 'N : ',N
+    # boxes = anchors , N
+    # query_boxex = gt_boxes , K
 
     for k in range(K):
         box_area = (

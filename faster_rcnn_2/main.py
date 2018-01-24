@@ -80,7 +80,7 @@ class FasterRcnnConv5():
         """
         rpn_out_ch = 512
         rpn_k=3
-        anchor_scales = [8, 16, 32]  # original anchor_scales
+        anchor_scales = [4, 8, 16]  # original anchor_scales
         n_anchors = len(anchor_scales) * 3 # len(ratio) =3
         #_n_anchors =len(self.anchor_scales)*3
         top_conv = self.top_conv
@@ -130,14 +130,11 @@ class FasterRcnnConv5():
         self.blobs =proposal_layer.proposal_layer(rpn_bbox_cls_prob=self.rpn_cls_prob , rpn_bbox_pred=self.rpn_bbox_layer,
                                     im_dims=self.im_dims, cfg_key=key, _feat_stride=self._feat_stride,
                                     anchor_scales=self.anchor_scales)
-
         if self.eval_mode is False:
             # Calculate targets for proposals
             self.rois, self.labels, self.bbox_targets, self.bbox_inside_weights, self.bbox_outside_weights = \
                 proposal_target_layer.proposal_target_layer(rpn_rois=self.blobs, gt_boxes=self.gt_boxes,
                                       _num_classes=self.num_classes)
-
-
     def _fast_rcnn(self):
         print '###### Fast R-CNN building.... '
         print
@@ -241,7 +238,6 @@ class FasterRcnnConv5():
         flips[0] = np.random.binomial(1,0.5)
         img = image_preprocessing.image_preprocessing(img)
         if np.max(img) > 1 :
-            print 'max value : ',np.max(img)
             img=img/255.
         feed_dict = {self.x_: img, self.im_dims: im_dims, self.gt_boxes : gt_bbox}
         return feed_dict

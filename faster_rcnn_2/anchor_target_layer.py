@@ -79,6 +79,7 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     shift_x, shift_y = np.meshgrid(shift_x, shift_y)
     shifts = np.vstack((shift_x.ravel(), shift_y.ravel(),
                         shift_x.ravel(), shift_y.ravel())).transpose() # 4,88 을 88,4 로 바꾼다
+    print shifts
     # shifts (91 ,4)
     # add A anchors (1, A, 4) to
     # cell K shifts (K, 1, 4) to get
@@ -98,9 +99,9 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     #print 'all anchors:' ,np.shape(all_anchors)
     #print all_anchors
 
-    all_anchors=all_anchors.reshape([1,K*A,4]).transpose((1,0,2))
     all_anchors = all_anchors.reshape((K * A, 4))
     total_anchors = int(K * A)
+
     #print 'total anchors : {}'.format(total_anchors)
     # anchors inside the imageprint all_anchors
     #print _anchors.reshape(1,A,4)
@@ -109,9 +110,8 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     inds_inside = np.where(
         (all_anchors[:, 0] >= -_allowed_border) &
         (all_anchors[:, 1] >= -_allowed_border) &
-        (all_anchors[:, 2] < im_dims[1] + _allowed_border) &  # width
-        (all_anchors[:, 3] < im_dims[0] + _allowed_border)  # height
-)[0] # - 좌표를 포함하고 있는 anchor 들을 지워버린다
+        (all_anchors[:, 2] < im_dims[1] + _allowed_border) &  # <-- width
+        (all_anchors[:, 3] < im_dims[0] + _allowed_border))[0] # <-- height
 
     # keep only inside anchors
     anchors = all_anchors[inds_inside]
@@ -119,10 +119,12 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     labels.fill(-1)
     # overlaps between the anchors and the gt boxes
     # overlaps (ex, gt)
+
+    import matplotlib.pyplot as plt
+
     overlaps = bbox_overlaps.bbox_overlaps(
         np.ascontiguousarray(anchors, dtype=np.float),
         np.ascontiguousarray(gt_boxes, dtype=np.float)) #anchor 별로 얼마나 겹치는지 확인해준다
-
     # overlaps 가 겹치지 않는 문제가 있다
     # overlaps shape : # ? , 2 왜 2개가 나오는거지
 
