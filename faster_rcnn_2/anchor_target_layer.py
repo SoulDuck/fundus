@@ -79,7 +79,7 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     shift_x, shift_y = np.meshgrid(shift_x, shift_y)
     shifts = np.vstack((shift_x.ravel(), shift_y.ravel(),
                         shift_x.ravel(), shift_y.ravel())).transpose() # 4,88 을 88,4 로 바꾼다
-    print shifts
+    #print shifts
     # shifts (91 ,4)
     # add A anchors (1, A, 4) to
     # cell K shifts (K, 1, 4) to get
