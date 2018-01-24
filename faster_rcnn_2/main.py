@@ -227,7 +227,8 @@ class FasterRcnnConv5():
                     _,loss = self.sess.run([self.optimizer,self.cost], feed_dict=feed_dict)
                     print 'loss',loss
                 except Exception as e:
-                    print e
+                    #print e
+                    pass;
 
     def _create_feed_dict_for_train(self , image_idx):
         img_path=os.path.join(self.data_dir , 'Images' ,self.train_names[image_idx]+cfg.IMAGE_FORMAT  )

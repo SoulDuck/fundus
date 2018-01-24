@@ -37,9 +37,9 @@ def bbox_overlaps(
     cdef DTYPE_t iw, ih, box_area
     cdef DTYPE_t ua
     cdef unsigned int k, n
-    print '### bbox_overlaps.pyx ###'
-    print 'K : ',K
-    print 'N : ',N
+    #print '### bbox_overlaps.pyx ###'
+    #print 'K : ',K
+    #print 'N : ',N
 
     for k in range(K):
         box_area = (
