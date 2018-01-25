@@ -24,8 +24,10 @@ def rpn_cls_loss(rpn_cls_score, rpn_labels):
         rpn_labels = tf.reshape(rpn_labels, [-1])
 
         # Ignore label=-1 (Neither object nor background: IoU between 0.3 and 0.7)
-        rpn_cls_score = tf.reshape(tf.gather(rpn_cls_score, tf.where(tf.not_equal(rpn_labels, -1))), [-1, 2])
-        rpn_labels = tf.reshape(tf.gather(rpn_labels, tf.where(tf.not_equal(rpn_labels, -1))), [-1])
+        cls_indices=tf.gather(rpn_cls_score, tf.where(tf.not_equal(rpn_labels, -1)) , name = 'cls_indices')
+        lab_indices=tf.gather(rpn_labels, tf.where(tf.not_equal(rpn_labels, -1)) , name = 'lab_indices')
+        rpn_cls_score = tf.reshape(cls_indices, [-1, 2])
+        rpn_labels = tf.reshape(lab_indices, [-1])
 
         # Cross entropy error
         rpn_cross_entropy = tf.reduce_mean(

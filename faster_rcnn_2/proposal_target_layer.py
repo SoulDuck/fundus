@@ -53,13 +53,17 @@ def _proposal_target_layer_py(rpn_rois, gt_boxes, _num_classes):
     # Include ground-truth boxes in the set of candidate rois
     zeros = np.zeros((gt_boxes.shape[0], 1), dtype=gt_boxes.dtype)
     all_rois = np.vstack((all_rois, np.hstack((zeros, gt_boxes[:, :-1]))))
+    # 뒤에 라벨을 자르고 앞에 0을 붙여 all _ros와 모양을 같게 맞춘후 all_rois 줄 맨 끝에 붙인다
+
+    #print np.shape(all_rois)
+    #exit()
 
     # Sanity check: single batch only
     assert np.all(all_rois[:, 0] == 0), \
         'Only single item batches are supported'
 
     num_images = 1
-    rois_per_image = cfg.TRAIN.BATCH_SIZE // num_images # cfg.TRAIN.BATCH_SIZE 0.25
+    rois_per_image = cfg.TRAIN.BATCH_SIZE // num_images # cfg.TRAIN.BATCH_SIZE 256
     fg_rois_per_image = np.round(cfg.TRAIN.FG_FRACTION * rois_per_image).astype(np.int32)
 
     # Sample rois with classification labels and bounding box regression
@@ -75,11 +79,6 @@ def _proposal_target_layer_py(rpn_rois, gt_boxes, _num_classes):
     bbox_targets = bbox_targets.reshape(-1, _num_classes * 4) # 코드가 겹치는데 왜 있는지 모르겠다.
     bbox_inside_weights = bbox_inside_weights.reshape(-1, _num_classes * 4)
     bbox_outside_weights = np.array(bbox_inside_weights > 0).astype(np.float32)
-
-    #print 'bbox_target shape {} '.format(np.shape(bbox_targets))
-    #print 'bbox_inside weights shape {} '.format(np.shape(bbox_inside_weights))
-    #rint 'bbox_outside weights shape {} '.format(np.shape(bbox_outside_weights))
-
 
     return np.float32(rois), labels, bbox_targets, bbox_inside_weights, bbox_outside_weights
 
@@ -98,10 +97,10 @@ def _get_bbox_regression_labels(bbox_target_data, num_classes):
     bbox_inside_weights = np.zeros(bbox_targets.shape, dtype=np.float32) # N , 4
     inds = np.where(clss > 0)[0]
     for ind in inds:
-        cls = clss[ind]
-        #start = int(4 * (cls)) # 수정한것 들 cls -1
+        #cls = clss[ind]
+        #start = int(4 * (cls-1)) # 수정한것 들 cls -1
         #end = start + 4
-        bbox_targets[ind, :] = bbox_target_data[ind, 1:] # bbox_targets[ind, start :end ]
+        bbox_targets[ind, :] = bbox_target_data[ind, 1:]  #
         bbox_inside_weights[ind, :] = (1, 1, 1, 1) # bbox_inside_weights[ind ,start  :end ]
     return bbox_targets, bbox_inside_weights
 
@@ -114,7 +113,10 @@ def _compute_targets(ex_rois, gt_rois, labels):
     assert gt_rois.shape[1] == 4
 
     targets = bbox_transform.bbox_transform(ex_rois, gt_rois)
-    if cfg.TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED:
+
+
+    if cfg.TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED: #default False
+
         # Optionally normalize targets by a precomputed mean and stdev
         targets = ((targets - np.array(cfg.TRAIN.BBOX_NORMALIZE_MEANS))
                    / np.array(cfg.TRAIN.BBOX_NORMALIZE_STDS))
@@ -132,12 +134,6 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
     gt_assignment = overlaps.argmax(axis=1)
     max_overlaps = overlaps.max(axis=1)
     labels = gt_boxes[gt_assignment, 4] # label 은 0 이 아닌 10 부터 시작한다
-
-    #print 'gt boxes {} '.format(gt_boxes)
-
-    #print 'gt_assignment {}'.format(gt_assignment)
-    #print 'overlaps : {} '.format(max_overlaps )
-    #print 'labels : {}'.format(labels)
     # Select foreground RoIs as those with >= FG_THRESH overlap
     fg_inds = np.where(max_overlaps >= cfg.TRAIN.FG_THRESH)[0] #cfg.TRAIN.FG_TRHESH 0.5
     #print cfg.TRAIN.FG_THRESH

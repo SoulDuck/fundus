@@ -160,12 +160,16 @@ class FasterRcnnConv5():
                                                           rpn_inside_weights=self.rpn_bbox_inside_weights,
                                                           rpn_outside_weights=self.rpn_bbox_outside_weights)
 
+
         # fast-rcnn optimzer
         self.fast_rcnn_cls_loss=loss_functions.fast_rcnn_cls_loss(self.fast_rcnn_cls_logits, self.labels)
         self.fast_rcnn_bbox_loss = loss_functions.fast_rcnn_bbox_loss(fast_rcnn_bbox_pred=self.fast_rcnn_cls_logits,
                                                                       bbox_targets=self.bbox_targets,
                                                                       roi_inside_weights=self.bbox_inside_weights,
                                                                       roi_outside_weights=self.bbox_outside_weights)
+
+
+
 
 
         self.cost=tf.reduce_sum(self.rpn_cls_loss + self.rpn_bbox_loss +self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss)
@@ -223,11 +227,11 @@ class FasterRcnnConv5():
                 try:
                     _,loss ,cls_prob= self.sess.run([self.optimizer,self.cost , self.rpn_cls_prob_ori], feed_dict=feed_dict)
 
-                    print 'loss',loss
-                    print 'cls_prob', cls_prob
-                    print np.shape(cls_prob)
+                    #print 'loss',loss
+                    #print 'cls_prob', cls_prob
+                    #print np.shape(cls_prob)
                 except Exception as e:
-                    #print e
+                    print e
                     pass;
 
     def _create_feed_dict_for_train(self , image_idx):
@@ -238,14 +242,8 @@ class FasterRcnnConv5():
         gt_bbox = np.loadtxt(annotation_path , ndmin=2)
         im_dims = np.array(img.shape[:2]).reshape([1,2])
 
-        print 'gt_boxx',gt_bbox
-        print 'image dimension',im_dims
-
-
-
-
-
-
+        #print 'gt_boxx',gt_bbox
+        #print 'image dimension',im_dims
         flips = [0, 0]
         flips[0] = np.random.binomial(1,0.5)
         img = image_preprocessing.image_preprocessing(img)

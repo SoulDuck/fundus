@@ -88,8 +88,6 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
             all_anchors=np.add(shifts , _anchors[i] )
         else:
             all_anchors=np.concatenate((all_anchors , np.add(shifts , _anchors[i])) ,axis=0)
-            #print _anchors[i]
-
 
     all_anchors = all_anchors.reshape((K * A, 4))
     total_anchors = int(K * A)

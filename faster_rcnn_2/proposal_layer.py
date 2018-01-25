@@ -54,7 +54,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
 
     # the first set of _num_anchors channels are bg probs
     # the second set are the fg probs, which we want
-    scores = rpn_bbox_cls_prob[:, _num_anchors:, :, :]
+    scores = rpn_bbox_cls_prob[:, _num_anchors:, :, :] # 1, 18  , H, W --> 1, 9, H, W
     bbox_deltas = rpn_bbox_pred
 
     # 1. Generate proposals from bbox deltas and shifted anchors
@@ -70,8 +70,6 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # cell K shifts (K, 1, 4) to get
     # shift anchors (K, A, 4)
     # reshape to (K*A, 4) shifted anchors
-
-
     A = _num_anchors
     K = shifts.shape[0]
     #anchors = _anchors.reshape((1, A, 4)) + shifts.reshape((1, K, 4)).transpose((1, 0, 2))
@@ -82,23 +80,12 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
         else:
             anchors = np.concatenate((anchors, np.add(shifts, _anchors[i])), axis=0)
     anchors = anchors.reshape((K * A, 4))
-
-    # Transpose and reshape predicted bbox transformations to get them
-    # into the same order as the anchors:
-    #
-    # bbox deltas will be (1, 4 * A, H, W) format
-    # transpose to (1, H, W, 4 * A)
-    # reshape to (1 * H * W * A, 4) where rows are ordered by (h, w, a)
-    # in slowest to fastest order
-
     bbox_deltas = bbox_deltas.transpose((0, 2, 3, 1)).reshape((-1, 4))
-    # Same story for the scores:
-    # scores are (1, A, H, W) format
-    # transpose to (1, H, W, A)
-    # reshape to (1 * H * W * A, 1) where rows are ordered by (h, w, a)
     scores = scores.transpose((0, 2, 3, 1)).reshape((-1, 1)) # (h * w * A , 1)
+    # anchors ,bbox_deltas , scores 모두 같은 shape 여야 한다
+
     proposals = bbox_transform_inv(anchors, bbox_deltas)
-    proposals = clip_boxes(proposals, im_dims)
+    proposals = clip_boxes(proposals, im_dims) # image size 보다 큰 proposals 들이 줄어 들수 있도록 한다.
     keep = _filter_boxes(proposals, min_size) # min size = 16 # min보다 큰 놈들만 살아남았다
     proposals = proposals[keep, :]
     scores = scores[keep]
@@ -126,7 +113,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # Our RPN implementation only supports a single input image, so all
     # batch inds are 0
     batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
-    blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False)))
+    blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False))) # N , 5
     return blob
 
 

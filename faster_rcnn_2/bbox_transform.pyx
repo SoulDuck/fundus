@@ -60,7 +60,6 @@ def bbox_transform_inv(boxes, deltas):
     pred_boxes[:, 2::4] = pred_ctr_x + 0.5 * pred_w
     # y2
     pred_boxes[:, 3::4] = pred_ctr_y + 0.5 * pred_h
-
     return pred_boxes
 
 def clip_boxes(boxes, im_shape):
