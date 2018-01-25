@@ -226,10 +226,6 @@ class FasterRcnnConv5():
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
                     _,loss ,cls_prob= self.sess.run([self.optimizer,self.cost , self.rpn_cls_prob_ori], feed_dict=feed_dict)
-
-                    #print 'loss',loss
-                    #print 'cls_prob', cls_prob
-                    #print np.shape(cls_prob)
                 except Exception as e:
                     print e
                     pass;
@@ -264,6 +260,6 @@ class FasterRcnnConv5():
 if __name__ == '__main__':
     data_dir ='./clutteredMNIST'
     model=FasterRcnnConv5(10 , eval_mode=False , data_dir=data_dir)
-    model.train(1)
+    model.train(file_epoch=1)
 
 
