@@ -252,7 +252,7 @@ class FasterRcnnConv5():
     def _start_session(self):
         config = tf.ConfigProto(log_device_placement=False)
         #config.gpu_options.per_process_gpu_memory_fraction = vram
-        self.sess = tf.Session()
+        self.sess = tf.Session(config=config)
         init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
         self.sess.run(init)
 
