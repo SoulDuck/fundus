@@ -151,7 +151,7 @@ class FasterRcnnConv5():
 
     def _optimizer(self):
 
-        self.lr=0.0001
+        self.lr=0.01
         self.step=0
         # rpn optimzer
         self.rpn_cls_loss=loss_functions.rpn_cls_loss(self.rpn_cls_layer,self.rpn_labels)
@@ -172,7 +172,9 @@ class FasterRcnnConv5():
 
 
 
-        self.cost=tf.reduce_sum(self.rpn_cls_loss + self.rpn_bbox_loss +self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss)
+        self.cost=tf.reduce_sum(self.rpn_cls_loss)
+        #self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
+
         decay_steps = cfg.TRAIN.LEARNING_RATE_DECAY_RATE * len(self.train_names)  # Number of Epochs x images/epoch
         learning_rate = tf.train.exponential_decay(learning_rate=self.lr, global_step=self.step,
                                                    decay_steps=decay_steps, decay_rate=cfg.TRAIN.LEARNING_RATE_DECAY,
@@ -226,6 +228,7 @@ class FasterRcnnConv5():
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
                     _,loss ,cls_prob= self.sess.run([self.optimizer,self.cost , self.rpn_cls_prob_ori], feed_dict=feed_dict)
+                    print loss
                 except Exception as e:
                     print e
                     pass;
