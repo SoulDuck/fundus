@@ -93,7 +93,6 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
 
     bbox_deltas = bbox_deltas.transpose((0, 2, 3, 1)).reshape((-1, 4))
     # Same story for the scores:
-    #
     # scores are (1, A, H, W) format
     # transpose to (1, H, W, A)
     # reshape to (1 * H * W * A, 1) where rows are ordered by (h, w, a)

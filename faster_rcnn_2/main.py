@@ -107,7 +107,6 @@ class FasterRcnnConv5():
                 self.rpn_labels, self.rpn_bbox_targets, self.rpn_bbox_inside_weights, self.rpn_bbox_outside_weights = anchor_target_layer.anchor_target_layer(
                     rpn_cls_score=self.rpn_cls_layer, gt_boxes=self.gt_boxes, im_dims=self.im_dims,
                     _feat_stride=self._feat_stride, anchor_scales=anchor_scales)
-
                 # layer shape : 1 ? ? 18
                 # gt.boxes placeholder : ? ,5
                 # img_dim : ? 2
@@ -184,9 +183,10 @@ class FasterRcnnConv5():
         rpn_cls_score = tf.transpose(self.rpn_cls_layer,[0,3,1,2]) # Tensor("transpose:0", shape=(1, 18, ?, ?)
         rpn_cls_score = tf.reshape(rpn_cls_score,[shape[0],2,shape[3]//2*shape[1],shape[2]])# Tensor("transpose:0", shape=(1, 2, ?, ?)
         rpn_cls_score = tf.transpose(rpn_cls_score,[0,2,3,1]) #Tensor("transpose_1:0", shape=(?, ?, ?, 2), dtype=float32)
-        rpn_cls_prob = tf.nn.softmax(rpn_cls_score)#Tensor("transpose_1:0", shape=(?, ?, ?, 2), dtype=float32)
+
+        self.rpn_cls_prob_ori = tf.nn.softmax(rpn_cls_score)#Tensor("transpose_1:0", shape=(?, ?, ?, 2), dtype=float32)
         # Reshape back to the original
-        rpn_cls_prob = tf.transpose(rpn_cls_prob, [0, 3, 1, 2]) #Tensor("transpose_2:0", shape=(?, 2, ?, ?), dtype=float32)
+        rpn_cls_prob = tf.transpose(self.rpn_cls_prob_ori, [0, 3, 1, 2]) #Tensor("transpose_2:0", shape=(?, 2, ?, ?), dtype=float32)
         rpn_cls_prob = tf.reshape(rpn_cls_prob, [shape[0], shape[3], shape[1], shape[2]]) #Tensor("transpose_2:0", shape=(?, ?, ?, ?), dtype=float32)
         rpn_cls_prob = tf.transpose(rpn_cls_prob, [0, 2, 3, 1])#Tensor("transpose_2:0", shape=(?, ?, ?, ?), dtype=float32)
 
@@ -221,8 +221,11 @@ class FasterRcnnConv5():
             for i in tqdm(train_order):
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
-                    _,loss = self.sess.run([self.optimizer,self.cost], feed_dict=feed_dict)
+                    _,loss ,cls_prob= self.sess.run([self.optimizer,self.cost , self.rpn_cls_prob_ori], feed_dict=feed_dict)
+
                     print 'loss',loss
+                    print 'cls_prob', cls_prob
+                    print np.shape(cls_prob)
                 except Exception as e:
                     #print e
                     pass;
