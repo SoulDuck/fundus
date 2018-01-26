@@ -272,7 +272,7 @@ class FasterRcnnConv5():
         img = image_preprocessing.image_preprocessing(img)
         if np.max(img) > 1 :
             img=img/255.
-        feed_dict = {self.x_: img, self.im_dims: im_dims, self.gt_boxes : gt_bbox}
+        feed_dict = {self.x_: img, self.im_dims: im_dims, self.gt_boxes : gt_bbox , self.phase_train : self.eval_mode}
         return feed_dict
 
 
