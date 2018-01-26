@@ -227,10 +227,17 @@ class FasterRcnnConv5():
             for i in tqdm(train_order):
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
-                    _, img, blobs, loss, gt_boxes = self.sess.run(
-                        [self.optimizer, self.x_, self.blobs, self.cost, self.gt_boxes],
-                                                       feed_dict=feed_dict)
-                    print loss
+                    ##self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
+                    _, loss, rpn_cls_loss, rpn_bbox_loss , fast_rcnn_cls_loss  , fast_rcnn_bbox_loss= self.sess.run(
+                        [self.optimizer, self.cost, self.rpn_cls_loss, self.rpn_bbox_loss, self.fast_rcnn_cls_loss ,
+                         self.fast_rcnn_bbox_loss],
+                        feed_dict=feed_dict)
+                    print 'total loss ', loss
+                    print 'rpn cls loss : ',rpn_cls_loss
+                    print 'rpn bbox loss',rpn_bbox_loss
+                    print 'fast rcnn cls loss : ', fast_rcnn_cls_loss
+                    print 'fast rcnn bbox loss : ', fast_rcnn_bbox_loss
+
                     """
                     blobs_root=os.path.join('./train', str(i))
                     os.makedirs(blobs_root)
