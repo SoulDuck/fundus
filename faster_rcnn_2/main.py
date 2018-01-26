@@ -16,6 +16,8 @@ import proposal_target_layer
 import roi_pool
 import loss_functions
 import image_preprocessing
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
