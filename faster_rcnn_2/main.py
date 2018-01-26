@@ -16,6 +16,8 @@ import proposal_target_layer
 import roi_pool
 import loss_functions
 import image_preprocessing
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 class FasterRcnnConv5():
     def __init__(self , n_classes  , eval_mode , data_dir):
@@ -80,8 +82,8 @@ class FasterRcnnConv5():
         """
         rpn_out_ch = 512
         rpn_k=3
-        anchor_scales = [1, 2, 4]  # original anchor_scales
-        n_anchors = len(anchor_scales) * 3 # len(ratio) =3
+        self.anchor_scales = [0.5, 1, 2]  # original anchor_scales
+        n_anchors = len(self.anchor_scales) * 3 # len(ratio) =3
         #_n_anchors =len(self.anchor_scales)*3
         top_conv = self.top_conv
         with tf.variable_scope('rpn'):
@@ -106,7 +108,7 @@ class FasterRcnnConv5():
                 """
                 self.rpn_labels, self.rpn_bbox_targets, self.rpn_bbox_inside_weights, self.rpn_bbox_outside_weights = anchor_target_layer.anchor_target_layer(
                     rpn_cls_score=self.rpn_cls_layer, gt_boxes=self.gt_boxes, im_dims=self.im_dims,
-                    _feat_stride=self._feat_stride, anchor_scales=anchor_scales)
+                    _feat_stride=self._feat_stride, anchor_scales=self.anchor_scales)
                 # layer shape : 1 ? ? 18
                 # gt.boxes placeholder : ? ,5
                 # img_dim : ? 2
@@ -122,7 +124,6 @@ class FasterRcnnConv5():
         print
 
         self.num_classes = cfg.NUM_CLASSES #1 background or Target
-        self.anchor_scales = cfg.RPN_ANCHOR_SCALES # [8, 16, 32]
         self.rpn_cls_prob=self._rpn_softmax()
         key = 'TRAIN' if self.eval_mode is False else 'TEST'
         self.blobs =proposal_layer.proposal_layer(rpn_bbox_cls_prob=self.rpn_cls_prob , rpn_bbox_pred=self.rpn_bbox_layer,
@@ -147,7 +148,6 @@ class FasterRcnnConv5():
                 self.fast_rcnn_cls_logits = affine('cls_logits' , layer , self.num_classes ,activation=None)
             with tf.variable_scope('bbox'):
                 self.fast_rcnn_bbox_logits = affine('bbox_logits' , layer , self.num_classes*4,activation=None)
-
 
     def _optimizer(self):
 
@@ -220,15 +220,35 @@ class FasterRcnnConv5():
     def train(self , file_epoch):
         train_order = np.random.permutation(len(self.train_names))
         self.file_epoch=file_epoch
-        tf_inputs = (self.x_, self.im_dims, self.gt_boxes)
+        #tf_inputs = (self.x_, self.im_dims, self.gt_boxes)
         self.step +=1
         print self.step
         for self.epoch in trange(1, self.file_epoch + 1, desc='epochs'):
             for i in tqdm(train_order):
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
-                    _,loss ,cls_prob= self.sess.run([self.optimizer,self.cost , self.rpn_cls_prob_ori], feed_dict=feed_dict)
-                    print loss
+                    _, img, blobs, loss, gt_boxes = self.sess.run(
+                        [self.optimizer, self.x_, self.blobs, self.cost, self.gt_boxes],
+                                                       feed_dict=feed_dict)
+                    img = img.reshape(img.shape[1:3])
+                    for g_i, g in enumerate(gt_boxes):
+                        for b_i, b in enumerate(blobs):
+                            fig, ax = plt.subplots(1)
+                            ax.imshow(img)
+                            x1, y1, x2, y2 = g[:-1]
+                            rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=1, edgecolor='b',
+                                                     facecolor='none')
+                            ax.add_patch(rect)
+                            b=b[1:]
+                            rect = patches.Rectangle((b[0], b[1]), b[2] - b[0], b[3] - b[1],
+                                                     linewidth=1, edgecolor='r',
+                                                     facecolor='none')
+                            ax.add_patch(rect)
+                            if not os.path.isdir('/Users/seongjungkim/PycharmProjects/fundus/faster_rcnn_2/tmp_{}'.format(g_i)):
+                                os.makedirs('/Users/seongjungkim/PycharmProjects/fundus/faster_rcnn_2/tmp_{}'.format(g_i))
+                            plt.savefig(
+                                '/Users/seongjungkim/PycharmProjects/fundus/faster_rcnn_2/tmp_{}/{}'.format(g_i, b_i))
+                            plt.close()
                 except Exception as e:
                     print e
                     pass;

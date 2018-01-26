@@ -100,7 +100,6 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     anchors = all_anchors[inds_inside]
     labels = np.empty((len(inds_inside),), dtype=np.float32)
     labels.fill(-1)
-
     overlaps = bbox_overlaps.bbox_overlaps(
         np.ascontiguousarray(anchors, dtype=np.float),
         np.ascontiguousarray(gt_boxes, dtype=np.float)) #anchor 별로 얼마나 겹치는지 확인해준다
@@ -108,11 +107,9 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     max_overlaps = overlaps[np.arange(len(inds_inside)), argmax_overlaps] # inds_inside 갯수 만큼 overlaps에서 가장 높은 overlays
     gt_argmax_overlaps = overlaps.argmax(axis=0)
     #print gt_argmax_overlaps # gt_argmax_overlap 이 empty가 뜨는데 어떻게 해결해야 하지.....
-
     gt_max_overlaps = overlaps[gt_argmax_overlaps,
                                np.arange(overlaps.shape[1])] #[ 0.63559322  0.39626705]
     gt_argmax_overlaps = np.where(overlaps == gt_max_overlaps)[0]
-
     if not cfg.TRAIN.RPN_CLOBBER_POSITIVES:
         # assign bg labels first so that positive labels can clobber them
         labels[max_overlaps < cfg.TRAIN.RPN_NEGATIVE_OVERLAP] = 0
