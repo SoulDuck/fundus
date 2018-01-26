@@ -4,8 +4,8 @@ from Cython.Build import cythonize
 import sys
 sys.path.insert(0, '../')
 
-setup(ext_modules = cythonize("./bbox_overlaps.pyx"),include_dirs=[np.get_include()])
-setup(ext_modules = cythonize("./bbox_transform.pyx"),include_dirs=[np.get_include()])
-setup(ext_modules = cythonize("./cpu_nms.pyx"),include_dirs=[np.get_include()])
+setup(ext_modules = cythonize("bbox_overlaps.pyx"),include_dirs=[np.get_include()])
+setup(ext_modules = cythonize("bbox_transform.pyx"),include_dirs=[np.get_include()])
+setup(ext_modules = cythonize("cpu_nms.pyx"),include_dirs=[np.get_include()])
 
 
