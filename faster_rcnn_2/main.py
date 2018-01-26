@@ -174,7 +174,7 @@ class FasterRcnnConv5():
 
 
 
-        self.cost=tf.reduce_sum(self.rpn_bbox_loss)#self.rpn_cls_loss
+        self.cost=tf.reduce_sum(self.rpn_cls_loss)#self.rpn_cls_loss
         #self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
 
         decay_steps = cfg.TRAIN.LEARNING_RATE_DECAY_RATE * len(self.train_names)  # Number of Epochs x images/epoch
