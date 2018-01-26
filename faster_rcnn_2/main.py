@@ -273,6 +273,10 @@ class FasterRcnnConv5():
 
 
     def _start_session(self):
+
+        #logs_path = os.path.join('/Users/seongjungkim/PycharmProjects/fundus/faster_rcnn_2/tensorboard')
+        #tb_writer = tf.summary.FileWriter(logs_path)
+        #tb_writer.add_graph(tf.get_default_graph())
         config = tf.ConfigProto(log_device_placement=False)
         #config.gpu_options.per_process_gpu_memory_fraction = vram
         self.sess = tf.Session(config=config)
