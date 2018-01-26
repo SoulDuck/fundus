@@ -151,12 +151,10 @@ class FasterRcnnConv5():
             for i in range(len(cfg.FRCNN_FC_HIDDEN)):
                 layer = affine('fc_{}'.format(i), layer, cfg.FRCNN_FC_HIDDEN[i])
                 layer = dropout(layer, phase_train=self.phase_train, keep_prob=0.5)
-
             with tf.variable_scope('cls'):
                 self.fast_rcnn_cls_logits = affine('cls_logits' , layer , self.num_classes ,activation=None)
             with tf.variable_scope('bbox'):
                 self.fast_rcnn_bbox_logits = affine('bbox_logits' , layer , self.num_classes*4,activation=None)
-
     def _optimizer(self):
 
         self.lr=0.01
@@ -173,12 +171,8 @@ class FasterRcnnConv5():
                                                                       bbox_targets=self.bbox_targets,
                                                                       roi_inside_weights=self.bbox_inside_weights,
                                                                       roi_outside_weights=self.bbox_outside_weights)
-
-
-
-
-
-        self.cost=tf.reduce_sum(self.rpn_cls_loss + self.rpn_bbox_loss)#self.rpn_cls_loss
+        self.cost=tf.reduce_sum(self.rpn_cls_loss + self.rpn_bbox_loss+\
+                                self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss)#self.rpn_cls_loss
         #self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
 
         decay_steps = cfg.TRAIN.LEARNING_RATE_DECAY_RATE * len(self.train_names)  # Number of Epochs x images/epoch
@@ -289,6 +283,8 @@ class FasterRcnnConv5():
         #tb_writer.add_graph(tf.get_default_graph())
         config = tf.ConfigProto(log_device_placement=False)
         #config.gpu_options.per_process_gpu_memory_fraction = vram
+        rpn_saver = tf.train.Saver(max_to_keep=1)
+
         self.sess = tf.Session(config=config)
         init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
         self.sess.run(init)
