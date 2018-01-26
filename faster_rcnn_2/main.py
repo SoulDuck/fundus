@@ -230,7 +230,7 @@ class FasterRcnnConv5():
                     _, img, blobs, loss, gt_boxes = self.sess.run(
                         [self.optimizer, self.x_, self.blobs, self.cost, self.gt_boxes],
                                                        feed_dict=feed_dict)
-
+                    print loss
                     blobs_root=os.path.join('./train', str(i))
                     os.makedirs(blobs_root)
                     img = img.reshape(img.shape[1:3])
