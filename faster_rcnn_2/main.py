@@ -101,13 +101,12 @@ class FasterRcnnConv5():
                 print self.im_dims
                 print self._feat_stride
                 print anchor_scales
-                
                 __C.TRAIN.RPN_BBOX_INSIDE_WEIGHTS = (1.0, 1.0, 1.0, 1.0)
                 # Give the positive RPN examples weight of p * 1 / {num positives}
                 # and give negatives a weight of (1 - p)
                 # Set to -1.0 to use uniform example weighting
-
                 """
+
                 self.rpn_labels, self.rpn_bbox_targets, self.rpn_bbox_inside_weights, self.rpn_bbox_outside_weights = anchor_target_layer.anchor_target_layer(
                     rpn_cls_score=self.rpn_cls_layer, gt_boxes=self.gt_boxes, im_dims=self.im_dims,
                     _feat_stride=self._feat_stride, anchor_scales=self.anchor_scales)
@@ -161,8 +160,6 @@ class FasterRcnnConv5():
                                                           rpn_bbox_targets=self.rpn_bbox_targets,
                                                           rpn_inside_weights=self.rpn_bbox_inside_weights,
                                                           rpn_outside_weights=self.rpn_bbox_outside_weights)
-
-
         # fast-rcnn optimzer
         self.fast_rcnn_cls_loss=loss_functions.fast_rcnn_cls_loss(self.fast_rcnn_cls_logits, self.labels)
         self.fast_rcnn_bbox_loss = loss_functions.fast_rcnn_bbox_loss(fast_rcnn_bbox_pred=self.fast_rcnn_cls_logits,
@@ -174,7 +171,7 @@ class FasterRcnnConv5():
 
 
 
-        self.cost=tf.reduce_sum(self.rpn_cls_loss)#self.rpn_cls_loss
+        self.cost=tf.reduce_sum(self.rpn_cls_loss + self.rpn_bbox_loss)#self.rpn_cls_loss
         #self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
 
         decay_steps = cfg.TRAIN.LEARNING_RATE_DECAY_RATE * len(self.train_names)  # Number of Epochs x images/epoch

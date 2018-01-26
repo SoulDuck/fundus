@@ -109,6 +109,7 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     #print gt_argmax_overlaps # gt_argmax_overlap 이 empty가 뜨는데 어떻게 해결해야 하지.....
     gt_max_overlaps = overlaps[gt_argmax_overlaps,
                                np.arange(overlaps.shape[1])] #[ 0.63559322  0.39626705]
+
     gt_argmax_overlaps = np.where(overlaps == gt_max_overlaps)[0]
     if not cfg.TRAIN.RPN_CLOBBER_POSITIVES:
         # assign bg labels first so that positive labels can clobber them

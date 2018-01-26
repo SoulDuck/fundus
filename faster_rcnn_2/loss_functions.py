@@ -59,6 +59,7 @@ def rpn_bbox_loss(rpn_bbox_pred, rpn_bbox_targets, rpn_inside_weights, rpn_outsi
         diff_sL1 = smoothL1(diff, 3.0)
 
         # Only count loss for positive anchors. Make sure it's a sum.
+        # tf.multiply(rpn_outside_weights, diff_sL1) shape : ? ? ? 36
         rpn_bbox_reg = tf.reduce_sum(tf.multiply(rpn_outside_weights, diff_sL1))
 
         # Constant for weighting bounding box loss with classification loss
@@ -100,10 +101,8 @@ def fast_rcnn_bbox_loss(fast_rcnn_bbox_pred, bbox_targets, roi_inside_weights, r
         # How far off was the prediction?
         diff = tf.multiply(roi_inside_weights, fast_rcnn_bbox_pred - bbox_targets)
         diff_sL1 = smoothL1(diff, 1.0)
-
         # Only count loss for positive anchors
         roi_bbox_reg = tf.reduce_mean(tf.reduce_sum(tf.multiply(roi_outside_weights, diff_sL1), reduction_indices=[1]))
-
         # Constant for weighting bounding box loss with classification loss
         roi_bbox_reg = cfg.TRAIN.FRCNN_BBOX_LAMBDA * roi_bbox_reg
 
