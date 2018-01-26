@@ -230,6 +230,7 @@ class FasterRcnnConv5():
                         [self.optimizer, self.x_, self.blobs, self.cost, self.gt_boxes],
                                                        feed_dict=feed_dict)
                     print loss
+                    """
                     blobs_root=os.path.join('./train', str(i))
                     os.makedirs(blobs_root)
                     img = img.reshape(img.shape[1:3])
@@ -250,7 +251,7 @@ class FasterRcnnConv5():
                                 os.makedirs(os.path.join( blobs_root ,'blobs_{}'.format(g_i)))
                             plt.savefig(os.path.join(blobs_root , 'blobs_{}/{}'.format(g_i, b_i)))
                             plt.close()
-
+                """
                 except Exception as e:
                     print e
                     pass;
