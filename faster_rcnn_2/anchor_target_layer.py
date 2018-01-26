@@ -22,7 +22,7 @@ import numpy.random as npr
 import tensorflow as tf
 
 from configure import cfg
-import bbox_overlaps
+from faster_rcnn_2 import bbox_overlaps
 import bbox_transform
 import generate_anchor
 
