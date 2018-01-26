@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 import sys
 sys.path.insert(0, '../')
-from cnn import convolution2d , affine
+from cnn import convolution2d , affine , dropout
 import os
 import os.path as osp
 from tqdm import tqdm, trange
@@ -30,6 +30,7 @@ class FasterRcnnConv5():
         self.x_ = tf.placeholder(dtype=tf.float32 , shape = [1 , None , None ,1 ])
         self.im_dims = tf.placeholder(tf.int32 , [None ,2 ])
         self.gt_boxes = tf.placeholder(tf.int32 , [None ,5 ])
+        self.phase_train = tf.placeholder(tf.bool)
 
         self.step=0
         self._build()
@@ -135,6 +136,10 @@ class FasterRcnnConv5():
             self.rois, self.labels, self.bbox_targets, self.bbox_inside_weights, self.bbox_outside_weights = \
                 proposal_target_layer.proposal_target_layer(rpn_rois=self.blobs, gt_boxes=self.gt_boxes,
                                       _num_classes=self.num_classes)
+        else:
+            # test
+            self.rois=self.blobs
+
     def _fast_rcnn(self):
         print '###### Fast R-CNN building.... '
         print
@@ -144,7 +149,9 @@ class FasterRcnnConv5():
             layer = pooledFeatures # ? 7,7 128 Same Output
             #print layer
             for i in range(len(cfg.FRCNN_FC_HIDDEN)):
-                layer = affine('fc_{}'.format(i) , layer ,cfg.FRCNN_FC_HIDDEN[i])
+                layer = affine('fc_{}'.format(i), layer, cfg.FRCNN_FC_HIDDEN[i])
+                layer = dropout(layer, phase_train=self.phase_train, keep_prob=0.5)
+
             with tf.variable_scope('cls'):
                 self.fast_rcnn_cls_logits = affine('cls_logits' , layer , self.num_classes ,activation=None)
             with tf.variable_scope('bbox'):
