@@ -82,7 +82,7 @@ class FasterRcnnConv5():
         """
         rpn_out_ch = 512
         rpn_k=3
-        self.anchor_scales = [0.5, 1, 2]  # original anchor_scales
+        self.anchor_scales = [1, 2, 4]  # original anchor_scales
         n_anchors = len(self.anchor_scales) * 3 # len(ratio) =3
         #_n_anchors =len(self.anchor_scales)*3
         top_conv = self.top_conv
@@ -230,6 +230,9 @@ class FasterRcnnConv5():
                     _, img, blobs, loss, gt_boxes = self.sess.run(
                         [self.optimizer, self.x_, self.blobs, self.cost, self.gt_boxes],
                                                        feed_dict=feed_dict)
+
+                    blobs_root=os.path.join('./train', str(i))
+                    os.makedirs(blobs_root)
                     img = img.reshape(img.shape[1:3])
                     for g_i, g in enumerate(gt_boxes):
                         for b_i, b in enumerate(blobs):
@@ -244,11 +247,11 @@ class FasterRcnnConv5():
                                                      linewidth=1, edgecolor='r',
                                                      facecolor='none')
                             ax.add_patch(rect)
-                            if not os.path.isdir('/Users/seongjungkim/PycharmProjects/fundus/faster_rcnn_2/tmp_{}'.format(g_i)):
-                                os.makedirs('/Users/seongjungkim/PycharmProjects/fundus/faster_rcnn_2/tmp_{}'.format(g_i))
-                            plt.savefig(
-                                '/Users/seongjungkim/PycharmProjects/fundus/faster_rcnn_2/tmp_{}/{}'.format(g_i, b_i))
+                            if not os.path.isdir(os.path.join(blobs_root , 'blobs_{}'.format(g_i))):
+                                os.makedirs(os.path.join( blobs_root ,'blobs_{}'.format(g_i)))
+                            plt.savefig(os.path.join(blobs_root , 'blobs_{}/{}'.format(g_i, b_i)))
                             plt.close()
+
                 except Exception as e:
                     print e
                     pass;
