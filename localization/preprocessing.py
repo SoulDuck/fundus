@@ -95,7 +95,7 @@ class Preprocessing(object):
 
     def get_rois(self , roi_num , show=False):
         fg_images=[]
-        for path in self.train_csv_paths[:]
+        for path in self.train_csv_paths[:]:
             name=os.path.split(path)[1]
             name=os.path.splitext(name)[0]
             print name
