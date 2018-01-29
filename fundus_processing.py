@@ -406,298 +406,34 @@ def image_resize(path):
         img =None
     return img , path
 
+def overlaps(window_coord , foreground_coord):
+    w_x1, w_y1, w_x2, w_y2 = window_coord
+    fg_x1,fg_y1,fg_x2,fg_y2 , =foreground_coord
+    o_x1=max(w_x1 , fg_x1) #o --> overlap
+    o_x2=min(w_x2 , fg_x2)
+    o_y1=min(w_y1 , fg_y1)
+    o_y2=min(w_y2 , fg_y2)
+    print window_coord
+    print foreground_coord
+    print o_x1 , o_y1 , o_x2 , o_y2
+    o_w = (o_x2 - o_x1)
+    o_h = (o_y2 - o_y1)
+
+    if o_w > 0 and o_h > 0:
+        area = o_w * o_h
+    else:
+        area=None
+    return area
+
+
+def get_width_height(coord):
+    x1, y1, x2, y2 = coord
+    w = (x2 - x1)
+    h = (y2 - y1)
+
+    return w , h
 
 
 
 if __name__ == '__main__':
-
-    """
-    img = Image.open('./normal/43203_20140121_L.png')
-    img=red_free_image(img)
-    plt.imshow(img/255.)
-    plt.show()
-    img = Image.open('./normal/43203_20140121_L.png')
-    img = green_free_image(img)
-    plt.imshow(img / 255.)
-    plt.show()
-    img = Image.open('./normal/43203_20140121_L.png')
-    img = blue_free_image(img)
-    plt.imshow(img / 255.)
-    plt.show()
-    """
-    """
-    path='./sample_image/original_images/43203_20140121_L.png'
-    path='./sample_image/original_images/43203_20140121_R.png'
-
-    ori_img=Image.open(path)
-    cropped_img,cropped_path=optical_crop(path)
-    fig= plt.figure()
-    a=fig.add_subplot(1,2,1)
-    plt.imshow(ori_img)
-    a=fig.add_subplot(1,2,2)
-    plt.imshow(cropped_img)
-    plt.show()
-    """
-
-
-    """usage: fundus optical crop"""
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dir" , help='folder to preprocessing')
-    parser.add_argument("--save_dir" , help='folder to save')
-    parser.add_argument("--extension" , help='extension')
-    parser.add_argument("--limit_paths", help='limit to paths for multiprocessing')
-    args = parser.parse_args()
-
-
-    if args.dir:
-        folder_path=args.dir
-    else:
-        folder_path='../fundus_data/cropped_original_fundus/'
-
-    if args.save_dir:
-        save_folder=args.save_dir
-    else:
-        save_folder='../fundus_data/cropped_optical/'
-
-    if args.extension:
-        extension = args.extension
-    else:
-        extension = '*.png'
-
-    if args.limit_paths:
-        limit_paths=args.limit_paths
-    else:
-        limit_paths=3000
-
-
-    folder_names=os.walk(folder_path).next()[1]
-    saved_extension='.png'
-    for folder_name in folder_names:
-        target_folder_path=folder_path+folder_name+'/'
-        target_save_folder_path = save_folder + folder_name + '/'
-        if not os.path.isdir(target_save_folder_path):
-            os.mkdir(target_save_folder_path)
-            print target_save_folder_path, 'is made'
-
-        paths=glob.glob(target_folder_path+extension)
-        saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
-        paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
-        paths = paths[:limit_paths]
-        if __debug__ == True:
-            print ''
-            print '################################ '
-            print 'folder_path:', target_folder_path
-            print 'save_folder:', target_save_folder_path
-            print 'number of paths' , len(paths)
-            print 'extension', extension
-            print 'saved extension', saved_extension
-
-        pool=Pool()
-        count=0
-        f=open(target_save_folder_path+'broken_images.txt' , 'w')
-        for img , path in pool.imap(optical_crop ,paths):
-            if img==None:
-                f.write(path+'\n')
-                continue;
-            save_img(img, target_save_folder_path , saved_extension) #save image ==> save_folder+name+extension
-            utils.show_progress(count , len(paths))
-            count+=1
-    """
-
-    """usage: fundus macula crop"""
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", help='folder to preprocessing')
-    parser.add_argument("--save_dir", help='folder to save')
-    parser.add_argument("--extension", help='extension')
-    parser.add_argument("--limit_paths", help='limit to paths for multiprocessing')
-    args = parser.parse_args()
-
-    if args.dir:
-        folder_path = args.dir
-    else:
-        folder_path = '../fundus_data/cropped_original_fundus/'
-
-    if args.save_dir:
-        save_folder = args.save_dir
-    else:
-        save_folder = '../fundus_data/cropped_macula/'
-
-    if args.extension:
-        extension = args.extension
-    else:
-        extension = '*.png'
-
-    if args.limit_paths:
-        limit_paths=args.limit_paths
-    else:
-        limit_paths=3000
-
-    folder_names = os.walk(folder_path).next()[1]
-    saved_extension = '.png'
-    for folder_name in folder_names:
-
-        target_folder_path = folder_path + folder_name + '/'
-        target_save_folder_path = save_folder + folder_name + '/'
-        if not os.path.isdir(target_save_folder_path):
-            os.mkdir(target_save_folder_path)
-            print target_save_folder_path, 'is made'
-
-        paths = glob.glob(target_folder_path + extension)
-        saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
-        paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
-        paths = paths[:limit_paths]
-        if __debug__ == True:
-            print ''
-            print '################################ '
-            print 'folder_path:', target_folder_path
-            print 'save_folder:', target_save_folder_path
-            print 'number of paths', len(paths)
-            print 'extension', extension
-            print 'saved extension', saved_extension
-
-        pool = Pool()
-        count = 0
-        for img, path in pool.imap(macula_crop, paths):
-            if img == None:
-                f.write(path + '\n')
-                continue;
-            save_img(img, target_save_folder_path, saved_extension)  # save image ==> save_folder+name+extension
-            utils.show_progress(count, len(paths))
-            count += 1
-    """
-    #########   usage : crop_reisize_fundus   #########
-    """
-    dir --- subDir_1
-                |- aaa.jpg
-                |- bbb.jpg
-                ...ccc.jpg
-                
-            subDir_2
-            subDir_3
-    """
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", help='folder to preprocessing')
-    parser.add_argument("--save_dir", help='folder to save')
-    parser.add_argument("--extension", help='extension') #'.png'
-    parser.add_argument("--limit_paths" , help='limit to paths for multiprocessing')
-    args = parser.parse_args()
-
-    folder_path = args.dir
-    save_folder = args.save_dir
-    extension = args.extension
-    limit_paths=args.limit_paths
-
-    folder_names = os.walk(folder_path).next()[1]
-    print folder_names
-    saved_extension = extension.replace('*','.') #extension = '.jpg'
-
-    for folder_name in folder_names:
-        target_folder_path = folder_path + folder_name + '/'
-        target_save_folder_path = save_folder + folder_name + '/'
-        if not os.path.isdir(target_save_folder_path):
-            os.mkdir(target_save_folder_path)
-            print target_save_folder_path,'is made'
-
-        paths = glob.glob(target_folder_path + extension)
-        saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
-        paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
-
-        paths=paths[:limit_paths]
-        print len(paths)
-        pool = Pool()
-        count = 0
-
-        if __debug__ == True:
-            print ''
-            print '################################ '
-            print 'folder_path:', target_folder_path
-            print 'save_folder:', target_save_folder_path
-            print 'number of paths', len(paths)
-            print 'extension', extension
-            print 'saved extension', saved_extension
-        if len(paths)==0:
-            continue;
-        for img, path in pool.imap(crop_resize_fundus, paths):
-            utils.show_progress(count,len(paths))
-            name = path.split('/')[-1]
-            save_path = os.path.join(target_save_folder_path, name)
-            reshape_img_size = (600, 600)
-            img = img.resize(reshape_img_size, PIL.Image.ANTIALIAS)
-            img.save(save_path + saved_extension)
-            count+=1
-    print 'fundus_processing.py out'
-
-
-    """usage : fundus resize"""
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", help='folder to preprocessing')
-    parser.add_argument("--save_dir", help='folder to save')
-    parser.add_argument("--extension", help='extension') #'.png'
-    parser.add_argument("--limit_paths" , help='limit to paths for multiprocessing')
-    args = parser.parse_args()
-
-    if args.dir:
-        folder_path = args.dir
-    else:
-        folder_path = '../fundus_data/cropped_original_fundus/'
-
-    if args.save_dir:
-        save_folder = args.save_dir
-    else:
-        save_folder = '../fundus_data/cropped_original_fundus_300x300/'
-
-    if args.extension:
-        extension = args.extension
-    else:
-        extension = '*.png'
-
-    if args.limit_paths:
-        limit_paths=args.limit_paths
-    else:
-        limit_paths=3000
-
-
-    folder_names = os.walk(folder_path).next()[1]
-    print folder_names
-    saved_extension = extension.replace('*','.') #extension = '.jpg'
-
-    for folder_name in folder_names:
-        target_folder_path = folder_path + folder_name + '/'
-        target_save_folder_path = save_folder + folder_name + '/'
-        if not os.path.isdir(target_save_folder_path):
-            os.mkdir(target_save_folder_path)
-            print target_save_folder_path,'is made'
-
-        paths = glob.glob(target_folder_path + extension)
-        saved_paths = glob.glob(target_save_folder_path + '*' + saved_extension)
-        paths = utils.check_overlay_paths(paths, saved_paths)  # check overlay paths
-
-        paths=paths[:limit_paths]
-        print len(paths)
-        pool = Pool()
-        count = 0
-
-        if __debug__ == True:
-            print ''
-            print '################################ '
-            print 'folder_path:', target_folder_path
-            print 'save_folder:', target_save_folder_path
-            print 'number of paths', len(paths)
-            print 'extension', extension
-            print 'saved extension', saved_extension
-        if len(paths)==0:
-            continue;
-        for img, path in pool.imap(image_resize , paths):
-            if img ==None:
-                continue
-            utils.show_progress(count,len(paths))
-            name = path.split('/')[-1]
-            save_path = os.path.join(target_save_folder_path, name)
-            img.save(save_path + saved_extension)
-            count+=1
-    print 'fundus_processing.py out'
-    """
+    pass;

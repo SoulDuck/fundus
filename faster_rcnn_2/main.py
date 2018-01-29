@@ -125,7 +125,7 @@ class FasterRcnnConv5():
         print '###### ROI Proposal Network building.... '
         print
 
-        self.num_classes = cfg.NUM_CLASSES #1 background or Target
+        self.num_classes = 10 +1 # 1 -> background
         self.rpn_cls_prob=self._rpn_softmax()
         key = 'TRAIN' if self.eval_mode is False else 'TEST'
         self.blobs =proposal_layer.proposal_layer(rpn_bbox_cls_prob=self.rpn_cls_prob , rpn_bbox_pred=self.rpn_bbox_layer,
@@ -139,7 +139,6 @@ class FasterRcnnConv5():
         else:
             # test
             self.rois=self.blobs
-
     def _fast_rcnn(self):
         print '###### Fast R-CNN building.... '
         print
@@ -147,10 +146,10 @@ class FasterRcnnConv5():
             keep_prob = cfg.FRCNN_DROPOUT_KEEP_RATE if self.eval_mode is False else 1.0
             pooledFeatures = roi_pool.roi_pool(self.top_conv, self.rois, self.im_dims) #roi pooling
             layer = pooledFeatures # ? 7,7 128 Same Output
-            #print layer
+            # print layer
             for i in range(len(cfg.FRCNN_FC_HIDDEN)):
                 layer = affine('fc_{}'.format(i), layer, cfg.FRCNN_FC_HIDDEN[i])
-                layer = dropout(layer, phase_train=self.phase_train, keep_prob=0.5)
+                layer = dropout(layer, phase_train=self.phase_train, keep_prob=keep_prob)
             with tf.variable_scope('cls'):
                 self.fast_rcnn_cls_logits = affine('cls_logits' , layer , self.num_classes ,activation=None)
             with tf.variable_scope('bbox'):
@@ -228,10 +227,13 @@ class FasterRcnnConv5():
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
                     ##self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
-                    _, loss, rpn_cls_loss, rpn_bbox_loss , fast_rcnn_cls_loss  , fast_rcnn_bbox_loss= self.sess.run(
+                    _, loss, rpn_cls_loss, rpn_bbox_loss , fast_rcnn_cls_loss  , fast_rcnn_bbox_loss , fr_labels , fr_cls= self.sess.run(
                         [self.optimizer, self.cost, self.rpn_cls_loss, self.rpn_bbox_loss, self.fast_rcnn_cls_loss ,
-                         self.fast_rcnn_bbox_loss],
+                         self.fast_rcnn_bbox_loss ,self.labels , self.fast_rcnn_cls_logits],
                         feed_dict=feed_dict)
+                    print fr_labels
+                    print fr_cls
+
                     print 'total loss ', loss
                     print 'rpn cls loss : ',rpn_cls_loss
                     print 'rpn bbox loss',rpn_bbox_loss

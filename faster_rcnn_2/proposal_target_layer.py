@@ -45,7 +45,7 @@ def _proposal_target_layer_py(rpn_rois, gt_boxes, _num_classes):
     Assign object detection proposals to ground-truth targets. Produces proposal
     classification labels and bounding-box regression targets.
     """
-
+    # rpn_rois = blobs
     # Proposal ROIs (0, x1, y1, x2, y2) coming from RPN
     # (i.e., rpn.proposal_layer.ProposalLayer), or any other source
     all_rois = rpn_rois
@@ -53,11 +53,8 @@ def _proposal_target_layer_py(rpn_rois, gt_boxes, _num_classes):
     # Include ground-truth boxes in the set of candidate rois
     zeros = np.zeros((gt_boxes.shape[0], 1), dtype=gt_boxes.dtype)
     all_rois = np.vstack((all_rois, np.hstack((zeros, gt_boxes[:, :-1]))))
+    # 왜 roi 의 모든 형태를 0 , x ,y ,x2, y2 형태로 만드는 거지? -- > 아직 예측값이 없어..그래서 그냥 0으로 넣은듯 ...
     # 뒤에 라벨을 자르고 앞에 0을 붙여 all _ros와 모양을 같게 맞춘후 all_rois 줄 맨 끝에 붙인다
-
-    #print np.shape(all_rois)
-    #exit()
-
     # Sanity check: single batch only
     assert np.all(all_rois[:, 0] == 0), \
         'Only single item batches are supported'
@@ -89,16 +86,17 @@ def _get_bbox_regression_labels(bbox_target_data, num_classes):
         bbox_target (ndarray): N x 4K blob of regression targets
         bbox_inside_weights (ndarray): N x 4K blob of loss weights
     """
+
     clss = bbox_target_data[:, 0]
     bbox_targets = np.zeros((clss.size, 4 * num_classes), dtype=np.float32)
     bbox_inside_weights = np.zeros(bbox_targets.shape, dtype=np.float32) # N , 4
     inds = np.where(clss > 0)[0]
     for ind in inds:
-        #cls = clss[ind]
-        #start = int(4 * (cls-1)) # 수정한것 들 cls -1
-        #end = start + 4
-        bbox_targets[ind, :] = bbox_target_data[ind, 1:]  #
-        bbox_inside_weights[ind, :] = (1, 1, 1, 1) # bbox_inside_weights[ind ,start  :end ]
+        cls = clss[ind]
+        start = int(4 * (cls)) # 수정한것 들 cls -1
+        end = start + 4
+        bbox_targets[ind, start: end] = bbox_target_data[ind, 1:]  #
+        bbox_inside_weights[ind, start: end] = (1, 1, 1, 1)  # bbox_inside_weights[ind ,start  :end ]
     return bbox_targets, bbox_inside_weights
 
 
@@ -133,7 +131,8 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
     labels = gt_boxes[gt_assignment, 4] # label 은 0 이 아닌 10 부터 시작한다
     # Select foreground RoIs as those with >= FG_THRESH overlap
     fg_inds = np.where(max_overlaps >= cfg.TRAIN.FG_THRESH)[0] #cfg.TRAIN.FG_TRHESH 0.5
-    #print cfg.TRAIN.FG_THRESH
+
+    #print   cfg.TRAIN.FG_THRESH
     #fg_ind 는 겹치는 비율이 50% 보다 많을 때 fg_inds 을 넘겨준다
 
 
@@ -146,7 +145,6 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
     # Sample foreground regions without replacement
     if fg_inds.size > 0:
         fg_inds = npr.choice(fg_inds, size=fg_rois_per_this_image, replace=False)
-
 
     # Select background RoIs as those within [BG_THRESH_LO, BG_THRESH_HI)
     # cfg.TRAIN.BG_THRESH_HI 0.5
@@ -171,6 +169,4 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
     rois = all_rois[keep_inds]
     bbox_target_data = _compute_targets(rois[:, 1:5], gt_boxes[gt_assignment[keep_inds], :4], labels)
     bbox_targets, bbox_inside_weights = _get_bbox_regression_labels(bbox_target_data, num_classes)
-
-
     return labels, rois, bbox_targets, bbox_inside_weights
