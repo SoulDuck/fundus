@@ -20,9 +20,10 @@ class network(object):
         self.fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
         self.bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
         n_fg , h ,w ,ch =np.shape(self.fg_imgs)
+        n_bg, h, w, ch = np.shape(self.fg_imgs)
 
-        print 'n foreground {}'.format(np.shape(len(self.fg_imgs)))
-        print 'n background {}'.format(np.shape(len(self.bg_imgs)))
+        print 'n foreground {}'.format(n_fg)
+        print 'n background {}'.format(n_bg)
         print 'Image shape {}'.format([h,w,ch])
 
         self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
