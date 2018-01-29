@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 import numpy as np
 import utils
-from fundus_processing import overlaps , get_width_height
+from fundus_processing import overlaps , get_width_height , sparse_crop
 from PIL import Image
 import matplotlib.pyplot as plt
 import os
@@ -60,7 +60,9 @@ class preprocessing(object):
         self.test_csv_paths = self.csv_paths[:self.n_test_paths]
         self.train_csv_paths = self.csv_paths[self.n_test_paths:]
         self.all_labels=self._get_all_coords() # get all_labels
-        self._get_cropped()
+        self.crop_size=75
+        self.get_rois(1)
+        #self._get_cropped()
 
     def get_coords(self, path):
         labels = {}
@@ -75,6 +77,7 @@ class preprocessing(object):
 
         return labels
 
+
     def _get_all_coords(self):
         assert len(self.csv_paths) > 0 , 'the number of csv path {} '.format(len(self.csv_paths))
         self.all_labels={}
@@ -86,6 +89,51 @@ class preprocessing(object):
                 else:
                     self.all_labels[key].extend(labels[key])
         return self.all_labels
+
+    def get_rois(self , roi_num):
+        images = {}
+        for path in self.train_csv_paths:
+            name=os.path.split(path)[1]
+            name=os.path.splitext(name)[0]
+            print name
+            labels = self.get_coords(path)  # csv별 roi을 가져온다. 예시 [4] : [[x1,y1 x2, y2] ...[x1,y1 x2, y2]]
+            img=np.asarray(Image.open(os.path.join(self.img_dir, name + '.png')))
+            for k in labels.keys():
+                if k ==roi_num:
+                    for i,fg_coord in enumerate(labels[k]):
+                        try:
+                            print 'foreground coord : {} , {}'.format(fg_coord,i)
+
+                            fg_x1, fg_y1, fg_x2, fg_y2 = map(int, fg_coord)
+                            fg_w = fg_x2 - fg_x1
+                            fg_h = fg_y2 - fg_y1
+                            fg_area = fg_w * fg_h
+                            if fg_area < 100*100:
+                                roi_img=img[fg_y1 : fg_y2 , fg_x1: fg_x2]
+                                roi_h,roi_w,ch=np.shape(roi_img)
+                                if not roi_h > self.crop_size or roi_w > self.crop_size:
+                                    h_ = max(roi_h, self.crop_size)
+                                    w_ = max(roi_w, self.crop_size)
+                                    resized_roi=np.asarray(Image.fromarray(roi_img).resize((h_,w_) , Image.ANTIALIAS))
+                                    fg_croppped_imgs = sparse_crop(resized_roi, self.crop_size, self.crop_size)
+                                else:
+                                    fg_croppped_imgs = sparse_crop(
+                                        img[fg_y1 - 10:fg_y2 + 10, fg_x1 - 10L:fg_x2 + 10], self.crop_size, self.crop_size)
+                        except Exception as e:
+                            print 'error coord {}'.format([fg_x1, fg_y1, fg_x2, fg_y2])
+
+                        utils.plot_images(fg_croppped_imgs)
+                        plt.close()
+                        plt.title(name)
+                        plt.imshow(roi_img)
+                        plt.show()
+                        plt.close()
+
+
+
+
+
+
 
     def _get_cropped(self):
         root_root_roi_dir = './data/roi'
@@ -146,7 +194,7 @@ class preprocessing(object):
                         fg_area = fg_w * fg_h
 
                         fg_croppped_imgs,fg_croppped_coords=dense_crop(img[fg_y1-10 :fg_y2+10 ,fg_x1-10L:fg_x2+10],75,75)
-                        print np.shape(fg_croppped_imgs)
+                        #print np.shape(fg_croppped_imgs)
                         fig = plt.figure()
                         ax1 = fig.add_subplot(1,2,1)
                         ax1.imshow(img)
