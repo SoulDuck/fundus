@@ -76,9 +76,9 @@ class network(object):
         for i in range(max_iter):
             show_progress(i ,max_iter)
             batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs , self.batch_size)
-            feed_dict={self.x_ : batch_xs , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
-            self.sess.run(self.train_op , feed_dict= feed_dict )
-
+            feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
+            _,train_acc=self.sess.run([self.train_op ,self.accuracy], feed_dict= feed_dict )
+        return train_acc
     def val(self):
         all_pred=[]
         batch_imgs_list , batch_labs_list=self.divide_images_labels_from_batch(self.val_imgs ,self.val_labs , self.batch_size)
@@ -88,8 +88,8 @@ class network(object):
             feed_dict = {self.x_: batch_xs, self.y_: batch_ys, self.phase_train: False, self.lr: 0.01}
             pred=self.sess.run(self.pred, feed_dict=feed_dict)
             all_pred.extend(pred)
-        acc=self.get_acc(true=self.val_labs , pred=all_pred)
-        print acc
+        val_acc=self.get_acc(true=self.val_labs , pred=all_pred)
+        print val_acc
 
 
 
