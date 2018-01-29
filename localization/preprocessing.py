@@ -61,7 +61,8 @@ class preprocessing(object):
         self.train_csv_paths = self.csv_paths[self.n_test_paths:]
         self.all_labels=self._get_all_coords() # get all_labels
         self.crop_size=75
-        self.get_rois(1)
+        fg_images=self.get_rois(roi_num=1)
+        print len(fg_images)
         #self._get_cropped()
 
     def get_coords(self, path):
@@ -91,7 +92,7 @@ class preprocessing(object):
         return self.all_labels
 
     def get_rois(self , roi_num):
-        images = {}
+        fg_images=[]
         for path in self.train_csv_paths:
             name=os.path.split(path)[1]
             name=os.path.splitext(name)[0]
@@ -108,7 +109,7 @@ class preprocessing(object):
                             fg_w = fg_x2 - fg_x1
                             fg_h = fg_y2 - fg_y1
                             fg_area = fg_w * fg_h
-                            if fg_area < 100*100:
+                            if fg_area < 225*225:
                                 roi_img=img[fg_y1 : fg_y2 , fg_x1: fg_x2]
                                 roi_h,roi_w,ch=np.shape(roi_img)
                                 if not roi_h > self.crop_size or roi_w > self.crop_size:
@@ -119,6 +120,9 @@ class preprocessing(object):
                                 else:
                                     fg_croppped_imgs = sparse_crop(
                                         img[fg_y1 - 10:fg_y2 + 10, fg_x1 - 10L:fg_x2 + 10], self.crop_size, self.crop_size)
+
+                                fg_images.extend(list(fg_croppped_imgs))
+
                                 utils.plot_images(fg_croppped_imgs)
                                 plt.close()
                                 plt.title(name)
@@ -128,7 +132,7 @@ class preprocessing(object):
 
                         except Exception as e:
                             print 'error coord {}'.format([fg_x1, fg_y1, fg_x2, fg_y2])
-
+        return fg_images
 
 
 
