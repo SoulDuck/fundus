@@ -2,20 +2,30 @@ from cnn import convolution2d , affine , dropout , algorithm
 import tensorflow as tf
 import numpy as np
 from fundus_processing import dense_crop
+import os
 class network(object):
-    def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes):
+    def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , data_dir='./'):
         self.conv_filters = conv_filters
         self.conv_strides = conv_strides
         self.conv_out_channels = conv_out_channels
         self.fc_out_channels = fc_out_channels
         self.n_classes = n_classes
+        self.data_dir = data_dir
         # building network
         self._input()
         self._build()
 
 
     def _input(self):
-        self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, 32, 1000, 3], name='x_')
+        self.fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
+        self.bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
+        n_fg , h ,w ,ch =np.shape(self.fg_imgs)
+
+        print 'n foreground {}'.format(np.shape(len(self.fg_imgs)))
+        print 'n background {}'.format(np.shape(len(self.bg_imgs)))
+        print 'Image shape {}'.format([h,w,ch])
+
+        self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
         self.y_ = tf.placeholder(dtype=tf.float32, shape=[None, self.n_classes], name='y_')
         self.keep_prob = tf.placeholder(dtype=tf.float32)
         self.phase_train = tf.placeholder(dtype=tf.bool)
