@@ -21,7 +21,8 @@ class network(object):
         self.get_acc = get_acc
         # building network
         self._input()
-        self._build()
+        self._model()
+        self._algorithm()
         self._start_session()
 
 
@@ -40,7 +41,7 @@ class network(object):
         self.phase_train = tf.placeholder(dtype=tf.bool)
         self.lr = tf.placeholder(dtype = tf.float32)
 
-    def _build(self):
+    def _model(self):
         layer=self.x_
         for i in range(len(self.conv_filters)):
             k=self.conv_filters[i]
