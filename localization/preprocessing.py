@@ -119,15 +119,16 @@ class preprocessing(object):
                                 else:
                                     fg_croppped_imgs = sparse_crop(
                                         img[fg_y1 - 10:fg_y2 + 10, fg_x1 - 10L:fg_x2 + 10], self.crop_size, self.crop_size)
+                                utils.plot_images(fg_croppped_imgs)
+                                plt.close()
+                                plt.title(name)
+                                plt.imshow(roi_img)
+                                plt.show()
+                                plt.close()
+
                         except Exception as e:
                             print 'error coord {}'.format([fg_x1, fg_y1, fg_x2, fg_y2])
 
-                        utils.plot_images(fg_croppped_imgs)
-                        plt.close()
-                        plt.title(name)
-                        plt.imshow(roi_img)
-                        plt.show()
-                        plt.close()
 
 
 
