@@ -68,10 +68,10 @@ class network(object):
 
     def train(self , max_iter):
         for i in range(max_iter):
-            self.next_batch()
+            batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs)
             next_batch()
-            feed_dict={x_ : }
-            self.sess.run((self.train_op , ))
+            feed_dict={self.x_ : batch_xs , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
+            self.sess.run(self.train_op , feed_dict= feed_dict )
 
 
 
