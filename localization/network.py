@@ -60,7 +60,7 @@ class network(object):
             layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
 
         #make Logits
-        self.logits=affine(name='logits' , x=layer , out_ch=self.n_classes)
+        self.logits=affine(name='logits' , x=layer , out_ch=self.n_classes , activation=None)
 
 
     def _algorithm(self):
