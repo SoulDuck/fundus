@@ -133,13 +133,12 @@ class preprocessing(object):
 
 
 
-
-
+"""
+    
     def _get_cropped(self):
         root_root_roi_dir = './data/roi'
         root_root_fg_dir = './data/fg'
         root_root_bg_dir = './data/bg'
-
 
         if not os.path.exists(root_root_roi_dir):
             os.makedirs(root_root_roi_dir)
@@ -159,17 +158,6 @@ class preprocessing(object):
                                                          [root_root_roi_dir, root_root_fg_dir, root_root_bg_dir])
             if not os.path.isdir(root_roi_dir):
                 map(lambda path: os.makedirs(os.path.join(path)),[root_roi_dir, root_fg_dir, root_bg_dir])
-            # 폴더가 생성된 적이 없다면 폴더를 생성한다
-            """
-            data 이런식의 파일 경로를 가지고 있다
-             |-bg
-             |  |-1
-             |  |-2
-             |  ...
-             |  |-6
-             |-fg
-             |-roi
-            """
             print 'name:',name
             for k in labels.keys():
                 if not k ==1 : # 1번 라벨에 대해서만 fg을 얻는다
@@ -207,28 +195,8 @@ class preprocessing(object):
                         np.save(os.path.join(fg_dir, 'fg.npy'),fg_croppped_imgs)
                     except Exception as e:
                         print 'error coordinate ',fg_x1, fg_y1, fg_x2, fg_y2
+"""
 
-
-
-
-
-
-                    """
-                    for i,bg_coord in enumerate(cropped_coords):
-                        utils.show_progress(i, len(cropped_coords))
-                        bg_coord = map(int, bg_coord)
-                        bg_x1, bg_y1, bg_x2, bg_y2 = bg_coord
-                        area = overlaps(bg_coord , fg_coord)
-                        if np.max(cropped_images[i]) <= 30:
-                            continue
-                        if area == None or area <=int(fg_area*0.3):
-                            bg_img=Image.fromarray(cropped_images[i])
-                            plt.imsave(os.path.join(bg_dir,str(i))+'.png' ,bg_img )
-                        elif area >=int(fg_area*0.8): # foreground Image에 90퍼 이상 겹치면 foregound Image로 분류한다
-                            #print area
-                            fg_img = Image.fromarray(cropped_images[i])
-                            plt.imsave(os.path.join(fg_dir, str(i)+'.png'), fg_img)
-                    """
 if __name__ =='__main__':
     img_dir ='/Users/seongjungkim/data/detection/resize'
     csv_dir='/Users/seongjungkim/data/detection/csv'
