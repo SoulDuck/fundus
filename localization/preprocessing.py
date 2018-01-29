@@ -96,11 +96,11 @@ class preprocessing(object):
 
         if not os.path.exists(root_root_roi_dir):
             os.makedirs(root_root_roi_dir)
+            print 'a'
         if not os.path.exists(root_root_fg_dir):
             os.makedirs(root_root_fg_dir)
         if not os.path.exists(root_root_bg_dir):
             os.makedirs(root_root_bg_dir)
-        exit()
         for path in self.train_csv_paths:
             name=os.path.split(path)[1]
             name = os.path.splitext(name)[0]
