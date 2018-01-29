@@ -5,6 +5,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import os
 import glob
+import matplotlib.patches as patches
 def dense_crop(image , crop_height , crop_width , lr_flip =False, ud_flip=False ):
     """
      _________________
@@ -57,64 +58,130 @@ class preprocessing(object):
         self.n_train_paths = self.n_paths - self.n_test_paths
         self.test_csv_paths = self.csv_paths[:self.n_test_paths]
         self.train_csv_paths = self.csv_paths[self.n_test_paths:]
-        self.train_labels =self._get_coords()
+        self.all_labels=self._get_all_coords() # get all_labels
+
         self._get_cropped()
 
+    def get_coords(self, path):
+        labels = {}
+        f = open(path, 'r')
+        lines = f.readlines()
+        for i, line in enumerate(lines[1:]):
+            label, x1, y1, x2, y2 = map(float, line.split(','))
+            if not label in labels.keys():
+                labels[int(label)] = [[x1, y1, x2, y2]]  #
+            else:
+                labels[int(label)].append([x1, y1, x2, y2])  # )
 
-    def _get_coords(self):
+        return labels
+
+    def _get_all_coords(self):
         assert len(self.csv_paths) > 0 , 'the number of csv path {} '.format(len(self.csv_paths))
-        train_labels = {}
+        self.all_labels={}
         for path in self.train_csv_paths:
-            f=open(path , 'r')
-            lines=f.readlines()
-            for i,line in enumerate(lines[1:]):
-                label , x1 , y1 ,x2 , y2 =map(float , line.split(','))
-                if not label in train_labels.keys():
-                    train_labels[int(label)]=[[x1,y1,x2,y2]] #
+            labels=self.get_coords(path)
+            for key in labels.keys():
+                if not key in self.all_labels.keys():
+                    self.all_labels[key] = labels[key]
                 else:
-                    train_labels[int(label)].append([x1,y1,x2,y2]) #)
-
-        return train_labels
-
+                    self.all_labels[key].extend(labels[key])
+        return self.all_labels
 
     def _get_cropped(self):
+        root_root_roi_dir = './data/roi'
+        root_root_fg_dir = './data/fg'
+        root_root_bg_dir = './data/bg'
+
+
+        if not os.path.exists(root_root_roi_dir):
+            os.makedirs(root_root_roi_dir)
+        if not os.path.exists(root_root_fg_dir):
+            os.makedirs(root_root_fg_dir)
+        if not os.path.exists(root_root_bg_dir):
+            os.makedirs(root_root_bg_dir)
+
         for path in self.train_csv_paths:
             name=os.path.split(path)[1]
             name = os.path.splitext(name)[0]
-            img=np.asarray(Image.open(os.path.join(self.img_dir , name+'.png')))
-            #overlaps(img)
-            #roi #foreground #backgound
+            labels = self.get_coords(path) # csv별 roi을 가져온다. 예시 [4] : [[x1,y1 x2, y2] ...[x1,y1 x2, y2]]
 
-            roi_dir='./data/roi'
-            fg_dir='./data/fg'
-            bg_dir='./data/bg'
+            # root_root_roi , fg_dir , bg_dir 에서 csv 이름이 있는 폴더를 생성한다
+            # E.G) './data/roi'-->'./data/roi/140352'
+            root_roi_dir, root_fg_dir, root_bg_dir = map(lambda path: os.path.join(path, name),
+                                                         [root_root_roi_dir, root_root_fg_dir, root_root_bg_dir])
+            if not os.path.isdir(root_roi_dir):
+                map(lambda path: os.makedirs(os.path.join(path)),[root_roi_dir, root_fg_dir, root_bg_dir])
+            # 폴더가 생성된 적이 없다면 폴더를 생성한다
+            """
+            data 이런식의 파일 경로를 가지고 있다
+             |-bg
+             |  |-1
+             |  |-2
+             |  ...
+             |  |-6
+             |-fg
+             |-roi
+            """
+            print 'name:',name
+            for k in labels.keys():
+                if not k ==1 : # 1번 라벨에 대해서만 fg을 얻는다
+                    continue
+                # make dir
+                roi_dir, fg_dir, bg_dir = map(lambda path: os.path.join(path, str(k)),
+                                              [root_roi_dir, root_fg_dir, root_bg_dir])
+                if not os.path.isdir(roi_dir):
+                    map(lambda path: os.makedirs(os.path.join(path)), [roi_dir, fg_dir, bg_dir])
+                # load image
+                img = np.asarray(Image.open(os.path.join(self.img_dir, name + '.png')))
+                # crop image
+                cropped_images, cropped_coords = dense_crop(img, 75, 75)  # 100 , 100 으로 모든 이미지를 자른다
 
-            if not os.path.exists(roi_dir):
-                os.makedirs(roi_dir)
-            if not os.path.exists(fg_dir):
-                os.makedirs(fg_dir)
-            if not os.path.exists(bg_dir):
-                os.makedirs(bg_dir)
+                # save background image and foreground image to each folder
+                for fg_coord in labels[k]:
+                    print 'foreground coord : {}'.format(fg_coord)
+                    fg_coord=map(int , fg_coord)
+                    fg_x1,fg_y1,fg_x2,fg_y2=fg_coord
+                    for i,bg_coord in enumerate(cropped_coords):
+                        bg_coord = map(int, bg_coord)
+                        bg_x1, bg_y1, bg_x2, bg_y2 = bg_coord
+                        area = overlaps(bg_coord , fg_coord)
+                        if np.max(cropped_images[i]) <= 30:
+                            continue
+                        #
+                        if area == None or area <=int((75*75)*0.3):
+                            continue
+                            bg_img=Image.fromarray(cropped_images[i])
+                            plt.imsave(os.path.join(bg_dir,str(i))+'.png' ,bg_img )
+                        elif area >=int((75*75)*0.8):
+                            fg_img = Image.fromarray(cropped_images[i])
+                            plt.imsave(os.path.join(fg_dir, str(i)+'.png'), fg_img)
 
 
 
 if __name__ =='__main__':
-    img_dir ='/Users/seongjungkim/data/detection/margin_cropped_image'
+    img_dir ='/Users/seongjungkim/data/detection/resize'
     csv_dir='/Users/seongjungkim/data/detection/csv'
     model=preprocessing(csv_dir , img_dir)
-    exit()
+
+    print len(model.all_labels[6])
+    """
     for k in model.train_labels.keys():
         print len(model.train_labels[k])
-    print model.train_labels[1]
+    print model.train_labels[2]
     width_height=map(lambda coord : get_width_height(coord) , model.train_labels[1])
 
+    count =0
     for w,h in width_height:
-        print w ,h
-        plt.scatter(w,h)
+        if w < 100 and h < 100 :
+            count +=1
+            print w ,h
+            plt.scatter(w,h)
+        print count
+
+
     plt.show()
-
-
     exit()
+    
     img=Image.open('../debug/0.png').convert('RGB')
     np_img=np.asarray(img)
 
@@ -126,4 +193,4 @@ if __name__ =='__main__':
         plt.imshow(cropped_images)
         plt.show()
 
-
+    """

@@ -409,13 +409,13 @@ def image_resize(path):
 def overlaps(window_coord , foreground_coord):
     w_x1, w_y1, w_x2, w_y2 = window_coord
     fg_x1,fg_y1,fg_x2,fg_y2 , =foreground_coord
-    o_x1=max(w_x1 , fg_x1) #o --> overlap
-    o_x2=min(w_x2 , fg_x2)
-    o_y1=min(w_y1 , fg_y1)
-    o_y2=min(w_y2 , fg_y2)
-    print window_coord
-    print foreground_coord
-    print o_x1 , o_y1 , o_x2 , o_y2
+    o_x1 = max(w_x1, fg_x1)  # o --> overlap
+    o_x2 = min(w_x2, fg_x2)
+    o_y1 = max(w_y1, fg_y1)
+    o_y2 = min(w_y2, fg_y2)
+    #print window_coord
+    #print foreground_coord
+    #print o_x1 , o_y1 , o_x2 , o_y2
     o_w = (o_x2 - o_x1)
     o_h = (o_y2 - o_y1)
 
