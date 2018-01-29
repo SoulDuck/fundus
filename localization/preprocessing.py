@@ -47,7 +47,7 @@ def dense_crop(image , crop_height , crop_width , lr_flip =False, ud_flip=False 
 
 
 
-class preprocessing(object):
+class Preprocessing(object):
     def __init__(self , csv_dir , img_dir):
         self.csv_dir  = csv_dir
         self.img_dir = img_dir
@@ -61,8 +61,8 @@ class preprocessing(object):
         self.train_csv_paths = self.csv_paths[self.n_test_paths:]
         self.all_labels=self._get_all_coords() # get all_labels
         self.crop_size=75
-        fg_images=self.get_rois(roi_num=1)
-        print len(fg_images)
+        self.fg_images=self.get_rois(roi_num=1)
+
         #self._get_cropped()
 
     def get_coords(self, path):
@@ -91,9 +91,9 @@ class preprocessing(object):
                     self.all_labels[key].extend(labels[key])
         return self.all_labels
 
-    def get_rois(self , roi_num):
+    def get_rois(self , roi_num , show=False):
         fg_images=[]
-        for path in self.train_csv_paths:
+        for path in self.train_csv_paths[:5]:
             name=os.path.split(path)[1]
             name=os.path.splitext(name)[0]
             print name
@@ -122,14 +122,13 @@ class preprocessing(object):
                                         img[fg_y1 - 10:fg_y2 + 10, fg_x1 - 10L:fg_x2 + 10], self.crop_size, self.crop_size)
 
                                 fg_images.extend(list(fg_croppped_imgs))
-
-                                utils.plot_images(fg_croppped_imgs)
-                                plt.close()
-                                plt.title(name)
-                                plt.imshow(roi_img)
-                                plt.show()
-                                plt.close()
-
+                                if show:
+                                    utils.plot_images(fg_croppped_imgs)
+                                    plt.close()
+                                    plt.title(name)
+                                    plt.imshow(roi_img)
+                                    plt.show()
+                                    plt.close()
                         except Exception as e:
                             print 'error coord {}'.format([fg_x1, fg_y1, fg_x2, fg_y2])
         return fg_images
