@@ -24,9 +24,12 @@ class network(object):
     def _input(self):
         fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
         bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
-        n, h, w, ch = np.shape(fg_imgs)
+        n_fg, h, w, ch = np.shape(fg_imgs)
+        self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs[:fg_imgs])
 
-        self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs)
+        print 'train_imgs',len(self.train_labs)
+        print 'val_imgs', len(self.tval_labs)
+
         self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
         self.y_ = tf.placeholder(dtype=tf.float32, shape=[None, self.n_classes], name='y_')
         self.keep_prob = tf.placeholder(dtype=tf.float32)
