@@ -3,7 +3,8 @@ import tensorflow as tf
 import numpy as np
 from fundus_processing import dense_crop
 import os
-from data import next_batch,get_train_test_images_labels
+from data import next_batch,get_train_test_images_labels , divide_images
+from utils import get_acc
 class network(object):
     def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , data_dir='./'):
 
@@ -15,6 +16,8 @@ class network(object):
         self.data_dir = data_dir
         self.next_batch = next_batch
         self.get_train_test_images_labels  = get_train_test_images_labels
+        self.divide_images = divide_images
+        self.get_acc = get_acc
         # building network
         self._input()
         self._build()
@@ -25,10 +28,10 @@ class network(object):
         fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
         bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
         n_fg, h, w, ch = np.shape(fg_imgs)
+        n_bg, h, w, ch = np.shape(fg_imgs)
         self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs[:n_fg])
-
         print 'train_imgs',len(self.train_labs)
-        print 'val_imgs', len(self.tval_labs)
+        print 'val_imgs', len(self.val_labs)
 
         self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
         self.y_ = tf.placeholder(dtype=tf.float32, shape=[None, self.n_classes], name='y_')
@@ -64,14 +67,29 @@ class network(object):
     def _start_session(self):
         self.sess = tf.Session()
         init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
-        self.sess(init)
+        self.sess.run(init)
 
     def train(self , max_iter):
         for i in range(max_iter):
             batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs)
-            next_batch()
             feed_dict={self.x_ : batch_xs , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
             self.sess.run(self.train_op , feed_dict= feed_dict )
+
+    def val(self):
+        all_pred=[]
+        batch_imgs_list , batch_labs_list=self.divide_images(self.val_imgs ,self.val_labs)
+        for i in range(len(batch_labs_list)):
+            batch_ys = batch_labs_list[i]
+            batch_xs = batch_imgs_list[i]
+            feed_dict = {self.x_: batch_xs, self.y_: batch_ys, self.phase_train: False, self.lr: 0.01}
+            pred=self.sess.run(self.pred, feed_dict=feed_dict)
+            all_pred.extend(pred)
+        acc=self.get_acc(true=self.val_labs , pred=all_pred)
+        print acc
+
+
+
+
 
 
 
@@ -83,6 +101,7 @@ if __name__=='__main__':
     fc_out_channels=[1024,1024]
     n_classes=2
     network=network(conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes)
+
 
 
 

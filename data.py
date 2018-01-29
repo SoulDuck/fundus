@@ -11,6 +11,35 @@ import aug
 import tensorflow as tf
 
 
+def divide_images(images , batch_size):
+    debug_flag_lv0=True
+    debug_flag_lv1=True
+    if __debug__ == debug_flag_lv0:
+        print 'debug start | utils.py | divide_images'
+    batch_img_list = []
+    share = len(images) / batch_size
+    # print len(images)
+    # print len(labels)
+    # print 'share :',share
+
+    for i in range(share + 1):
+        if i == share:
+            imgs = images[i * batch_size:]
+            # print i+1, len(imgs), len(labs)
+            batch_img_list.append(imgs)
+            if __debug__ == debug_flag_lv1:
+                print "######utils.py: divide_images_from_batch debug mode#####"
+                print 'total :', len(images), 'batch', i * batch_size, '-', len(images)
+        else:
+            imgs = images[i * batch_size:(i + 1) * batch_size]
+            # print i , len(imgs) , len(labs)
+            batch_img_list.append(imgs)
+            if __debug__ == debug_flag_lv1:
+                print "######utils.py: divide_images_from_batch debug mode######"
+                print 'total :', len(images), 'batch', i * batch_size, ":", (i + 1) * batch_size
+    return batch_img_list
+
+
 
 def save_paths(src_paths, f_path):
     f = open(f_path, 'w')
@@ -180,14 +209,14 @@ def get_train_test_images_labels(normal_images, abnormal_images, train_ratio=0.9
     labels_abnormal_test = np.zeros([n_abnormal_test])
     labels_abnormal_test.fill(ABNORMAL_LABEL)
 
-    train_labels = np.concatenate(labels_normal_train, labels_abnormal_train)
-    test_labels = np.concatenate(labels_normal_test, labels_abnormal_test)
+    train_labels = np.concatenate([labels_normal_train, labels_abnormal_train])
+    test_labels = np.concatenate([labels_normal_test, labels_abnormal_test])
     train_labels = train_labels.astype(np.int32)
     test_labels = test_labels.astype(np.int32)
     train_labels = cls2onehot(train_labels, 2)
     test_labels = cls2onehot(test_labels, 2)
 
-    if __debug__ == True:
+    if __debug__ == False:
         print 'the number of normal data', n_normal
         print 'the normal images shape', normal_images.shape
         print 'the number of normal train data', n_normal_train
