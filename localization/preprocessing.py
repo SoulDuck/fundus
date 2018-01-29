@@ -138,25 +138,27 @@ class preprocessing(object):
 
                 # save background image and foreground image to each folder
                 for fg_coord in labels[k]:
+                    try:
+                        print 'foreground coord : {}'.format(fg_coord)
+                        fg_x1, fg_y1, fg_x2, fg_y2=map(int , fg_coord)
+                        fg_w = fg_x2 - fg_x1
+                        fg_h = fg_y2 - fg_y1
+                        fg_area = fg_w * fg_h
 
-                    print 'foreground coord : {}'.format(fg_coord)
-                    fg_x1, fg_y1, fg_x2, fg_y2=map(int , fg_coord)
-                    fg_w = fg_x2 - fg_x1
-                    fg_h = fg_y2 - fg_y1
-                    fg_area = fg_w * fg_h
-
-                    fg_croppped_imgs,fg_croppped_coords=dense_crop(img[fg_y1-10 :fg_y2+10 ,fg_x1-10L:fg_x2+10],75,75)
-                    print np.shape(fg_croppped_imgs)
-                    fig = plt.figure()
-                    ax1 = fig.add_subplot(1,2,1)
-                    ax1.imshow(img)
-                    rect=patches.Rectangle((fg_x1, fg_y1), fg_w, fg_h , facecolor=None , linewidth=1 , edgecolor='r' ,fill=False)
-                    ax1.add_patch(rect)
-                    ax2 = fig.add_subplot(1, 2, 2)
-                    ax2.imshow(fg_croppped_imgs[0])
-                    plt.show()
-                    plt.close()
-                    np.save(os.path.join(fg_dir, 'fg.npy'),fg_croppped_imgs)
+                        fg_croppped_imgs,fg_croppped_coords=dense_crop(img[fg_y1-10 :fg_y2+10 ,fg_x1-10L:fg_x2+10],75,75)
+                        print np.shape(fg_croppped_imgs)
+                        fig = plt.figure()
+                        ax1 = fig.add_subplot(1,2,1)
+                        ax1.imshow(img)
+                        rect=patches.Rectangle((fg_x1, fg_y1), fg_w, fg_h , facecolor=None , linewidth=1 , edgecolor='r' ,fill=False)
+                        ax1.add_patch(rect)
+                        ax2 = fig.add_subplot(1, 2, 2)
+                        ax2.imshow(fg_croppped_imgs[0])
+                        plt.show()
+                        plt.close()
+                        np.save(os.path.join(fg_dir, 'fg.npy'),fg_croppped_imgs)
+                    except Exception as e:
+                        print fg_x1, fg_y1, fg_x2, fg_y2
 
 
 
