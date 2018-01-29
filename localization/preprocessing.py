@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import os
 import glob
 import matplotlib.patches as patches
+import random
 def dense_crop(image , crop_height , crop_width , lr_flip =False, ud_flip=False ):
     """
      _________________
@@ -62,6 +63,7 @@ class Preprocessing(object):
         self.all_labels=self._get_all_coords() # get all_labels
         self.crop_size=75
         self.fg_images=self.get_rois(roi_num=1)
+        self.bg_images = self.get_bg(roi_num=1 , num_bg=30)
 
         #self._get_cropped()
 
@@ -93,7 +95,7 @@ class Preprocessing(object):
 
     def get_rois(self , roi_num , show=False):
         fg_images=[]
-        for path in self.train_csv_paths:
+        for path in self.train_csv_paths[:5]:
             name=os.path.split(path)[1]
             name=os.path.splitext(name)[0]
             print name
@@ -132,7 +134,35 @@ class Preprocessing(object):
                         except Exception as e:
                             print 'error coord {}'.format([fg_x1, fg_y1, fg_x2, fg_y2])
         return np.asarray(fg_images)
+    def get_bg(self ,roi_num , num_bg):
+        bg_images=[]
 
+        for path in self.train_csv_paths:
+            name=os.path.split(path)[1]
+            name=os.path.splitext(name)[0]
+            labels = self.get_coords(path)  # csv별 roi을 가져온다. 예시 [4] : [[x1,y1 x2, y2] ...[x1,y1 x2, y2]]
+            img=np.asarray(Image.open(os.path.join(self.img_dir, name + '.png')))
+            img_h, img_w, img_ch = np.shape(img)
+            #이미지에서 임의의 좌표를 찍고 self.crop_size 너비와 높이를 가지는 사각형을 crop한다 , 원래 이미지를 넘어가지 않게 좌표를 잘조정한다
+            #하지만 그 좌표가 fg와 겹치면 pass한다
+
+            for i in range(num_bg):
+                overlap_flag = False
+                bg_y1=random.randint(0 , img_h-self.crop_size)
+                bg_x1 = random.randint(0, img_w - self.crop_size)
+                bg_y2 = bg_y1 + self.crop_size
+                bg_x2=bg_x1+self.crop_size
+                bg_coord=[bg_x1, bg_y1, bg_x2, bg_y2]
+
+                for k in labels.keys():
+                    if k ==roi_num:
+                        for i,fg_coord in enumerate(labels[k]):
+                            if not overlaps(bg_coord , fg_coord ) == None:
+                                overlap_flag=True
+
+                if not overlap_flag:
+                    bg_images.append(list(img[bg_y1:bg_y2, bg_x1:bg_x2]))
+        return np.asarray(bg_images)
 
 
 
@@ -206,6 +236,8 @@ if __name__ =='__main__':
     csv_dir='/Users/seongjungkim/data/detection/csv'
     model=Preprocessing(csv_dir , img_dir)
     print np.shape(model.fg_images)
+    print np.shape(model.bg_images)
+
 
     """
     for k in model.train_labels.keys():
