@@ -204,7 +204,7 @@ class Preprocessing(object):
 if __name__ =='__main__':
     img_dir ='/Users/seongjungkim/data/detection/resize'
     csv_dir='/Users/seongjungkim/data/detection/csv'
-    model=preprocessing(csv_dir , img_dir)
+    model=Preprocessing(csv_dir , img_dir)
 
     print len(model.all_labels[6])
     """

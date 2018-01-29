@@ -97,7 +97,7 @@ def dense_crop(image , crop_height , crop_width , lr_flip =False, ud_flip=False)
     return np.asarray(cropped_images)
 
 
-def sparse_crop(image , crop_height , crop_width ,lr_flip =False, ud_flip=False ):
+def sparse_crop(image , crop_height , crop_width ,lr_flip =False, ud_flip=False):
     """
      _________________
     | ____       ___  |
@@ -158,7 +158,6 @@ def sparse_crop(image , crop_height , crop_width ,lr_flip =False, ud_flip=False 
 
     if lr_flip == False and ud_flip ==False:
         cropped_images= ori_cropped_images
-        utils.plot_images(cropped_images)
     return cropped_images
 
 
