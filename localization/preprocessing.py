@@ -158,7 +158,7 @@ class preprocessing(object):
                         plt.close()
                         np.save(os.path.join(fg_dir, 'fg.npy'),fg_croppped_imgs)
                     except Exception as e:
-                        print fg_x1, fg_y1, fg_x2, fg_y2
+                        print 'error coordinate ',fg_x1, fg_y1, fg_x2, fg_y2
 
 
 
