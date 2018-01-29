@@ -138,25 +138,34 @@ class preprocessing(object):
 
                 # save background image and foreground image to each folder
                 for fg_coord in labels[k]:
+
                     print 'foreground coord : {}'.format(fg_coord)
-                    fg_coord=map(int , fg_coord)
-                    fg_x1,fg_y1,fg_x2,fg_y2=fg_coord
+                    fg_x1, fg_y1, fg_x2, fg_y2=map(int , fg_coord)
+                    fg_w = fg_x2 - fg_x1
+                    fg_h = fg_y2 - fg_y1
+                    fg_area = fg_w * fg_h
+
+                    fig, ax = plt.subplots(1)
+                    ax.imshow(img)
+                    rect=patches.Rectangle((fg_x1, fg_y1), fg_w, fg_h , facecolor=None , linewidth=1 , edgecolor='r' ,fill=False)
+                    ax.add_patch(rect)
+                    plt.show()
+
+
                     for i,bg_coord in enumerate(cropped_coords):
                         bg_coord = map(int, bg_coord)
                         bg_x1, bg_y1, bg_x2, bg_y2 = bg_coord
                         area = overlaps(bg_coord , fg_coord)
                         if np.max(cropped_images[i]) <= 30:
                             continue
-                        #
-                        if area == None or area <=int((75*75)*0.3):
+                        if area == None or area <=int(fg_area*0.3):
                             continue
                             bg_img=Image.fromarray(cropped_images[i])
                             plt.imsave(os.path.join(bg_dir,str(i))+'.png' ,bg_img )
-                        elif area >=int((75*75)*0.8):
+                        elif area >=int(fg_area*0.8): # foreground Image에 90퍼 이상 겹치면 foregound Image로 분류한다
+                            #print area
                             fg_img = Image.fromarray(cropped_images[i])
                             plt.imsave(os.path.join(fg_dir, str(i)+'.png'), fg_img)
-
-
 
 if __name__ =='__main__':
     img_dir ='/Users/seongjungkim/data/detection/resize'
