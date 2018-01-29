@@ -25,7 +25,7 @@ class network(object):
         fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
         bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
         n_fg, h, w, ch = np.shape(fg_imgs)
-        self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs[:fg_imgs])
+        self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs[:n_fg])
 
         print 'train_imgs',len(self.train_labs)
         print 'val_imgs', len(self.tval_labs)
