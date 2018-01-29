@@ -65,7 +65,7 @@ class network(object):
     def _algorithm(self):
         self.pred, self.pred_cls, self.cost, self.train_op, self.correct_pred, self.accuracy = algorithm(
             y_conv=self.logits, y_=self.y_,
-            learning_rate=self.lr, optimizer='sgd')
+            learning_rate=self.lr, optimizer='sgd',use_l2_loss=False)
     def _start_session(self):
         self.sess = tf.Session()
         init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
