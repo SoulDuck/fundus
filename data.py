@@ -10,6 +10,36 @@ from multiprocessing import Pool
 import aug
 import tensorflow as tf
 
+def divide_images_labels_from_batch(images, labels ,batch_size):
+    debug_flag=False
+
+    batch_img_list=[]
+    batch_lab_list = []
+    share=len(labels)/batch_size
+    #print len(images)
+    #print len(labels)
+    #print 'share :',share
+
+    for i in range(share+1):
+        if i==share:
+            imgs = images[i*batch_size:]
+            labs = labels[i*batch_size:]
+            #print i+1, len(imgs), len(labs)
+            batch_img_list.append(imgs)
+            batch_lab_list.append(labs)
+            if __debug__ ==debug_flag:
+                print "######utils.py: divide_images_labels_from_batch debug mode#####"
+                print 'total :', len(images), 'batch', i*batch_size ,'-',len(images)
+        else:
+            imgs=images[i*batch_size:(i+1)*batch_size]
+            labs=labels[i * batch_size:(i + 1) * batch_size]
+           # print i , len(imgs) , len(labs)
+            batch_img_list.append(imgs)
+            batch_lab_list.append(labs)
+            if __debug__ == debug_flag:
+                print "######utils.py: divide_images_labels_from_batch debug mode######"
+                print 'total :', len(images) ,'batch' ,i*batch_size ,":",(i+1)*batch_size
+    return batch_img_list , batch_lab_list
 
 def divide_images(images , batch_size):
     debug_flag_lv0=True

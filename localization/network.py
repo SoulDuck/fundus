@@ -3,20 +3,21 @@ import tensorflow as tf
 import numpy as np
 from fundus_processing import dense_crop
 import os
-from data import next_batch,get_train_test_images_labels , divide_images
+from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch
 from utils import get_acc
 class network(object):
-    def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , data_dir='./'):
+    def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , batch_size , data_dir='./' ):
 
         self.conv_filters = conv_filters
         self.conv_strides = conv_strides
         self.conv_out_channels = conv_out_channels
         self.fc_out_channels = fc_out_channels
         self.n_classes = n_classes
+        self.batch_size = batch_size
         self.data_dir = data_dir
         self.next_batch = next_batch
         self.get_train_test_images_labels  = get_train_test_images_labels
-        self.divide_images = divide_images
+        self.divide_images = divide_images_labels_from_batch
         self.get_acc = get_acc
         # building network
         self._input()
@@ -71,13 +72,13 @@ class network(object):
 
     def train(self , max_iter):
         for i in range(max_iter):
-            batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs)
+            batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs , self.batch_size)
             feed_dict={self.x_ : batch_xs , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
             self.sess.run(self.train_op , feed_dict= feed_dict )
 
     def val(self):
         all_pred=[]
-        batch_imgs_list , batch_labs_list=self.divide_images(self.val_imgs ,self.val_labs)
+        batch_imgs_list , batch_labs_list=self.divide_images_labels_from_batch(self.val_imgs ,self.val_labs , self.batch_size)
         for i in range(len(batch_labs_list)):
             batch_ys = batch_labs_list[i]
             batch_xs = batch_imgs_list[i]
