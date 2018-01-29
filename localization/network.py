@@ -3,34 +3,36 @@ import tensorflow as tf
 import numpy as np
 from fundus_processing import dense_crop
 import os
+from data import next_batch,get_train_test_images_labels
 class network(object):
     def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , data_dir='./'):
+
         self.conv_filters = conv_filters
         self.conv_strides = conv_strides
         self.conv_out_channels = conv_out_channels
         self.fc_out_channels = fc_out_channels
         self.n_classes = n_classes
         self.data_dir = data_dir
+        self.next_batch = next_batch
+        self.get_train_test_images_labels  = get_train_test_images_labels
         # building network
         self._input()
         self._build()
+        self._start_session()
 
 
     def _input(self):
-        self.fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
-        self.bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
-        n_fg , h ,w ,ch =np.shape(self.fg_imgs)
-        n_bg, h, w, ch = np.shape(self.bg_imgs)
+        fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
+        bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
+        n, h, w, ch = np.shape(fg_imgs)
 
-        print 'n foreground {}'.format(n_fg)
-        print 'n background {}'.format(n_bg)
-        print 'Image shape {}'.format([h,w,ch])
-
+        self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs)
         self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
         self.y_ = tf.placeholder(dtype=tf.float32, shape=[None, self.n_classes], name='y_')
         self.keep_prob = tf.placeholder(dtype=tf.float32)
         self.phase_train = tf.placeholder(dtype=tf.bool)
         self.lr = tf.placeholder(dtype = tf.float32)
+
     def _build(self):
         layer=self.x_
         for i in range(len(self.conv_filters)):
@@ -56,7 +58,17 @@ class network(object):
         self.pred, self.pred_cls, self.cost, self.train_op, self.correct_pred, self.accuracy = algorithm(
             y_conv=self.logits, y_=self.y_,
             learning_rate=self.lr, optimizer='sgd')
+    def _start_session(self):
+        self.sess = tf.Session()
+        init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
+        self.sess(init)
 
+    def train(self , max_iter):
+        for i in range(max_iter):
+            self.next_batch()
+            next_batch()
+            feed_dict={x_ : }
+            self.sess.run((self.train_op , ))
 
 
 
