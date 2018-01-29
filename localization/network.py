@@ -17,7 +17,7 @@ class network(object):
         self.data_dir = data_dir
         self.next_batch = next_batch
         self.get_train_test_images_labels  = get_train_test_images_labels
-        self.divide_images = divide_images_labels_from_batch
+        self.divide_images_labels_from_batch = divide_images_labels_from_batch
         self.get_acc = get_acc
         # building network
         self._input()
