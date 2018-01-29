@@ -60,7 +60,6 @@ class preprocessing(object):
         self.test_csv_paths = self.csv_paths[:self.n_test_paths]
         self.train_csv_paths = self.csv_paths[self.n_test_paths:]
         self.all_labels=self._get_all_coords() # get all_labels
-
         self._get_cropped()
 
     def get_coords(self, path):
@@ -146,13 +145,25 @@ class preprocessing(object):
                     fg_h = fg_y2 - fg_y1
                     fg_area = fg_w * fg_h
 
-                    fig, ax = plt.subplots(1)
-                    ax.imshow(img)
+                    fg_croppped_imgs,fg_croppped_coords=dense_crop(img[fg_y1-10 :fg_y2+10 ,fg_x1-10L:fg_x2+10],75,75)
+                    print np.shape(fg_croppped_imgs)
+                    fig = plt.figure()
+                    ax1 = fig.add_subplot(1,2,1)
+                    ax1.imshow(img)
                     rect=patches.Rectangle((fg_x1, fg_y1), fg_w, fg_h , facecolor=None , linewidth=1 , edgecolor='r' ,fill=False)
-                    ax.add_patch(rect)
+                    ax1.add_patch(rect)
+                    ax2 = fig.add_subplot(1, 2, 2)
+                    ax2.imshow(fg_croppped_imgs[0])
                     plt.show()
+                    plt.close()
+                    np.save(os.path.join(fg_dir, 'fg.npy'),fg_croppped_imgs)
 
 
+
+
+
+
+                    """
                     for i,bg_coord in enumerate(cropped_coords):
                         utils.show_progress(i, len(cropped_coords))
                         bg_coord = map(int, bg_coord)
@@ -167,7 +178,7 @@ class preprocessing(object):
                             #print area
                             fg_img = Image.fromarray(cropped_images[i])
                             plt.imsave(os.path.join(fg_dir, str(i)+'.png'), fg_img)
-
+                    """
 if __name__ =='__main__':
     img_dir ='/Users/seongjungkim/data/detection/resize'
     csv_dir='/Users/seongjungkim/data/detection/csv'
