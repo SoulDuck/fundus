@@ -131,7 +131,7 @@ class Preprocessing(object):
                                     plt.close()
                         except Exception as e:
                             print 'error coord {}'.format([fg_x1, fg_y1, fg_x2, fg_y2])
-        return fg_images
+        return np.asarray(fg_images)
 
 
 
@@ -205,8 +205,8 @@ if __name__ =='__main__':
     img_dir ='/Users/seongjungkim/data/detection/resize'
     csv_dir='/Users/seongjungkim/data/detection/csv'
     model=Preprocessing(csv_dir , img_dir)
+    print np.shape(model.fg_images)
 
-    print len(model.all_labels[6])
     """
     for k in model.train_labels.keys():
         print len(model.train_labels[k])
