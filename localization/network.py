@@ -4,7 +4,8 @@ import numpy as np
 from fundus_processing import dense_crop
 import os
 from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch
-from utils import get_acc
+from utils import get_acc,show_progress
+
 class network(object):
     def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , batch_size , data_dir='./' ):
 
@@ -73,6 +74,7 @@ class network(object):
 
     def train(self , max_iter):
         for i in range(max_iter):
+            show_progress(i ,max_iter)
             batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs , self.batch_size)
             feed_dict={self.x_ : batch_xs , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
             self.sess.run(self.train_op , feed_dict= feed_dict )
