@@ -172,7 +172,7 @@ class detection(network):
             all_pred.extend(
                 self.model.sess.run(self.model.pred, feed_dict={self.model.x_: imgs, self.model.phase_train: False}))
 
-        print np.shape(all_pred)
+        print all_pred ,  imgs ,coords
 
 
     def dense_crop(self,image, crop_height, crop_width, lr_flip=False, ud_flip=False):
@@ -213,7 +213,7 @@ if __name__=='__main__':
     crop_size=75
     detection_model=detection(img_dir,crop_size)
     img=np.asarray(Image.open(detection_model.img_path[0]))
-    detection_model.detect_target(img)
+    pred=detection_model.detect_target(img)
     """
     conv_filters=[3,3,3,3,3]
     conv_strides=[2,2,1,1,2,]
