@@ -106,8 +106,8 @@ class network(object):
             feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
             _,train_acc , train_loss =self.sess.run([self.train_op ,self.accuracy , self.cost], feed_dict= feed_dict )
             # on training best_acc,best_loss, acc,loss was not changed , so last model was saved only at model/train/
-            self.max_acc, self.min_loss = self.save_model(self.sess, self.best_acc, self.best_loss, self.acc, self.loss,
-                                                          self.global_step, './model', self.last_saver, self.best_saver)
+            #self.max_acc, self.min_loss = self.save_model(self.sess, self.best_acc, self.best_loss, self.acc, self.loss,
+            #                                              self.global_step, './model', self.last_saver, self.best_saver)
             self.global_step+=1
         return train_acc , train_loss
 
