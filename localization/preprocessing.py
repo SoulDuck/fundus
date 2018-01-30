@@ -94,18 +94,20 @@ class Preprocessing(object):
         return self.all_labels
 
     def get_rois(self , roi_num , csv_paths):
-        roi_coords=[]
+        roi_coords={}
         roi_images = []
         for path in csv_paths[:]:
             name = os.path.split(path)[1]
             name = os.path.splitext(name)[0]
-            print name
             labels = self.get_coords(path)  # csv별 roi을 가져온다. 예시 [4] : [[x1,y1 x2, y2] ...[x1,y1 x2, y2]]
             img = np.asarray(Image.open(os.path.join(self.img_dir, name + '.png')))
             for k in labels.keys():
                 if k == roi_num:
                      for i, coord in enumerate(labels[k]):
-                        roi_coords.append(coord)
+                        if not  name in roi_coords.keys():
+                            roi_coords[name]=[coord]
+                        else:
+                            roi_coords[name].append(coord)
         return roi_coords
 
     def get_fg(self , roi_num , csv_paths,show=False):
@@ -271,7 +273,7 @@ if __name__ =='__main__':
     csv_dir='/Users/seongjungkim/data/detection/csv'
     model=Preprocessing(csv_dir , img_dir)
     rois=model.get_rois(1,model.test_csv_paths)
-    print rois
+    print len(rois.keys())
     #print np.shape(model.fg_images)
     #print np.shape(model.bg_images)
 
