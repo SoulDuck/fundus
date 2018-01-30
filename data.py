@@ -45,8 +45,8 @@ def divide_images_labels_from_batch(images, labels ,batch_size):
     return batch_img_list , batch_lab_list
 
 def divide_images(images , batch_size):
-    debug_flag_lv0=True
-    debug_flag_lv1=True
+    debug_flag_lv0=False
+    debug_flag_lv1=False
     if __debug__ == debug_flag_lv0:
         print 'debug start | utils.py | divide_images'
     batch_img_list = []
