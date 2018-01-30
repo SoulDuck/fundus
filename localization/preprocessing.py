@@ -99,6 +99,7 @@ class Preprocessing(object):
         return self.all_labels
 
     def get_rois(self , roi_num , csv_paths):
+        roi_coords=[]
         roi_images = []
         for path in csv_paths[:]:
             name = os.path.split(path)[1]
@@ -108,9 +109,9 @@ class Preprocessing(object):
             img = np.asarray(Image.open(os.path.join(self.img_dir, name + '.png')))
             for k in labels.keys():
                 if k == roi_num:
-                     for i, roi_coord in enumerate(labels[k]):
-                        roi_coord.append([roi_coord])
-        return roi_coord
+                     for i, coord in enumerate(labels[k]):
+                        roi_coords.append(coord)
+        return roi_coords
 
     def get_fg(self , roi_num , csv_paths,show=False):
         fg_images=[]
@@ -274,6 +275,8 @@ if __name__ =='__main__':
     img_dir ='/Users/seongjungkim/data/detection/resize'
     csv_dir='/Users/seongjungkim/data/detection/csv'
     model=Preprocessing(csv_dir , img_dir)
+    rois=model.get_rois(1,model.test_csv_paths)
+    print rois
     #print np.shape(model.fg_images)
     #print np.shape(model.bg_images)
 
