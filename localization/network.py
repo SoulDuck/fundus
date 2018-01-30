@@ -106,7 +106,7 @@ class network(object):
             feed_dict = {self.x_: batch_xs, self.y_: batch_ys, self.phase_train: False, self.lr: 0.1}
             pred,cost=self.sess.run([self.pred ,self.cost], feed_dict=feed_dict)
             all_pred.extend(pred)
-            mean_cost.append(mean_cost)
+            mean_cost.extend(cost)
         val_acc=self.get_acc(true=self.val_labs , pred=all_pred)
         mean_cost=np.mean(mean_cost)
         print val_acc , mean_cost
