@@ -47,7 +47,7 @@ class network(object):
         val_imgs =mnist.val_imgs
         val_labs = mnist.val_labs
 
-        n , h , w , ch =np.shpae(train_imgs)
+        n , h , w , ch =np.shape(train_imgs)
 
 
 
