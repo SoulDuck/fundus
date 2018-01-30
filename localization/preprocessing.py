@@ -109,7 +109,7 @@ class Preprocessing(object):
             for k in labels.keys():
                 if k == roi_num:
                      for i, roi_coord in enumerate(labels[k]):
-                        roi_coord.append(roi_coord)
+                        roi_coord.append([roi_coord])
         return roi_coord
 
     def get_fg(self , roi_num , csv_paths,show=False):
