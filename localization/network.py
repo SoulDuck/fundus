@@ -42,10 +42,10 @@ class network(object):
 
 
         # for mnist
-        self.train_imgs = mnist.train_imgs
-        self.train_labs = mnist.train_labs
-        self.val_imgs =mnist.val_imgs
-        self.val_labs = mnist.val_labs
+        #self.train_imgs = mnist.train_imgs
+        #self.train_labs = mnist.train_labs
+        #self.val_imgs =mnist.val_imgs
+        #self.val_labs = mnist.val_labs
 
         n, h, w, ch = np.shape(self.train_imgs)
         self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
