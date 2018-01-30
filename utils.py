@@ -395,20 +395,42 @@ def write_acc_loss(summary_writer ,prefix , loss , acc  , step):
     summary_writer.add_summary(summary, step)
 
 
-def restore_model(saver,sess,ckpt_dir):
+def restore_model(saver,sess,ckpt_dir,type='last'):
+    if type=='last':
+        if tf.train.get_checkpoint_state(checkpoint_dir=ckpt_dir):
+            last_ckpt_filename=tf.train.latest_checkpoint(ckpt_dir, latest_filename=None)
+            global_step = int(os.path.basename(last_ckpt_filename).split('-')[1])
+            saver.restore(sess, tf.train.latest_checkpoint(ckpt_dir))
+            print '*********************************************'
+            print '*            Restore Model                  *'
+            print '*           global step : {: <6}            *'.format(global_step)
+            print '*********************************************'
+        else:
+            print 'No Model , initializing global step to 0'
+            global_step=0
+        return global_step
+    elif type =='acc':
+        #search best accuracy model at ckpt_dir
+        path , subdirs , files =os.walk(ckpt_dir).next()
+        max_subdir_name=''
+        max_acc=0
+        for subdir in (subdirs):
+            acc=float(str(subdir).split('_')[-1])
+            if acc > max_acc:
+                max_subdir_name = subdir
+                max_acc=acc
+        best_model_path=os.path.join(path , max_subdir_name , 'model')
+        saver.restore(sess ,save_path=best_model_path)
+        print '*************************************'
+        print '*            Best Model             *'
+        print '*           acc : {:.4f}            *'.format(max_acc)
+        print '*************************************'
 
-    if tf.train.get_checkpoint_state(checkpoint_dir=ckpt_dir):
-        last_ckpt_filename=tf.train.latest_checkpoint(ckpt_dir, latest_filename=None)
-        global_step = int(os.path.basename(last_ckpt_filename).split('-')[1])
-        saver.restore(sess, tf.train.latest_checkpoint(ckpt_dir))
-        print '*********************************************'
-        print '*            Restore Model                  *'
-        print '*           global step : {: <6}            *'.format(global_step)
-        print '*********************************************'
+
     else:
-        print 'No Model , initializing global step to 0'
-        global_step=0
-    return global_step
+        raise NotImplementedError
+
+
 
 
 def cache(cache_path ,  fn , *args , **kwargs):

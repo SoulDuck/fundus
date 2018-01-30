@@ -7,7 +7,8 @@ from data import next_batch,get_train_test_images_labels , divide_images_labels_
 from utils import get_acc,show_progress ,plot_images , save_model , make_saver , restore_model
 import mnist
 class network(object):
-    def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , batch_size , data_dir='./' ):
+    def __init__(self, conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, batch_size,
+                 data_dir='./', restore_type='last'):
 
         self.conv_filters = conv_filters
         self.conv_strides = conv_strides
@@ -16,6 +17,7 @@ class network(object):
         self.n_classes = n_classes
         self.batch_size = batch_size
         self.data_dir = data_dir
+        self.restore_type = restore_type #'last' or 'best_acc'
 
         #bring method from the other method
         self.next_batch = next_batch
@@ -97,7 +99,8 @@ class network(object):
         self.sess = tf.Session()
         init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
         self.sess.run(init)
-        self.global_step=self.restore_model(self.last_saver ,self.sess , './model/last')
+        ckpt_dir = os.path.join('./model' , self.restore_type)
+        self.global_step=self.restore_model(self.last_saver ,self.sess , ckpt_dir , self.restore_type)
 
     def train(self , max_iter):
         for i in range(self.global_step,max_iter):
@@ -133,11 +136,25 @@ class network(object):
 
 
 
+class detection(network):
+    def __init__(self):
+        conv_filters = [3, 3, 3, 3, 3]
+        conv_strides = [2, 2, 1, 1, 2, ]
+        conv_out_channels = [64, 64, 128, 128, 256]
+        fc_out_channels = [1024, 1024]
+        n_classes = 2
+        model=network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60 , restore_type='acc')
+        #network.restore_model(network.last_saver ,network.sess , './model/last')
+
+
 
 
 
 
 if __name__=='__main__':
+
+    detection_model=detection()
+    """
     conv_filters=[3,3,3,3,3]
     conv_strides=[2,2,1,1,2,]
     conv_out_channels=[64,64,128,128,256]
@@ -150,7 +167,7 @@ if __name__=='__main__':
     model.val()
     #n_classes=2
     #network=network(conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes,60)
-
+    """
 
 
 
