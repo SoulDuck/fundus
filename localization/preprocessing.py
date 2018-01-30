@@ -98,9 +98,9 @@ class Preprocessing(object):
                     self.all_labels[key].extend(labels[key])
         return self.all_labels
 
-    def get_rois(self , roi_num , show=False):
+    def get_rois(self , roi_num , csv_paths,show=False):
         fg_images=[]
-        for path in self.train_csv_paths[:]:
+        for path in csv_paths[:]:
             name=os.path.split(path)[1]
             name=os.path.splitext(name)[0]
             print name
@@ -139,10 +139,10 @@ class Preprocessing(object):
                         except Exception as e:
                             print 'error coord {}'.format([fg_x1, fg_y1, fg_x2, fg_y2])
         return np.asarray(fg_images)
-    def get_bg(self ,roi_num , num_bg):
+    def get_bg(self ,roi_num , num_bg , csv_paths):
         bg_images=[]
 
-        for path in self.train_csv_paths:
+        for path in csv_paths:
             name=os.path.split(path)[1]
             name=os.path.splitext(name)[0]
             labels = self.get_coords(path)  # csv별 roi을 가져온다. 예시 [4] : [[x1,y1 x2, y2] ...[x1,y1 x2, y2]]
