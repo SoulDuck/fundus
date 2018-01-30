@@ -82,7 +82,7 @@ class network(object):
     def _algorithm(self):
         self.pred, self.pred_cls, self.cost, self.train_op, self.correct_pred, self.accuracy = algorithm(
             y_conv=self.logits, y_=self.y_,
-            learning_rate=self.lr, optimizer='adam',use_l2_loss=False)
+            learning_rate=self.lr, optimizer='sgd',use_l2_loss=False)
     def _start_session(self):
         self.sess = tf.Session()
         init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
@@ -105,7 +105,6 @@ class network(object):
             batch_xs = batch_imgs_list[i]
             feed_dict = {self.x_: batch_xs, self.y_: batch_ys, self.phase_train: False, self.lr: 0.1}
             pred,cost=self.sess.run([self.pred ,self.cost], feed_dict=feed_dict)
-            print cost
             all_pred.extend(pred)
             mean_cost.append(cost)
 
