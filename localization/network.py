@@ -154,7 +154,7 @@ class detection(network):
         self.img_path=self._load_test_imgs()
 
 
-
+        exit()
     def _load_test_imgs(self):
         f=open('test_path.txt','r')
         img_paths=[]
@@ -165,7 +165,7 @@ class detection(network):
 
     def detect_target(self ,image):
         imgs, coords = self.dense_crop(image, self.crop_size, self.crop_size)
-        imgs_list =self.divide_images(imgs ,self.batch_size) #from network
+        imgs_list =self.divide_images(imgs ,self.model.batch_size) #from network
         all_pred=[]
         for i in range(len(imgs_list)):
             show_progress(i , len(imgs_list))
