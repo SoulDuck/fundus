@@ -153,8 +153,6 @@ class detection(network):
         self.crop_size = crop_size
         self.img_path=self._load_test_imgs()
 
-
-        exit()
     def _load_test_imgs(self):
         f=open('test_path.txt','r')
         img_paths=[]
