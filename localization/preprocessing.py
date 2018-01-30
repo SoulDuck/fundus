@@ -196,17 +196,6 @@ class Preprocessing(object):
             f.write(path+'\n')
         f.close()
 
-
-
-
-
-
-
-
-
-
-
-
 """
     
     def _get_cropped(self):

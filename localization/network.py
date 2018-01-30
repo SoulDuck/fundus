@@ -158,7 +158,7 @@ class detection(network):
         return img_paths
 
     def detect_target(self ,image):
-        cropped_imgs, coords = self.dense_crop(image, self.crop_size, self.crop_size)
+        cropped_imgs, coords = self.dense_crop(image, self.crop_size, self.crop_size ,interval=30 )
         imgs_list =self.divide_images(cropped_imgs ,self.model.batch_size) #from network
         all_pred=[]
         for i in range(len(imgs_list)):
@@ -171,7 +171,7 @@ class detection(network):
         return all_pred ,coords
 
 
-    def dense_crop(self,image, crop_height, crop_width, lr_flip=False, ud_flip=False):
+    def dense_crop(self,image , crop_height , crop_width , interval):
         """
          _________________
         | ____       ___  |
@@ -190,17 +190,25 @@ class detection(network):
         :param ud_flip:
         :return:
         """
-        cropped_images = []
-        img_h, img_w, ch = np.shape(image)
+        coords=[]
+        cropped_images=[]
+        img_h,img_w,ch=np.shape(image)
         n_h_move = img_h - crop_height + 1
         n_w_move = img_w - crop_width + 1
-        coords = []
         for h in range(n_h_move):
             for w in range(n_w_move):
-                cropped_images.append(image[h: h + crop_height, w: w + crop_width, :])
-                coords.append([w, h, w + crop_width, h + crop_height])
+                x1 = w
+                y1 = h
+                x2 = w + crop_width
+                y2 = h + crop_height
+                coords.append((x1,y1,x2,y2))
+                cropped_images.append(image[ h : h+crop_height , w : w+crop_width , :])
+        assert len(cropped_images) == len(coords)
+        keep_index=range(0 , len(coords) , step=interval)
+        cropped_images=np.asarray(cropped_images)
+        cropped_images=cropped_images[keep_index]
+        return cropped_images , coords
 
-        return np.asarray(cropped_images) ,coords
 
 
 if __name__=='__main__':
