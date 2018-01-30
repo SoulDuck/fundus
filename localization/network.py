@@ -3,9 +3,10 @@ import tensorflow as tf
 import numpy as np
 from fundus_processing import dense_crop
 import os
-from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch ,divide_images
+from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch ,divide_images , cls2onehot
 from utils import get_acc,show_progress ,plot_images , save_model , make_saver , restore_model
 import mnist
+import random
 from PIL import Image
 class network(object):
     def __init__(self, conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, batch_size,
@@ -28,7 +29,7 @@ class network(object):
         self.make_saver = make_saver
         self.save_model = save_model
         self.restore_model = restore_model
-
+        self.cls2onehot = cls2onehot
         # building network
         self._input()
         self._model()
@@ -42,28 +43,20 @@ class network(object):
         self.loss=10000000
     def _input(self):
 
+        self.train_fg_imgs = np.load(os.path.join(self.data_dir, 'train_fg_images.npy'))
+        self.train_bg_imgs = np.load(os.path.join(self.data_dir, 'train_bg_images.npy'))
+        test_fg_imgs = np.load(os.path.join(self.data_dir, 'test_fg_images.npy'))
+        test_bg_imgs = np.load(os.path.join(self.data_dir, 'test_bg_images.npy'))
 
-        fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
-        bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
-        n_fg, h, w, ch = np.shape(fg_imgs)
-
+        self.val_imgs = np.vstack((test_fg_imgs, test_bg_imgs))
+        self.val_labs = np.vstack((self.cls2onehot(np.zeros([len(test_fg_imgs)]), 2),
+                                  self.cls2onehot(np.ones([len(test_bg_imgs)]), 2)))
         #divide images into train , validation dataset
-        self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs[:n_fg])
-
         # for mnist # if you want test toy sample , uncommnet below line
         # self.train_imgs = mnist.train_imgs;self.train_labs = mnist.train_labs;self.val_imgs =mnist.val_imgs;self.val_labs = mnist.val_labs
-
-        #normalize
-        if np.max(self.train_imgs) > 1:
-            self.train_imgs=self.train_imgs/255.
-        if np.max(self.val_imgs) > 1:
-            self.val_imgs= self.val_imgs/ 255.
-
         # show n train  , n validation dataset
-        print 'train_imgs',len(self.train_labs)
-        print 'val_imgs', len(self.val_labs)
-
-        n, h, w, ch = np.shape(self.train_imgs) #to set h , w ,ch
+        self.n_fg, h, w, ch = np.shape(self.train_fg_imgs) #to set h , w ,ch
+        self.n_bg, self.h, self.w, self.ch = np.shape(self.train_bg_imgs)  # to set h , w ,ch
         self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
         self.y_ = tf.placeholder(dtype=tf.float32, shape=[None, self.n_classes], name='y_')
         self.keep_prob = tf.placeholder(dtype=tf.float32)
@@ -102,11 +95,28 @@ class network(object):
         self.sess.run(init)
         ckpt_dir = os.path.join('./model' , self.restore_type)
         self.global_step=self.restore_model(self.last_saver ,self.sess , ckpt_dir , self.restore_type)
+    def _make_batch(self):
+        fg_indices = random.sample(range(self.n_fg), int(self.batch_size / 2))
+        bg_indices = random.sample(range(self.n_fg), int(self.batch_size - len(fg_indices)))
+        fg_batch_xs = self.train_fg_imgs[fg_indices]
+        bg_batch_xs = self.train_bg_imgs[bg_indices]
+        fg_batch_ys = self.cls2onehot(np.zeros(len(fg_indices)), 2)
+        bg_batch_ys = self.cls2onehot(np.ones(len(bg_indices)), 2)
 
+
+        batch_xs = np.vstack((fg_batch_xs, bg_batch_xs))
+        batch_ys = np.vstack((fg_batch_ys, bg_batch_ys))
+        indices=random.sample(range(len(batch_ys)) , len(batch_ys))
+        batch_xs=batch_xs[indices]
+        batch_ys = batch_ys[indices]
+
+        return batch_xs , batch_ys
     def train(self , max_iter):
         for i in range(self.global_step,max_iter):
+            batch_xs , batch_ys=self._make_batch()
+            if np.max(batch_xs)>1:
+                batch_xs=batch_xs/255.
             show_progress(i ,max_iter)
-            batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs , self.batch_size)
             feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
             _,train_acc , train_loss =self.sess.run([self.train_op ,self.accuracy , self.cost], feed_dict= feed_dict )
             self.global_step+=1
@@ -115,6 +125,8 @@ class network(object):
     def val(self):
         all_pred=[]
         mean_cost=[]
+        if np.max(self.val_imgs)>1:
+            self.val_imgs=self.val_imgs/255.
         batch_imgs_list , batch_labs_list=self.divide_images_labels_from_batch(self.val_imgs ,self.val_labs , self.batch_size)
         for i in range(len(batch_labs_list)):
             batch_ys = batch_labs_list[i]
@@ -212,12 +224,14 @@ class detection(network):
 
 
 if __name__=='__main__':
+    """
     img_dir='/Users/seongjungkim/data/detection/resize'
     crop_size=75
     detection_model=detection(img_dir,crop_size)
     img=np.asarray(Image.open(detection_model.img_path[0]))
     pred=detection_model.detect_target(img)
     """
+
     conv_filters=[3,3,3,3,3]
     conv_strides=[2,2,1,1,2,]
     conv_out_channels=[64,64,128,128,256]
@@ -225,12 +239,12 @@ if __name__=='__main__':
 
     ##mnist version ###
     n_classes = 2
-    model= network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60)
-    model.train(5)
+    model= network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60,)
+    model.train(11)
     model.val()
     #n_classes=2
     #network=network(conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes,60)
-    """
+
 
 
 
