@@ -42,17 +42,12 @@ class network(object):
 
 
         # for mnist
-        train_imgs=mnist.train_imgs
-        train_labs = mnist.train_labs
-        val_imgs =mnist.val_imgs
-        val_labs = mnist.val_labs
+        self.train_imgs = mnist.train_imgs
+        self.train_labs = mnist.train_labs
+        self.val_imgs =mnist.val_imgs
+        self.val_labs = mnist.val_labs
 
-        n , h , w , ch =np.shape(train_imgs)
-
-
-
-
-
+        n, h, w, ch = np.shape(self.train_imgs)
         self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
         self.y_ = tf.placeholder(dtype=tf.float32, shape=[None, self.n_classes], name='y_')
         self.keep_prob = tf.placeholder(dtype=tf.float32)
@@ -123,8 +118,9 @@ if __name__=='__main__':
 
     ##mnist version ###
     n_classes = 10
-    network = network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60)
-
+    model= network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60)
+    model.train(100)
+    model.val()
     #n_classes=2
     #network=network(conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes,60)
 
