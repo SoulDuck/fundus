@@ -65,8 +65,8 @@ class Preprocessing(object):
         self.save_csv_paths()
         self.all_labels=self._get_all_coords() # get all_labels
         self.crop_size=75
-        self.fg_images=self.get_rois(roi_num=1)
-        self.bg_images = self.get_bg(roi_num=1 , num_bg=30)
+#        self.fg_images=self.get_rois(roi_num=1)
+#        self.bg_images = self.get_bg(roi_num=1 , num_bg=30)
 
 
 
