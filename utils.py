@@ -352,36 +352,41 @@ def get_acc(true , pred):
 
 
 
-def save_model(sess,max_acc, min_loss, acc, loss, step,model_dir):
-    last_dir=os.path.join(model_dir , 'last')
-    best_acc_dir = os.path.join(model_dir, 'acc')
-    best_loss_dir = os.path.join(model_dir, 'loss')
+def make_saver():
+    last_saver=tf.train.Saver(max_to_keep=1)
+    best_saver = tf.train.Saver(max_to_keep=100)
+    return last_saver , best_saver
+def save_model(sess,max_acc, min_loss, acc, loss, step,model_dir , last_saver , best_saver):
+    last_dir=os.path.join(model_dir , 'last' )
+    root_best_acc_dir = os.path.join(model_dir, 'acc' )
+    root_best_loss_dir = os.path.join(model_dir, 'loss' )
     if not os.path.isdir(last_dir):
         print 'construct last model Saver!'
-        last_saver=tf.train.Saver(max_to_keep=1)
         os.makedirs(last_dir)
 
-    if not os.path.isdir(best_acc_dir):
+    if not os.path.isdir(root_best_acc_dir):
         print 'construct best acc model Saver!'
-        best_saver= tf.train.Saver(max_to_keep=100)
-        os.makedirs(best_acc_dir)
+        os.makedirs(root_best_acc_dir)
+    if not os.path.isdir(root_best_loss_dir):
+        print 'construct best loss model Saver!'
+        os.makedirs(root_best_loss_dir)
 
     # if training, acc, loss param not is changed , so onlt last model was saved
     if acc > max_acc:  # best acc
         max_acc = acc
-        print 'max acc : {}'.format(max_acc)
-        best_acc_folder = os.path.join(best_acc_dir, 'step_{}_acc_{}'.format(step, max_acc))
-        os.mkdir(best_acc_folder)
-        best_saver.save(sess=sess,save_path=best_acc_dir)
+        print 'max acc : {} , model_saved'.format(max_acc)
+        best_acc_dir= os.path.join(root_best_acc_dir, 'step_{}_acc_{}'.format(step, max_acc))
+        os.mkdir(best_acc_dir)
+        best_saver.save(sess=sess,save_path=os.path.join(best_acc_dir,'model'))
 
     if loss < min_loss:  # best loss
         min_loss = loss
-        print 'min loss : {}'.format(min_loss)
-        best_loss_folder = os.path.join(best_loss_dir, 'step_{}_loss_{}'.format(step, min_loss))
-        os.mkdir(best_loss_folder)
-        best_saver.save(sess=sess,save_path=best_loss_dir)
+        print 'min loss : {}, model_saved'.format(min_loss)
+        best_loss_dir = os.path.join(root_best_loss_dir, 'step_{}_loss_{}'.format(step, min_loss))
+        os.mkdir(best_loss_dir)
+        best_saver.save(sess=sess,save_path=os.path.join(best_loss_dir , 'model'))
 
-    last_saver.save(sess, save_path=last_dir, global_step=step)
+    last_saver.save(sess, save_path=os.path.join(last_dir , 'model'), global_step=step)
     return max_acc, min_loss
 
 def write_acc_loss(summary_writer ,prefix , loss , acc  , step):

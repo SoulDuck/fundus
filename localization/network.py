@@ -4,7 +4,7 @@ import numpy as np
 from fundus_processing import dense_crop
 import os
 from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch
-from utils import get_acc,show_progress ,plot_images , make_saver , last_model_save
+from utils import get_acc,show_progress ,plot_images , save_model , make_saver , restore_model
 import mnist
 class network(object):
     def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , batch_size , data_dir='./' ):
@@ -17,13 +17,14 @@ class network(object):
         self.batch_size = batch_size
         self.data_dir = data_dir
 
-        #bring method from the otther method
+        #bring method from the other method
         self.next_batch = next_batch
         self.get_train_test_images_labels  = get_train_test_images_labels
         self.divide_images_labels_from_batch = divide_images_labels_from_batch
         self.get_acc = get_acc
         self.make_saver = make_saver
-        self.last_model_saver = last_model_save
+        self.save_model = save_model
+        self.restore_model = restore_model
 
         # building network
         self._input()
@@ -31,33 +32,35 @@ class network(object):
         self._algorithm()
         self._start_session()
 
-
+        #
+        self.best_acc=0
+        self.best_loss=10000000
+        self.acc=0
+        self.loss=10000000
     def _input(self):
 
 
         fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
         bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
         n_fg, h, w, ch = np.shape(fg_imgs)
-        n_bg, h, w, ch = np.shape(fg_imgs)
 
+        #divide images into train , validation dataset
         self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs[:n_fg])
 
+        # for mnist # if you want test toy sample , uncommnet below line
+        # self.train_imgs = mnist.train_imgs;self.train_labs = mnist.train_labs;self.val_imgs =mnist.val_imgs;self.val_labs = mnist.val_labs
+
+        #normalize
         if np.max(self.train_imgs) > 1:
             self.train_imgs=self.train_imgs/255.
         if np.max(self.val_imgs) > 1:
             self.val_imgs= self.val_imgs/ 255.
 
+        # show n train  , n validation dataset
         print 'train_imgs',len(self.train_labs)
         print 'val_imgs', len(self.val_labs)
 
-
-        # for mnist
-        #self.train_imgs = mnist.train_imgs
-        #self.train_labs = mnist.train_labs
-        #self.val_imgs =mnist.val_imgs
-        #self.val_labs = mnist.val_labs
-
-        n, h, w, ch = np.shape(self.train_imgs)
+        n, h, w, ch = np.shape(self.train_imgs) #to set h , w ,ch
         self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
         self.y_ = tf.placeholder(dtype=tf.float32, shape=[None, self.n_classes], name='y_')
         self.keep_prob = tf.placeholder(dtype=tf.float32)
@@ -88,18 +91,24 @@ class network(object):
         self.pred, self.pred_cls, self.cost, self.train_op, self.correct_pred, self.accuracy = algorithm(
             y_conv=self.logits, y_=self.y_,
             learning_rate=self.lr, optimizer='sgd',use_l2_loss=False)
+
     def _start_session(self):
-        self.last_saver, self.best_acc_saver, self.best_loss_saver = self.make_saver('./model')
+        self.last_saver , self.best_saver=self.make_saver()
         self.sess = tf.Session()
         init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
         self.sess.run(init)
+        self.global_step=self.restore_model(self.last_saver ,self.sess , './model/last')
 
     def train(self , max_iter):
-        for i in range(max_iter):
+        for i in range(self.global_step,max_iter):
             show_progress(i ,max_iter)
             batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs , self.batch_size)
             feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
             _,train_acc , train_loss =self.sess.run([self.train_op ,self.accuracy , self.cost], feed_dict= feed_dict )
+            # on training best_acc,best_loss, acc,loss was not changed , so last model was saved only at model/train/
+            self.max_acc, self.min_loss = self.save_model(self.sess, self.best_acc, self.best_loss, self.acc, self.loss,
+                                                          self.global_step, './model', self.last_saver, self.best_saver)
+            self.global_step+=1
         return train_acc , train_loss
 
     def val(self):
@@ -113,10 +122,13 @@ class network(object):
             pred,cost=self.sess.run([self.pred ,self.cost], feed_dict=feed_dict)
             all_pred.extend(pred)
             mean_cost.append(cost)
-        last_model_save(self.see , self.last_saver , './model/last' )
-        val_acc=self.get_acc(true=self.val_labs , pred=all_pred)
-        mean_cost=np.mean(mean_cost)
-        print val_acc , mean_cost
+
+        self.acc=self.get_acc(true=self.val_labs , pred=all_pred)
+        self.loss=np.mean(mean_cost)
+        self.max_acc, self.min_loss = self.save_model(self.sess, self.best_acc, self.best_loss, self.acc, self.loss,
+                                                      self.global_step, './model', self.last_saver, self.best_saver)
+
+        print self.acc, self.loss
 
 
 
@@ -134,7 +146,7 @@ if __name__=='__main__':
     ##mnist version ###
     n_classes = 2
     model= network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60)
-    model.train(1)
+    model.train(5)
     model.val()
     #n_classes=2
     #network=network(conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes,60)
