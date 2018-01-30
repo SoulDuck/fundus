@@ -5,7 +5,7 @@ from fundus_processing import dense_crop
 import os
 from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch
 from utils import get_acc,show_progress
-
+import mnist
 class network(object):
     def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , batch_size , data_dir='./' ):
 
@@ -28,6 +28,8 @@ class network(object):
 
 
     def _input(self):
+
+
         fg_imgs = np.load(os.path.join(self.data_dir, 'fg_images.npy'))
         bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
         n_fg, h, w, ch = np.shape(fg_imgs)
@@ -35,6 +37,16 @@ class network(object):
         self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs[:n_fg])
         print 'train_imgs',len(self.train_labs)
         print 'val_imgs', len(self.val_labs)
+
+
+        # for mnist
+        train_imgs=mnist.train_imgs
+        train_labs = mnist.train_labs
+        val_imgs =mnist.val_imgs
+        val_labs = mnist.val_labs
+
+
+
 
         self.x_ = tf.placeholder(dtype=tf.float32, shape=[None, h , w, ch], name='x_')
         self.y_ = tf.placeholder(dtype=tf.float32, shape=[None, self.n_classes], name='y_')
@@ -103,8 +115,13 @@ if __name__=='__main__':
     conv_strides=[2,2,1,1,2,]
     conv_out_channels=[64,64,128,128,256]
     fc_out_channels=[1024,1024]
-    n_classes=2
-    network=network(conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes)
+
+    ##mnist version ###
+    n_classes = 10
+    network = network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60)
+
+    #n_classes=2
+    #network=network(conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes,60)
 
 
 
