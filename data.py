@@ -20,6 +20,9 @@ def divide_images_labels_from_batch(images, labels ,batch_size):
     #print len(labels)
     #print 'share :',share
 
+    if share ==0 :
+        return images , labels
+
     for i in range(share+1):
         if i==share:
             imgs = images[i*batch_size:]

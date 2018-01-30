@@ -171,14 +171,14 @@ class Preprocessing(object):
     def save_csv_paths(self , save_path='./'):
         #save train_csv and test_csv to path
 
-        f=open(path+'train_path.txt' ,'w')
+        f=open(save_path+'train_path.txt' ,'w')
         for path in self.train_csv_paths:
-            f.write(path)
+            f.write(path+'\n')
         f.close()
 
-        f = open(path + 'test_path.txt', 'w')
+        f = open(save_path + 'test_path.txt', 'w')
         for path in self.test_csv_paths:
-            f.write(path)
+            f.write(path+'\n')
         f.close()
 
 
@@ -260,8 +260,8 @@ if __name__ =='__main__':
     img_dir ='/Users/seongjungkim/data/detection/resize'
     csv_dir='/Users/seongjungkim/data/detection/csv'
     model=Preprocessing(csv_dir , img_dir)
-    print np.shape(model.fg_images)
-    print np.shape(model.bg_images)
+    #print np.shape(model.fg_images)
+    #print np.shape(model.bg_images)
 
 
     """

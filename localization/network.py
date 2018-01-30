@@ -3,9 +3,10 @@ import tensorflow as tf
 import numpy as np
 from fundus_processing import dense_crop
 import os
-from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch
+from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch ,divide_images
 from utils import get_acc,show_progress ,plot_images , save_model , make_saver , restore_model
 import mnist
+from PIL import Image
 class network(object):
     def __init__(self, conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, batch_size,
                  data_dir='./', restore_type='last'):
@@ -137,25 +138,62 @@ class network(object):
 
 
 class detection(network):
-    def __init__(self):
+    def __init__(self , img_dir , crop_size):
         conv_filters = [3, 3, 3, 3, 3]
         conv_strides = [2, 2, 1, 1, 2, ]
         conv_out_channels = [64, 64, 128, 128, 256]
         fc_out_channels = [1024, 1024]
         n_classes = 2
 
-        #
-        self.dense_crop = dense_crop
-
         # restore or train classification model
-        model=network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60 , restore_type='acc')
+        self.divide_images = divide_images
+        self.model=network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60 , restore_type='acc')
+        self.img_dir = img_dir
+        self.dense_crop = dense_crop
+        self.test_paths=self._load_test_imgs()
+        self.crop_size = crop_size
+        self.img_path=self._load_test_imgs()
+
+
+
+    def _load_test_imgs(self):
+        f=open('test_path.txt','r')
+        img_paths=[]
+        for line in f.readlines():
+            name=os.path.splitext(os.path.split(line.replace('\n',''))[1])[0]
+            img_paths.append(os.path.join(self.img_dir, name+'.png'))
+        return img_paths
+
+    def detect_target(self ,image):
+        imgs, coords = self.dense_crop(image, self.crop_size, self.crop_size)
+        imgs_list =self.divide_images(imgs ,self.batch_size) #from network
+        all_pred=[]
+        for i in range(len(imgs_list)):
+            show_progress(i , len(imgs_list))
+            #labs=labs_list[i]
+            imgs=imgs_list[i]
+            all_pred.extend(
+                self.model.sess.run(self.model.pred, feed_dict={self.model.x_: imgs, self.model.phase_train: False}))
+
+        print np.shape(all_pred)
+        exit()
+
+
+
+
+
+
+
 
 
 
 
 if __name__=='__main__':
-
-    detection_model=detection()
+    img_dir='/Users/seongjungkim/data/detection/resize'
+    crop_size=75
+    detection_model=detection(img_dir,crop_size)
+    img=np.asarray(Image.open(detection_model.img_path[0]))
+    detection_model.detect_target(img)
     """
     conv_filters=[3,3,3,3,3]
     conv_strides=[2,2,1,1,2,]
