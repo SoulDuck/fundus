@@ -203,9 +203,7 @@ class detection(network):
                 y2 = h + crop_height
                 coords.append((x1,y1,x2,y2))
                 cropped_images.append(image[ h : h+crop_height , w : w+crop_width , :])
-        assert len(cropped_images) == len(coords)
-        print interval
-        keep_index=range(0,len(coords) ,interval )
+        keep_index=range(0,len(coords) ,interval)
         cropped_images=np.asarray(cropped_images)
         coords = np.asarray(coords)
         cropped_images=cropped_images[keep_index]
