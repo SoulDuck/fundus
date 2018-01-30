@@ -165,6 +165,8 @@ class detection(network):
             show_progress(i , len(imgs_list))
             #labs=labs_list[i]
             imgs=imgs_list[i]
+            if np.max(imgs)>1:
+                imgs=imgs/255.
             all_pred.extend(
                 self.model.sess.run(self.model.pred, feed_dict={self.model.x_: imgs, self.model.phase_train: False}))
 
