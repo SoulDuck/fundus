@@ -1,4 +1,4 @@
-from cnn import convolution2d , affine , dropout , algorithm
+from cnn import convolution2d , affine , dropout , algorithm , logits
 import tensorflow as tf
 import numpy as np
 from fundus_processing import dense_crop
@@ -72,7 +72,7 @@ class network(object):
             #layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
 
         #make Logits
-        self.logits=affine(name='logits' , x=layer , out_ch=self.n_classes , activation=None)
+        self.logits=logits(name='logits' , x=layer, n_classes=self.n_classes)
 
     def _algorithm(self):
         self.pred, self.pred_cls, self.cost, self.train_op, self.correct_pred, self.accuracy = algorithm(
