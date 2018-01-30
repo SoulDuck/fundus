@@ -207,7 +207,10 @@ class detection(network):
         print interval
         keep_index=range(0,len(coords) ,interval )
         cropped_images=np.asarray(cropped_images)
+        coords = np.asarray(coords)
         cropped_images=cropped_images[keep_index]
+        coords=coords[keep_index]
+        assert len(cropped_images) == len(coords)
         return cropped_images , coords
 
 
