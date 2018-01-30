@@ -43,10 +43,12 @@ class network(object):
         self.loss=10000000
     def _input(self):
 
-        self.train_fg_imgs = np.load(os.path.join(self.data_dir, 'train_fg_images.npy'))
-        self.train_bg_imgs = np.load(os.path.join(self.data_dir, 'train_bg_images.npy'))
-        test_fg_imgs = np.load(os.path.join(self.data_dir, 'test_fg_images.npy'))
-        test_bg_imgs = np.load(os.path.join(self.data_dir, 'test_bg_images.npy'))
+        self.train_fg_imgs = np.load(os.path.join(self.data_dir, 'train_fg_images.npy'))/255.
+        self.train_bg_imgs = np.load(os.path.join(self.data_dir, 'train_bg_images.npy'))/255.
+        test_fg_imgs = np.load(os.path.join(self.data_dir, 'test_fg_images.npy'))/255.
+        test_bg_imgs = np.load(os.path.join(self.data_dir, 'test_bg_images.npy'))/255.
+
+
 
         self.val_imgs = np.vstack((test_fg_imgs, test_bg_imgs))
         self.val_labs = np.vstack((self.cls2onehot(np.zeros([len(test_fg_imgs)]), 2),
