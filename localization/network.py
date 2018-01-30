@@ -205,8 +205,9 @@ class detection(network):
                 y2 = h + crop_height
                 coords.append((x1,y1,x2,y2))
                 cropped_images.append(image[h: h + crop_height, w: w + crop_width, :])
+
         assert len(cropped_images) == len(coords)
-        return cropped_images , coords
+        return np.asarray(cropped_images) , coords
 
 
 
