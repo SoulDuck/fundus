@@ -39,7 +39,7 @@ class network(object):
 
         if np.max(self.train_imgs) > 1:
             self.train_imgs=self.train_imgs/255.
-        if np.max(self.test_imgs) > 1:
+        if np.max(self.val_imgs) > 1:
             self.val_imgs= self.val_imgs/ 255.
 
         print 'train_imgs',len(self.train_labs)
