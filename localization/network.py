@@ -4,7 +4,7 @@ import numpy as np
 from fundus_processing import dense_crop
 import os
 from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch
-from utils import get_acc,show_progress ,plot_images
+from utils import get_acc,show_progress ,plot_images , make_saver , last_model_save
 import mnist
 class network(object):
     def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , batch_size , data_dir='./' ):
@@ -16,10 +16,15 @@ class network(object):
         self.n_classes = n_classes
         self.batch_size = batch_size
         self.data_dir = data_dir
+
+        #bring method from the otther method
         self.next_batch = next_batch
         self.get_train_test_images_labels  = get_train_test_images_labels
         self.divide_images_labels_from_batch = divide_images_labels_from_batch
         self.get_acc = get_acc
+        self.make_saver = make_saver
+        self.last_model_saver = last_model_save
+
         # building network
         self._input()
         self._model()
@@ -84,8 +89,9 @@ class network(object):
             y_conv=self.logits, y_=self.y_,
             learning_rate=self.lr, optimizer='sgd',use_l2_loss=False)
     def _start_session(self):
+        self.last_saver, self.best_acc_saver, self.best_loss_saver = self.make_saver('./model')
         self.sess = tf.Session()
-        init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
+        init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
         self.sess.run(init)
 
     def train(self , max_iter):
@@ -94,8 +100,8 @@ class network(object):
             batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs , self.batch_size)
             feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
             _,train_acc , train_loss =self.sess.run([self.train_op ,self.accuracy , self.cost], feed_dict= feed_dict )
-
         return train_acc , train_loss
+
     def val(self):
         all_pred=[]
         mean_cost=[]
@@ -107,7 +113,7 @@ class network(object):
             pred,cost=self.sess.run([self.pred ,self.cost], feed_dict=feed_dict)
             all_pred.extend(pred)
             mean_cost.append(cost)
-
+        last_model_save(self.see , self.last_saver , './model/last' )
         val_acc=self.get_acc(true=self.val_labs , pred=all_pred)
         mean_cost=np.mean(mean_cost)
         print val_acc , mean_cost
