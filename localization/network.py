@@ -143,10 +143,12 @@ class detection(network):
         conv_out_channels = [64, 64, 128, 128, 256]
         fc_out_channels = [1024, 1024]
         n_classes = 2
+
+        #
+        self.dense_crop = dense_crop
+
+        # restore or train classification model
         model=network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60 , restore_type='acc')
-        #network.restore_model(network.last_saver ,network.sess , './model/last')
-
-
 
 
 

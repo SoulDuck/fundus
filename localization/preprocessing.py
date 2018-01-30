@@ -60,10 +60,15 @@ class Preprocessing(object):
         self.n_train_paths = self.n_paths - self.n_test_paths
         self.test_csv_paths = self.csv_paths[:self.n_test_paths]
         self.train_csv_paths = self.csv_paths[self.n_test_paths:]
+
+        # save train path , test path to ./train_path.txt , ./test_path.txt
+        self.save_csv_paths()
         self.all_labels=self._get_all_coords() # get all_labels
         self.crop_size=75
         self.fg_images=self.get_rois(roi_num=1)
         self.bg_images = self.get_bg(roi_num=1 , num_bg=30)
+
+
 
         #self._get_cropped()
 
@@ -163,6 +168,26 @@ class Preprocessing(object):
                 if not overlap_flag:
                     bg_images.append(list(img[bg_y1:bg_y2, bg_x1:bg_x2]))
         return np.asarray(bg_images)
+    def save_csv_paths(self , save_path='./'):
+        #save train_csv and test_csv to path
+
+        f=open(path+'train_path.txt' ,'w')
+        for path in self.train_csv_paths:
+            f.write(path)
+        f.close()
+
+        f = open(path + 'test_path.txt', 'w')
+        for path in self.test_csv_paths:
+            f.write(path)
+        f.close()
+
+
+
+
+
+
+
+
 
 
 
