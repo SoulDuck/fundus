@@ -206,9 +206,12 @@ class detection(network):
                 if count ==0:
                     cropped_images=image[h: h + crop_height, w: w + crop_width, :]
                 else:
-                    cropped_images=np.vstack(cropped_images , image[h: h + crop_height, w: w + crop_width, :])
+                    cropped_images=np.vstack((cropped_images , image[h: h + crop_height, w: w + crop_width, :]))
+                count+=1
+        print np.shape(cropped_images)
         keep_index=range(0,len(coords) ,interval)
         #cropped_images=np.asarray(cropped_images)
+        exit()
         coords = np.asarray(coords)
         cropped_images=cropped_images[keep_index]
         coords=coords[keep_index]
