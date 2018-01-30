@@ -149,7 +149,6 @@ class detection(network):
         self.divide_images = divide_images
         self.model=network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60 , restore_type='acc')
         self.img_dir = img_dir
-        self.dense_crop = dense_crop
         self.test_paths=self._load_test_imgs()
         self.crop_size = crop_size
         self.img_path=self._load_test_imgs()
@@ -176,16 +175,39 @@ class detection(network):
                 self.model.sess.run(self.model.pred, feed_dict={self.model.x_: imgs, self.model.phase_train: False}))
 
         print np.shape(all_pred)
-        exit()
 
 
+    def dense_crop(self,image, crop_height, crop_width, lr_flip=False, ud_flip=False):
+        """
+         _________________
+        | ____       ___  |
+        ||    |-->->|   | |
+        ||____|     |___| |
 
+                ...
+          ____       ____
+        ||    |-->->|    ||
+        ||____|     |____||
+        |_________________|
+        :param image:
+        :param crop_height:
+        :param crop_width:
+        :param lr_flip:
+        :param ud_flip:
+        :return:
+        """
+        cropped_images = []
+        img_h, img_w, ch = np.shape(image)
+        n_h_move = img_h - crop_height + 1
+        n_w_move = img_w - crop_width + 1
+        coords = []
+        for h in range(n_h_move):
+            for w in range(n_w_move):
+                cropped_images.append(image[h: h + crop_height, w: w + crop_width, :])
+                coords.append([w, h, w + crop_width, h + crop_height])
 
-
-
-
-
-
+        ori_cropped_images = np.asarray(cropped_images)
+        return np.asarray(cropped_images) ,coords
 
 
 if __name__=='__main__':

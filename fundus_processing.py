@@ -73,9 +73,11 @@ def dense_crop(image , crop_height , crop_width , lr_flip =False, ud_flip=False)
     img_h,img_w,ch=np.shape(image)
     n_h_move = img_h - crop_height + 1
     n_w_move = img_w - crop_width + 1
+    coords=[]
     for h in range(n_h_move):
         for w in range(n_w_move):
             cropped_images.append(image[ h : h+crop_height , w : w+crop_width , :])
+            coords.append([w,h,w+crop_width , h+crop_height])
 
     ori_cropped_images=np.asarray(cropped_images)
     #indices = random.sample(range(5900), 60)
