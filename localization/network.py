@@ -168,7 +168,7 @@ class detection(network):
             all_pred.extend(
                 self.model.sess.run(self.model.pred, feed_dict={self.model.x_: imgs, self.model.phase_train: False}))
 
-        print all_pred ,  cropped_imgs ,coords
+        print all_pred ,coords
 
 
     def dense_crop(self,image, crop_height, crop_width, lr_flip=False, ud_flip=False):
