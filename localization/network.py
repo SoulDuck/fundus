@@ -197,21 +197,14 @@ class detection(network):
         img_h,img_w,ch=np.shape(image)
         n_h_move = img_h - crop_height + 1
         n_w_move = img_w - crop_width + 1
-        for h in range(n_h_move):
-            for w in range(n_w_move):
+        for h in range(0,n_h_move,interval):
+            for w in range(0,n_w_move,interval):
                 x1 = w
                 y1 = h
                 x2 = w + crop_width
                 y2 = h + crop_height
                 coords.append((x1,y1,x2,y2))
                 cropped_images.append(image[h: h + crop_height, w: w + crop_width, :])
-        print np.shape(cropped_images)
-        keep_index=range(0,len(coords) ,interval)
-        #cropped_images=np.asarray(cropped_images)
-        exit()
-        coords = np.asarray(coords)
-        cropped_images=cropped_images[keep_index]
-        coords=coords[keep_index]
         assert len(cropped_images) == len(coords)
         return cropped_images , coords
 
