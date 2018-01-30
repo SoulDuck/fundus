@@ -96,7 +96,7 @@ class network(object):
         for i in range(len(batch_labs_list)):
             batch_ys = batch_labs_list[i]
             batch_xs = batch_imgs_list[i]
-            feed_dict = {self.x_: batch_xs, self.y_: batch_ys, self.phase_train: False, self.lr: 0.01}
+            feed_dict = {self.x_: batch_xs, self.y_: batch_ys, self.phase_train: False, self.lr: 0.1}
             pred=self.sess.run(self.pred, feed_dict=feed_dict)
             all_pred.extend(pred)
         val_acc=self.get_acc(true=self.val_labs , pred=all_pred)
