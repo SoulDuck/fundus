@@ -109,9 +109,6 @@ class network(object):
             batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs , self.batch_size)
             feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
             _,train_acc , train_loss =self.sess.run([self.train_op ,self.accuracy , self.cost], feed_dict= feed_dict )
-            # on training best_acc,best_loss, acc,loss was not changed , so last model was saved only at model/train/
-            #self.best_acc, self.best_loss = self.save_model(self.sess, self.best_acc, self.best_loss, self.acc, self.loss,
-            #                                              self.global_step, './model', self.last_saver, self.best_saver)
             self.global_step+=1
         return train_acc , train_loss
 
@@ -152,7 +149,6 @@ class detection(network):
         self.test_paths=self._load_test_imgs()
         self.crop_size = crop_size
         self.img_path=self._load_test_imgs()
-
     def _load_test_imgs(self):
         f=open('test_path.txt','r')
         img_paths=[]
@@ -162,8 +158,8 @@ class detection(network):
         return img_paths
 
     def detect_target(self ,image):
-        imgs, coords = self.dense_crop(image, self.crop_size, self.crop_size)
-        imgs_list =self.divide_images(imgs ,self.model.batch_size) #from network
+        cropped_imgs, coords = self.dense_crop(image, self.crop_size, self.crop_size)
+        imgs_list =self.divide_images(cropped_imgs ,self.model.batch_size) #from network
         all_pred=[]
         for i in range(len(imgs_list)):
             show_progress(i , len(imgs_list))
@@ -172,7 +168,7 @@ class detection(network):
             all_pred.extend(
                 self.model.sess.run(self.model.pred, feed_dict={self.model.x_: imgs, self.model.phase_train: False}))
 
-        print all_pred ,  imgs ,coords
+        print all_pred ,  cropped_imgs ,coords
 
 
     def dense_crop(self,image, crop_height, crop_width, lr_flip=False, ud_flip=False):
@@ -204,7 +200,6 @@ class detection(network):
                 cropped_images.append(image[h: h + crop_height, w: w + crop_width, :])
                 coords.append([w, h, w + crop_width, h + crop_height])
 
-        ori_cropped_images = np.asarray(cropped_images)
         return np.asarray(cropped_images) ,coords
 
 
