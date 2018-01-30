@@ -158,7 +158,7 @@ class detection(network):
         return img_paths
 
     def detect_target(self ,image):
-        cropped_imgs, coords = self.dense_crop(image, self.crop_size, self.crop_size ,interval=30 )
+        cropped_imgs, coords = self.dense_crop(image, self.crop_size, self.crop_size ,interval=75 )
         imgs_list =self.divide_images(cropped_imgs ,self.model.batch_size) #from network
         all_pred=[]
         for i in range(len(imgs_list)):
