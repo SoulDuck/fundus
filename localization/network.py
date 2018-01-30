@@ -69,7 +69,7 @@ class network(object):
         for i in range(len(self.fc_out_channels)):
             out_ch= self.fc_out_channels[i]
             layer=affine(name = 'fc_{}'.format(i) ,x= layer , out_ch=out_ch )
-            #layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
+            layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
 
         #make Logits
         self.logits=logits(name='logits' , x=layer, n_classes=self.n_classes)
