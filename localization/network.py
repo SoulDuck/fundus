@@ -93,20 +93,23 @@ class network(object):
             show_progress(i ,max_iter)
             batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs , self.batch_size)
             feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
-            _,train_acc=self.sess.run([self.train_op ,self.accuracy], feed_dict= feed_dict )
+            _,train_acc , train_loss =self.sess.run([self.train_op ,self.accuracy , self.cost], feed_dict= feed_dict )
 
-        return train_acc
+        return train_acc , train_loss
     def val(self):
         all_pred=[]
+        mean_cost=[]
         batch_imgs_list , batch_labs_list=self.divide_images_labels_from_batch(self.val_imgs ,self.val_labs , self.batch_size)
         for i in range(len(batch_labs_list)):
             batch_ys = batch_labs_list[i]
             batch_xs = batch_imgs_list[i]
             feed_dict = {self.x_: batch_xs, self.y_: batch_ys, self.phase_train: False, self.lr: 0.1}
-            pred=self.sess.run(self.pred, feed_dict=feed_dict)
+            pred,cost=self.sess.run([self.pred ,self.cost], feed_dict=feed_dict)
             all_pred.extend(pred)
+            mean_cost.append(mean_cost)
         val_acc=self.get_acc(true=self.val_labs , pred=all_pred)
-        print val_acc
+        mean_cost=np.mean(mean_cost)
+        print val_acc , mean_cost
 
 
 
