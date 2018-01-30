@@ -34,7 +34,9 @@ class network(object):
         bg_imgs = np.load(os.path.join(self.data_dir, 'bg_images.npy'))
         n_fg, h, w, ch = np.shape(fg_imgs)
         n_bg, h, w, ch = np.shape(fg_imgs)
+
         self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs[:n_fg])
+
         print 'train_imgs',len(self.train_labs)
         print 'val_imgs', len(self.val_labs)
 
@@ -44,6 +46,9 @@ class network(object):
         train_labs = mnist.train_labs
         val_imgs =mnist.val_imgs
         val_labs = mnist.val_labs
+
+        n , h , w , ch =np.shpae(train_imgs)
+
 
 
 
