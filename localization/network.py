@@ -69,11 +69,10 @@ class network(object):
         for i in range(len(self.fc_out_channels)):
             out_ch= self.fc_out_channels[i]
             layer=affine(name = 'fc_{}'.format(i) ,x= layer , out_ch=out_ch )
-            layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
+            #layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
 
         #make Logits
         self.logits=affine(name='logits' , x=layer , out_ch=self.n_classes , activation=None)
-
 
     def _algorithm(self):
         self.pred, self.pred_cls, self.cost, self.train_op, self.correct_pred, self.accuracy = algorithm(

@@ -84,6 +84,21 @@ def affine(name,x,out_ch , trainable=True , activation=tf.nn.relu):
         print 'layer name : {}'.format(name)
         print 'layer shape :',layer.get_shape()
         return layer
+def logits(name,x, n_classes ):
+    with tf.variable_scope(name) as scope:
+        if len(x.get_shape())==4:
+            batch, height , width , in_ch=x.get_shape().as_list()
+            w_fc = tf.get_variable('w', [height * width * in_ch, n_classes],
+                                   initializer=tf.contrib.layers.xavier_initializer(), trainable=True)
+            x = tf.reshape(x, (-1, height * width * in_ch))
+        elif len(x.get_shape())==2:
+            batch, in_ch = x.get_shape().as_list()
+            w_fc = tf.get_variable('w', [in_ch, n_classes], initializer=tf.contrib.layers.xavier_initializer(),
+                                   trainable=True)
+        logits= tf.matmul(x, w_fc)
+        return logits
+
+
 def gap(name,x , n_classes ):
     in_ch=x.get_shape()[-1]
     gap_x=tf.reduce_mean(x, (1,2) ,name='global_average_pooling')
