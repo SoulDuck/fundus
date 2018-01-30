@@ -20,9 +20,6 @@ def dense_crop(image , crop_height , crop_width , lr_flip =False, ud_flip=False 
     ||    |-->->|    ||
     ||____|     |____||
     |_________________|
-
-
-
     :param image:
     :param crop_height:
     :param crop_width:
@@ -82,9 +79,7 @@ class Preprocessing(object):
                 labels[int(label)] = [[x1, y1, x2, y2]]  #
             else:
                 labels[int(label)].append([x1, y1, x2, y2])  # )
-
         return labels
-
 
     def _get_all_coords(self):
         assert len(self.csv_paths) > 0 , 'the number of csv path {} '.format(len(self.csv_paths))
