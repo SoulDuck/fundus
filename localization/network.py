@@ -4,7 +4,7 @@ import numpy as np
 from fundus_processing import dense_crop
 import os
 from data import next_batch,get_train_test_images_labels , divide_images_labels_from_batch
-from utils import get_acc,show_progress
+from utils import get_acc,show_progress ,plot_images
 import mnist
 class network(object):
     def __init__(self , conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes , batch_size , data_dir='./' ):
@@ -36,6 +36,11 @@ class network(object):
         n_bg, h, w, ch = np.shape(fg_imgs)
 
         self.train_imgs , self.train_labs , self.val_imgs ,self.val_labs=self.get_train_test_images_labels(fg_imgs , bg_imgs[:n_fg])
+
+        if np.max(self.train_imgs) > 1:
+            self.train_imgs=self.train_imgs/255.
+        if np.max(self.test_imgs) > 1:
+            self.val_imgs= self.val_imgs/ 255.
 
         print 'train_imgs',len(self.train_labs)
         print 'val_imgs', len(self.val_labs)
@@ -89,6 +94,7 @@ class network(object):
             batch_xs , batch_ys=self.next_batch(self.train_imgs , self.train_labs , self.batch_size)
             feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
             _,train_acc=self.sess.run([self.train_op ,self.accuracy], feed_dict= feed_dict )
+
         return train_acc
     def val(self):
         all_pred=[]
