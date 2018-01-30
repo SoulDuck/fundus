@@ -105,6 +105,7 @@ class network(object):
             batch_xs = batch_imgs_list[i]
             feed_dict = {self.x_: batch_xs, self.y_: batch_ys, self.phase_train: False, self.lr: 0.1}
             pred,cost=self.sess.run([self.pred ,self.cost], feed_dict=feed_dict)
+            print cost
             all_pred.extend(pred)
             mean_cost.append(cost)
 
