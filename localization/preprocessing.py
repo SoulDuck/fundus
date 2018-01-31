@@ -99,7 +99,6 @@ class Preprocessing(object):
 
     def show_rois(self , roi_coords):
         """
-
         :param roi_num:
         :param roi_coords: type dictionary name : coords | get roi_coords from preprocessing.get_rois method
         :return:
@@ -108,15 +107,20 @@ class Preprocessing(object):
             img_path =os.path.join(self.img_dir , name +'.png')
             img=Image.open(img_path)
             fig=plt.figure()
-            ax=fig.add_subplot(111)
+            ax=fig.add_subplot(1,1,1)
             ax.imshow(img) #open Original Image
-            rects=[]
+            roi_imgs=[]
             for coord in roi_coords[name]:
                 x1,y1,x2,y2=coord
                 ax.add_patch(patches.Rectangle((x1,y1),x2-x1,y2-y1))
+                roi_imgs.append(np.asarray(img)[y1:y2 , x1:x2])
             plt.show()
             plt.close()
 
+            for img in roi_imgs:
+                plt.imshow(img)
+                plt.show()
+            plt.close()
 
     def get_rois(self , roi_num , csv_paths):
         roi_coords={}
