@@ -110,11 +110,11 @@ class Preprocessing(object):
             fig=plt.figure()
             ax=fig.add_subplot(111)
             ax.imshow(img) #open Original Image
+            rects=[]
             for coord in roi_coords[name]:
                 x1,y1,x2,y2=coord
-                rect=patches.Rectangle((x1,y1),x2-x1,y2-y1)
-                ax.add_patch(rect)
-                plt.show()
+                ax.add_patch(patches.Rectangle((x1,y1),x2-x1,y2-y1))
+            plt.show()
             plt.close()
 
 
