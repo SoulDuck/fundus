@@ -7,6 +7,7 @@ from data import next_batch,get_train_test_images_labels , divide_images_labels_
 from utils import get_acc,show_progress ,plot_images , save_model , make_saver , restore_model
 import mnist
 import random
+from aug import random_rotate_images
 from PIL import Image
 class network(object):
     def __init__(self, conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, batch_size,
@@ -112,6 +113,10 @@ class network(object):
         batch_xs=batch_xs[indices]
         batch_ys = batch_ys[indices]
 
+        batch_xs=(batch_xs)
+        batch_xs=random_rotate_images(batch_xs)
+
+
         return batch_xs , batch_ys
     def train(self , max_iter):
         for i in range(self.global_step,max_iter):
@@ -186,7 +191,6 @@ class detection(network):
 
         return all_pred ,coords
 
-
     def dense_crop(self,image , crop_height , crop_width , interval):
         """
          _________________
@@ -219,7 +223,6 @@ class detection(network):
                 y2 = h + crop_height
                 coords.append((x1,y1,x2,y2))
                 cropped_images.append(image[h: h + crop_height, w: w + crop_width, :])
-
         assert len(cropped_images) == len(coords)
         return np.asarray(cropped_images) , coords
 
@@ -242,7 +245,7 @@ if __name__=='__main__':
     ##mnist version ###
     n_classes = 2
     model= network(conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, 60,)
-    model.train(11)
+    model.train(13)
     model.val()
     #n_classes=2
     #network=network(conv_filters , conv_strides , conv_out_channels , fc_out_channels , n_classes,60)

@@ -38,7 +38,7 @@ def random_rotate(img):
     img=img/255.
     return img
 
-def random_rotate_image(images):
+def random_rotate_images(images):
     images=np.asarray(map(lambda image : random_rotate(image) , images))
     return images
 
