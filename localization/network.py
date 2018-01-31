@@ -7,7 +7,7 @@ from data import next_batch,get_train_test_images_labels , divide_images_labels_
 from utils import get_acc,show_progress ,plot_images , save_model , make_saver , restore_model
 import mnist
 import random
-from aug import random_rotate_images
+from aug import random_rotate_images , aug_tensor_images
 from PIL import Image
 class network(object):
     def __init__(self, conv_filters, conv_strides, conv_out_channels, fc_out_channels, n_classes, batch_size,
@@ -31,6 +31,8 @@ class network(object):
         self.save_model = save_model
         self.restore_model = restore_model
         self.cls2onehot = cls2onehot
+        self.random_rotate_images=random_rotate_images
+        self.aug_tensor_images=aug_tensor_images
         # building network
         self._input()
         self._model()
@@ -67,7 +69,8 @@ class network(object):
         self.lr = tf.placeholder(dtype = tf.float32)
 
     def _model(self):
-        layer=self.x_
+        self.x_aug=self.aug_tensor_images(self.x_ , self.phase_train , 75 , False) # only lr flip , ud flip
+        layer=self.x_aug
         for i in range(len(self.conv_filters)):
             k=self.conv_filters[i]
             s=self.conv_strides[i]
@@ -114,7 +117,7 @@ class network(object):
         batch_ys = batch_ys[indices]
 
         batch_xs=(batch_xs)
-        batch_xs=random_rotate_images(batch_xs)
+        batch_xs=self.random_rotate_images(batch_xs)
 
 
         return batch_xs , batch_ys
