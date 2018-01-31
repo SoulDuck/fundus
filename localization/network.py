@@ -127,7 +127,7 @@ class network(object):
             if np.max(batch_xs)>1:
                 batch_xs=batch_xs/255.
             show_progress(i ,max_iter)
-            feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.01}
+            feed_dict={self.x_ : batch_xs  , self.y_: batch_ys ,self.phase_train: True , self.lr:0.1}
             _,train_acc , train_loss =self.sess.run([self.train_op ,self.accuracy , self.cost], feed_dict= feed_dict )
             self.global_step+=1
         return train_acc , train_loss
