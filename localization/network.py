@@ -160,7 +160,7 @@ class detection(network):
     def __init__(self , img_dir , crop_size):
         conv_filters = [3, 3, 3, 3, 3]
         conv_strides = [2, 2, 1, 1, 2, ]
-        conv_out_channels = [64, 64, 128, 128, 256]
+        conv_out_channels = [16, 16, 32, 32, 64]
         fc_out_channels = [1024, 1024]
         n_classes = 2
 
