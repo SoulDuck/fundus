@@ -96,9 +96,30 @@ class Preprocessing(object):
                     self.all_labels[key].extend(labels[key])
         return self.all_labels
 
+
+    def show_rois(self , roi_coords):
+        """
+
+        :param roi_num:
+        :param roi_coords: type dictionary name : coords | get roi_coords from preprocessing.get_rois method
+        :return:
+        """
+        for name in roi_coords.keys():
+            img_path =os.path.join(self.img_dir , name +'.png')
+            img=Image.open(img_path)
+            fig=plt.figure()
+            ax=fig.add_subplot(111)
+            ax.imshow(img) #open Original Image
+            for coord in roi_coords[name]:
+                x1,y1,x2,y2=coord
+                rect=patches.Rectangle((x1,y1),x2-x1,y2-y1)
+                ax.add_patch(rect)
+                plt.show()
+            plt.close()
+
+
     def get_rois(self , roi_num , csv_paths):
         roi_coords={}
-        roi_images = []
         for path in csv_paths[:]:
             name = os.path.split(path)[1]
             name = os.path.splitext(name)[0]
