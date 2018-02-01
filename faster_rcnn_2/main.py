@@ -274,8 +274,8 @@ class FasterRcnnConv5():
                     ax.add_patch(rect)
 
                 count=0
-                while not (os.path.isfile('{}.png'.format(count))):
-                    count+=1
+                #while (os.path.isfile('{}.png'.format(count))):
+                #    count+=1
                 plt.savefig('./{}.png'.format(count))
                 plt.close()
                 exit()
