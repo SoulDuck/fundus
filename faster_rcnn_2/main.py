@@ -254,24 +254,32 @@ class FasterRcnnConv5():
         target_bbox=np.zeros([len(bbox) , 4])
         cls = np.argmax(cls, axis=1)
 
-        if np.sum(cls) != 0:
-            print cls
         for i,c in enumerate(cls):
             target_bbox[i,:]=bbox[i, c * 4:c * 4 + 4]
         pred_boxes=bbox_transform_inv(rois[:1] , target_bbox)
         pred_boxes = clip_boxes( pred_boxes,np.squeeze(im_dims))
 
-        fig = plt.figure()
-        ax =fig.add_subplot(111)
-        img=img.reshape(img.shape[1:3])
-        ax.imshow(img)
 
-        for coord in pred_boxes:
-            x1,y1,x2,y2=coord
-            rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1 ,fill=False , edgecolor='w')
-            ax.add_patch(rect)
-        plt.show()
-        print np.shape(pred_boxes)
+        for i,c in enumerate(cls):
+            if c !=0:
+
+                fig = plt.figure()
+                ax =fig.add_subplot(111)
+                img=img.reshape(img.shape[1:3])
+                ax.imshow(img)
+
+                for coord in pred_boxes:
+                    x1,y1,x2,y2=coord
+                    rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1 ,fill=False , edgecolor='w')
+                    ax.add_patch(rect)
+
+                count=0
+                while not (os.path.isfile('{}.png'.format(count))):
+                    count+=1
+                plt.savefig('./{}.png'.format(count))
+                plt.close()
+                exit()
+                print np.shape(pred_boxes)
 
     def _create_feed_dict_for_train(self , image_idx):
         img_path=os.path.join(self.data_dir , 'Images' ,self.train_names[image_idx]+cfg.IMAGE_FORMAT  )
