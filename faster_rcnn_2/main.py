@@ -262,16 +262,14 @@ class FasterRcnnConv5():
 
         for i,c in enumerate(cls):
             if c !=0:
-
                 fig = plt.figure()
                 ax =fig.add_subplot(111)
                 img=img.reshape(img.shape[1:3])
                 ax.imshow(img)
-
-                for coord in pred_boxes:
-                    x1,y1,x2,y2=coord
-                    rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1 ,fill=False , edgecolor='w')
-                    ax.add_patch(rect)
+                coord = pred_boxes[c]
+                x1,y1,x2,y2=coord
+                rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1 ,fill=False , edgecolor='w')
+                ax.add_patch(rect)
 
                 count=0
                 #while (os.path.isfile('{}.png'.format(count))):
