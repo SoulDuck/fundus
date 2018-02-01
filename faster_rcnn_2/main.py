@@ -233,14 +233,14 @@ class FasterRcnnConv5():
                         [self.optimizer, self.cost, self.rpn_cls_loss, self.rpn_bbox_loss, self.fast_rcnn_cls_loss ,
                          self.fast_rcnn_bbox_loss ,self.labels , self.fast_rcnn_cls_logits],
                         feed_dict=feed_dict)
-                    print fr_labels
-                    print fr_cls
+                    #print fr_labels
+                    #print fr_cls
 
-                    print 'total loss ', loss
-                    print 'rpn cls loss : ',rpn_cls_loss
-                    print 'rpn bbox loss',rpn_bbox_loss
-                    print 'fast rcnn cls loss : ', fast_rcnn_cls_loss
-                    print 'fast rcnn bbox loss : ', fast_rcnn_bbox_loss
+                    #print 'total loss ', loss
+                    #print 'rpn cls loss : ',rpn_cls_loss
+                    #print 'rpn bbox loss',rpn_bbox_loss
+                    #print 'fast rcnn cls loss : ', fast_rcnn_cls_loss
+                    #print 'fast rcnn bbox loss : ', fast_rcnn_bbox_loss
                 except Exception as e:
                     print e
                     pass;
