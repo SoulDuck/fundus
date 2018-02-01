@@ -18,7 +18,7 @@ import roi_pool
 import loss_functions
 import image_preprocessing
 import matplotlib
-#matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
