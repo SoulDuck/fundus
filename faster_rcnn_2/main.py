@@ -2,6 +2,7 @@
 import sys
 sys.path.insert(0, '../')
 from cnn import convolution2d , affine , dropout
+from bbox_transform import bbox_transform_inv , clip_boxes
 import os
 import os.path as osp
 from tqdm import tqdm, trange
@@ -17,7 +18,7 @@ import roi_pool
 import loss_functions
 import image_preprocessing
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
@@ -185,6 +186,7 @@ class FasterRcnnConv5():
 
         #cost = rpn_cls_loss+ rpn_bbox_loss + fast_rcnn_cls_loss + fast_rcnn_bbox_loss
 
+
     def _rpn_softmax(self):
         shape=tf.shape(self.rpn_cls_layer)
         rpn_cls_score = tf.transpose(self.rpn_cls_layer,[0,3,1,2]) # Tensor("transpose:0", shape=(1, 18, ?, ?)
@@ -219,6 +221,7 @@ class FasterRcnnConv5():
         self.print_log(scope + ' output: ' + str(input.get_shape()))
 
     def train(self , file_epoch):
+
         train_order = np.random.permutation(len(self.train_names))
         self.file_epoch=file_epoch
         #tf_inputs = (self.x_, self.im_dims, self.gt_boxes)
@@ -229,21 +232,44 @@ class FasterRcnnConv5():
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
                     ##self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
-                    _, loss, rpn_cls_loss, rpn_bbox_loss , fast_rcnn_cls_loss  , fast_rcnn_bbox_loss , fr_labels , fr_cls= self.sess.run(
-                        [self.optimizer, self.cost, self.rpn_cls_loss, self.rpn_bbox_loss, self.fast_rcnn_cls_loss ,
-                         self.fast_rcnn_bbox_loss ,self.labels , self.fast_rcnn_cls_logits],
+                    _, loss, fr_labels , fr_cls= self.sess.run([self.optimizer, self.cost,self.labels , self.fast_rcnn_cls_logits],
                         feed_dict=feed_dict)
-                    #print fr_labels
-                    #print fr_cls
+                    rois,image_size,ori_img= self.sess.run([self.rois,self.im_dims ,self.x_],feed_dict=feed_dict)
 
-                    #print 'total loss ', loss
-                    #print 'rpn cls loss : ',rpn_cls_loss
-                    #print 'rpn bbox loss',rpn_bbox_loss
-                    #print 'fast rcnn cls loss : ', fast_rcnn_cls_loss
-                    #print 'fast rcnn bbox loss : ', fast_rcnn_bbox_loss
+
+                    ## to show each loss , uncomment bolow line
+                    rpn_cls_loss, rpn_bbox_loss, fast_rcnn_cls_loss, fast_rcnn_bbox_loss = self.sess.run(
+                        [self.rpn_cls_loss, self.rpn_bbox_loss, self.fast_rcnn_cls_loss, self.fast_rcnn_bbox_loss],
+                        feed_dict=feed_dict)
+                    fr_cls , fr_bbox=self.sess.run([self.fast_rcnn_cls_logits , self.fast_rcnn_bbox_logits] , feed_dict = feed_dict)
+
+                    self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
+
                 except Exception as e:
                     print e
                     pass;
+
+    def _show_result(self, rois , cls, bbox , im_dims , img):
+
+        target_bbox=np.zeros([len(bbox) , 4])
+        cls = np.argmax(cls, axis=1)
+        print cls
+        for i,c in enumerate(cls):
+            target_bbox[i,:]=bbox[i, c * 4:c * 4 + 4]
+        pred_boxes=bbox_transform_inv(rois[:1] , target_bbox)
+        pred_boxes = clip_boxes( pred_boxes,np.squeeze(im_dims))
+
+        fig = plt.figure()
+        ax =fig.add_subplot(111)
+        img=img.reshape(img.shape[1:3])
+        ax.imshow(img)
+
+        for coord in pred_boxes:
+            x1,y1,x2,y2=coord
+            rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1 ,fill=False , edgecolor='w')
+            ax.add_patch(rect)
+        plt.show()
+        print np.shape(pred_boxes)
 
     def _create_feed_dict_for_train(self , image_idx):
         img_path=os.path.join(self.data_dir , 'Images' ,self.train_names[image_idx]+cfg.IMAGE_FORMAT  )
