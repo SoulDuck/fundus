@@ -63,7 +63,7 @@ def _proposal_target_layer_py(rpn_rois, gt_boxes, _num_classes):
         all_rois, gt_boxes, fg_rois_per_image,
         rois_per_image, _num_classes)
     rois = rois.reshape(-1, 5)
-    labels = labels.reshape(-1, 1) # labels은 왜 one hot 으로  바꾸지 않는거지 --> sparse 여서..
+    labels = labels.reshape(-1) # labels은 왜 one hot 으로  바꾸지 않는거지 --> sparse 여서..
     bbox_targets = bbox_targets.reshape(-1, _num_classes * 4) # 코드가 겹치는데 왜 있는지 모르겠다.
     bbox_inside_weights = bbox_inside_weights.reshape(-1, _num_classes * 4)
     bbox_outside_weights = np.array(bbox_inside_weights > 0).astype(np.float32)

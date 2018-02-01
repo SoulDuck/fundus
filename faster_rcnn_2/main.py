@@ -151,9 +151,9 @@ class FasterRcnnConv5():
                 layer = affine('fc_{}'.format(i), layer, cfg.FRCNN_FC_HIDDEN[i])
                 layer = dropout(layer, phase_train=self.phase_train, keep_prob=keep_prob)
             with tf.variable_scope('cls'):
-                self.fast_rcnn_cls_logits = affine('cls_logits' , layer , self.num_classes ,activation=None)
+                self.fast_rcnn_cls_logits = affine('cls_logits', layer, self.num_classes, activation=None)
             with tf.variable_scope('bbox'):
-                self.fast_rcnn_bbox_logits = affine('bbox_logits' , layer , self.num_classes*4,activation=None)
+                self.fast_rcnn_bbox_logits = affine('bbox_logits', layer, self.num_classes * 4, activation=None)
 
     def _optimizer(self):
 
@@ -166,8 +166,9 @@ class FasterRcnnConv5():
                                                           rpn_inside_weights=self.rpn_bbox_inside_weights,
                                                           rpn_outside_weights=self.rpn_bbox_outside_weights)
         # fast-rcnn optimzer
+        print self.fast_rcnn_cls_logits
         self.fast_rcnn_cls_loss=loss_functions.fast_rcnn_cls_loss(self.fast_rcnn_cls_logits, self.labels)
-        self.fast_rcnn_bbox_loss = loss_functions.fast_rcnn_bbox_loss(fast_rcnn_bbox_pred=self.fast_rcnn_cls_logits,
+        self.fast_rcnn_bbox_loss = loss_functions.fast_rcnn_bbox_loss(fast_rcnn_bbox_pred=self.fast_rcnn_bbox_logits,
                                                                       bbox_targets=self.bbox_targets,
                                                                       roi_inside_weights=self.bbox_inside_weights,
                                                                       roi_outside_weights=self.bbox_outside_weights)
