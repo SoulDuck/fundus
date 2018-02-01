@@ -270,8 +270,9 @@ class FasterRcnnConv5():
                 x1,y1,x2,y2=coord
                 rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1 ,fill=False , edgecolor='w')
                 ax.add_patch(rect)
-
                 count=0
+                print x1,y1,x2,y2
+                print c
                 #while (os.path.isfile('{}.png'.format(count))):
                 #    count+=1
                 plt.savefig('./{}.png'.format(count))
