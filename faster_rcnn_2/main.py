@@ -253,7 +253,9 @@ class FasterRcnnConv5():
 
         target_bbox=np.zeros([len(bbox) , 4])
         cls = np.argmax(cls, axis=1)
-        print cls
+
+        if np.sum(cls) != 0:
+            print cls
         for i,c in enumerate(cls):
             target_bbox[i,:]=bbox[i, c * 4:c * 4 + 4]
         pred_boxes=bbox_transform_inv(rois[:1] , target_bbox)
