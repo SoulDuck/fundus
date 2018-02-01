@@ -275,9 +275,9 @@ class FasterRcnnConv5():
                 print c
                 #while (os.path.isfile('{}.png'.format(count))):
                 #    count+=1
-                plt.savefig('./{}.png'.format(count))
+                plt.savefig('./{}.png'.format(c))
                 plt.close()
-                exit()
+                print c,'saved!'
                 print np.shape(pred_boxes)
 
     def _create_feed_dict_for_train(self , image_idx):
