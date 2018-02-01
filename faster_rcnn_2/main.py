@@ -242,7 +242,7 @@ class FasterRcnnConv5():
                         [self.rpn_cls_loss, self.rpn_bbox_loss, self.fast_rcnn_cls_loss, self.fast_rcnn_bbox_loss],
                         feed_dict=feed_dict)
                     fr_cls , fr_bbox=self.sess.run([self.fast_rcnn_cls_logits , self.fast_rcnn_bbox_logits] , feed_dict = feed_dict)
-
+                    print rpn_cls_loss, rpn_bbox_loss, fast_rcnn_cls_loss, fast_rcnn_bbox_loss
                     self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
 
                 except Exception as e:
