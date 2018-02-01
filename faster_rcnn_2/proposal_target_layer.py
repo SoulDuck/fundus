@@ -30,15 +30,12 @@ def proposal_target_layer(rpn_rois, gt_boxes, _num_classes):
                                                                                        [tf.float32, tf.int32,
                                                                                         tf.float32, tf.float32,
                                                                                         tf.float32])
-
     rois = tf.reshape(rois, [-1, 5], name='rois')
     labels = tf.convert_to_tensor(tf.cast(labels, tf.int32), name='labels')
     bbox_targets = tf.convert_to_tensor(bbox_targets, name='bbox_targets')
     bbox_inside_weights = tf.convert_to_tensor(bbox_inside_weights, name='bbox_inside_weights')
     bbox_outside_weights = tf.convert_to_tensor(bbox_outside_weights, name='bbox_outside_weights')
-
     return rois, labels, bbox_targets, bbox_inside_weights, bbox_outside_weights
-
 
 def _proposal_target_layer_py(rpn_rois, gt_boxes, _num_classes):
     """
@@ -49,33 +46,28 @@ def _proposal_target_layer_py(rpn_rois, gt_boxes, _num_classes):
     # Proposal ROIs (0, x1, y1, x2, y2) coming from RPN
     # (i.e., rpn.proposal_layer.ProposalLayer), or any other source
     all_rois = rpn_rois
-
     # Include ground-truth boxes in the set of candidate rois
     zeros = np.zeros((gt_boxes.shape[0], 1), dtype=gt_boxes.dtype)
     all_rois = np.vstack((all_rois, np.hstack((zeros, gt_boxes[:, :-1]))))
-    # 왜 roi 의 모든 형태를 0 , x ,y ,x2, y2 형태로 만드는 거지? -- > 아직 예측값이 없어..그래서 그냥 0으로 넣은듯 ...
+    # 왜 roi 의 모든 형태를 [0 , x ,y ,x2, y2] 형태로 만드는 거지? -- > 아직 예측값이 없어..그래서 그냥 0으로 넣은듯 ...
     # 뒤에 라벨을 자르고 앞에 0을 붙여 all _ros와 모양을 같게 맞춘후 all_rois 줄 맨 끝에 붙인다
     # Sanity check: single batch only
     assert np.all(all_rois[:, 0] == 0), \
         'Only single item batches are supported'
-
     num_images = 1
     rois_per_image = cfg.TRAIN.BATCH_SIZE // num_images # cfg.TRAIN.BATCH_SIZE 256
     fg_rois_per_image = np.round(cfg.TRAIN.FG_FRACTION * rois_per_image).astype(np.int32)
-
     # Sample rois with classification labels and bounding box regression
     # targets
     labels, rois, bbox_targets, bbox_inside_weights = _sample_rois(
         all_rois, gt_boxes, fg_rois_per_image,
         rois_per_image, _num_classes)
     rois = rois.reshape(-1, 5)
-    labels = labels.reshape(-1, 1)
-
+    labels = labels.reshape(-1, 1) # labels은 왜 one hot 으로  바꾸지 않는거지 --> sparse 여서..
     bbox_targets = bbox_targets.reshape(-1, _num_classes * 4) # 코드가 겹치는데 왜 있는지 모르겠다.
     bbox_inside_weights = bbox_inside_weights.reshape(-1, _num_classes * 4)
     bbox_outside_weights = np.array(bbox_inside_weights > 0).astype(np.float32)
     return np.float32(rois), labels, bbox_targets, bbox_inside_weights, bbox_outside_weights
-
 
 def _get_bbox_regression_labels(bbox_target_data, num_classes):
     """Bounding-box regression targets (bbox_target_data) are stored in a
@@ -86,7 +78,6 @@ def _get_bbox_regression_labels(bbox_target_data, num_classes):
         bbox_target (ndarray): N x 4K blob of regression targets
         bbox_inside_weights (ndarray): N x 4K blob of loss weights
     """
-
     clss = bbox_target_data[:, 0]
     bbox_targets = np.zeros((clss.size, 4 * num_classes), dtype=np.float32)
     bbox_inside_weights = np.zeros(bbox_targets.shape, dtype=np.float32) # N , 4
@@ -98,7 +89,6 @@ def _get_bbox_regression_labels(bbox_target_data, num_classes):
         bbox_targets[ind, start: end] = bbox_target_data[ind, 1:]  #
         bbox_inside_weights[ind, start: end] = (1, 1, 1, 1)  # bbox_inside_weights[ind ,start  :end ]
     return bbox_targets, bbox_inside_weights
-
 
 def _compute_targets(ex_rois, gt_rois, labels):
     """Compute bounding-box regression targets for an image."""
@@ -131,17 +121,13 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
     labels = gt_boxes[gt_assignment, 4] # label 은 0 이 아닌 10 부터 시작한다
     # Select foreground RoIs as those with >= FG_THRESH overlap
     fg_inds = np.where(max_overlaps >= cfg.TRAIN.FG_THRESH)[0] #cfg.TRAIN.FG_TRHESH 0.5
-
     #print   cfg.TRAIN.FG_THRESH
     #fg_ind 는 겹치는 비율이 50% 보다 많을 때 fg_inds 을 넘겨준다
-
-
     # Guard against the case when an image has fewer than fg_rois_per_image
     # foreground RoIs
+
     fg_rois_per_this_image = min(fg_rois_per_image, fg_inds.size)
-
     # foreground 가 몇개 있는지 알려준다.
-
     # Sample foreground regions without replacement
     if fg_inds.size > 0:
         fg_inds = npr.choice(fg_inds, size=fg_rois_per_this_image, replace=False)

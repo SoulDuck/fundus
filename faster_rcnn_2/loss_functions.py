@@ -78,7 +78,7 @@ def fast_rcnn_cls_loss(fast_rcnn_cls_score, labels):
     with tf.variable_scope('fast_rcnn_cls_loss'):
         # Cross entropy error
         fast_rcnn_cross_entropy = tf.reduce_mean(
-            tf.nn.softmax_cross_entropy_with_logits(logits=fast_rcnn_cls_score, labels=labels))
+            tf.nn.sparse_softmax_cross_entropy_with_logits(logits=fast_rcnn_cls_score, labels=labels))
 
     return fast_rcnn_cross_entropy
 

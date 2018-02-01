@@ -8,6 +8,7 @@ import os
 import glob
 import matplotlib.patches as patches
 import random
+import shutil
 def dense_crop(image , crop_height , crop_width , interval):
     """
      _________________
@@ -97,6 +98,26 @@ class Preprocessing(object):
         return self.all_labels
 
 
+    def save_rois(self , roi_coords , root_dir):
+        try:
+            for name in roi_coords.keys():
+                save_dir=os.path.join(root_dir, name)
+                img_path = os.path.join(self.img_dir, name + '.png')
+                img = Image.open(img_path)
+                if not os.path.isdir(save_dir):
+                    os.makedirs(os.path.join(save_dir))
+                for i,coord in enumerate(roi_coords[name]):
+                    x1, y1, x2, y2 = map(int, coord)
+                    save_path=os.path.join(save_dir , str(i)+'.png')
+                    plt.imsave(save_path , img.crop(coord))
+        except Exception as e:
+            print 'Error Image ',name
+
+            os.remove(save_dir)
+            pass;
+
+
+
     def show_rois(self , roi_coords):
         """
         :param roi_num:
@@ -112,7 +133,7 @@ class Preprocessing(object):
             img = np.asarray(img)
             roi_imgs=[]
             for coord in roi_coords[name]:
-                x1,y1,x2,y2=coord
+                x1, y1, x2, y2 = map(int, coord)
                 ax.add_patch(patches.Rectangle((x1,y1),x2-x1,y2-y1))
                 roi_imgs.append(img[y1:y2 , x1:x2])
             plt.show()
@@ -123,7 +144,7 @@ class Preprocessing(object):
                 plt.show()
             plt.close()
 
-    def get_rois(self , roi_num , csv_paths):
+    def get_rois(self , roi_num , csv_paths ):
         roi_coords={}
         for path in csv_paths[:]:
             name = os.path.split(path)[1]
@@ -290,7 +311,9 @@ if __name__ =='__main__':
     img_dir ='/Users/seongjungkim/data/detection/resize'
     csv_dir='/Users/seongjungkim/data/detection/csv'
     model=Preprocessing(csv_dir , img_dir)
-    rois=model.get_rois(1,model.test_csv_paths)
+    rois=model.get_rois(1,model.train_csv_paths)
+    #model.save_rois(rois , root_dir='./rois')
+    model.show_rois(rois)
     print len(rois.keys())
     #print np.shape(model.fg_images)
     #print np.shape(model.bg_images)

@@ -154,6 +154,7 @@ class FasterRcnnConv5():
                 self.fast_rcnn_cls_logits = affine('cls_logits' , layer , self.num_classes ,activation=None)
             with tf.variable_scope('bbox'):
                 self.fast_rcnn_bbox_logits = affine('bbox_logits' , layer , self.num_classes*4,activation=None)
+
     def _optimizer(self):
 
         self.lr=0.01
@@ -239,29 +240,6 @@ class FasterRcnnConv5():
                     print 'rpn bbox loss',rpn_bbox_loss
                     print 'fast rcnn cls loss : ', fast_rcnn_cls_loss
                     print 'fast rcnn bbox loss : ', fast_rcnn_bbox_loss
-
-                    """
-                    blobs_root=os.path.join('./train', str(i))
-                    os.makedirs(blobs_root)
-                    img = img.reshape(img.shape[1:3])
-                    for g_i, g in enumerate(gt_boxes):
-                        for b_i, b in enumerate(blobs):
-                            fig, ax = plt.subplots(1)
-                            ax.imshow(img)
-                            x1, y1, x2, y2 = g[:-1]
-                            rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=1, edgecolor='b',
-                                                     facecolor='none')
-                            ax.add_patch(rect)
-                            b=b[1:]
-                            rect = patches.Rectangle((b[0], b[1]), b[2] - b[0], b[3] - b[1],
-                                                     linewidth=1, edgecolor='r',
-                                                     facecolor='none')
-                            ax.add_patch(rect)
-                            if not os.path.isdir(os.path.join(blobs_root , 'blobs_{}'.format(g_i))):
-                                os.makedirs(os.path.join( blobs_root ,'blobs_{}'.format(g_i)))
-                            plt.savefig(os.path.join(blobs_root , 'blobs_{}/{}'.format(g_i, b_i)))
-                            plt.close()
-                """
                 except Exception as e:
                     print e
                     pass;
@@ -284,16 +262,9 @@ class FasterRcnnConv5():
         feed_dict = {self.x_: img, self.im_dims: im_dims, self.gt_boxes : gt_bbox , self.phase_train : True}
         return feed_dict
 
-
     def _start_session(self):
-
-        #logs_path = os.path.join('/Users/seongjungkim/PycharmProjects/fundus/faster_rcnn_2/tensorboard')
-        #tb_writer = tf.summary.FileWriter(logs_path)
-        #tb_writer.add_graph(tf.get_default_graph())
         config = tf.ConfigProto(log_device_placement=False)
-        #config.gpu_options.per_process_gpu_memory_fraction = vram
         rpn_saver = tf.train.Saver(max_to_keep=1)
-
         self.sess = tf.Session(config=config)
         init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
         self.sess.run(init)
@@ -301,7 +272,7 @@ class FasterRcnnConv5():
 
 if __name__ == '__main__':
     data_dir ='./clutteredMNIST'
-    model=FasterRcnnConv5(10 , eval_mode=False , data_dir=data_dir)
+    model = FasterRcnnConv5(n_classes=10, eval_mode=False, data_dir=data_dir)
     model.train(file_epoch=1)
 
 
