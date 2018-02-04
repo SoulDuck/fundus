@@ -108,7 +108,6 @@ class FasterRcnnConv5():
                 # and give negatives a weight of (1 - p)
                 # Set to -1.0 to use uniform example weighting
                 """
-
                 self.rpn_labels, self.rpn_bbox_targets, self.rpn_bbox_inside_weights, self.rpn_bbox_outside_weights = anchor_target_layer.anchor_target_layer(
                     rpn_cls_score=self.rpn_cls_layer, gt_boxes=self.gt_boxes, im_dims=self.im_dims,
                     _feat_stride=self._feat_stride, anchor_scales=self.anchor_scales)
@@ -117,15 +116,14 @@ class FasterRcnnConv5():
                 # img_dim : ? 2
             with tf.variable_scope('bbox'):
                 # Bounding-Box regression layer (bounding box predictions)
-                rpn_bbox_layer = convolution2d('conv', self.rpn_layer, out_ch=n_anchors * 4, k=1, s=1,
-                                               act=None)  # (1, ?, ?, 36)
+                rpn_bbox_layer = convolution2d('conv', self.rpn_layer, out_ch=n_anchors * 4, k=1, s=1,act=None)  # (1, ?, ?, 36)
             self.rpn_bbox_layer = tf.identity(rpn_bbox_layer , 'bbox_output')
             print '** bbox_layer shape : {}'.format(np.shape(self.rpn_bbox_layer ))
             print
+
     def _roi_proposal(self):
         print '###### ROI Proposal Network building.... '
         print
-
         self.num_classes = 10 +1 # 1 -> background
         self.rpn_cls_prob=self._rpn_softmax()
         key = 'TRAIN' if self.eval_mode is False else 'TEST'
@@ -140,6 +138,7 @@ class FasterRcnnConv5():
         else:
             # test
             self.rois=self.blobs
+
     def _fast_rcnn(self):
         print '###### Fast R-CNN building.... '
         print
@@ -166,15 +165,16 @@ class FasterRcnnConv5():
                                                           rpn_bbox_targets=self.rpn_bbox_targets,
                                                           rpn_inside_weights=self.rpn_bbox_inside_weights,
                                                           rpn_outside_weights=self.rpn_bbox_outside_weights)
+
+
         # fast-rcnn optimzer
-        print self.fast_rcnn_cls_logits
         self.fast_rcnn_cls_loss=loss_functions.fast_rcnn_cls_loss(self.fast_rcnn_cls_logits, self.labels)
         self.fast_rcnn_bbox_loss = loss_functions.fast_rcnn_bbox_loss(fast_rcnn_bbox_pred=self.fast_rcnn_bbox_logits,
                                                                       bbox_targets=self.bbox_targets,
                                                                       roi_inside_weights=self.bbox_inside_weights,
                                                                       roi_outside_weights=self.bbox_outside_weights)
-        self.cost=tf.reduce_sum(self.rpn_cls_loss + self.rpn_bbox_loss+\
-                                self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss)#self.rpn_cls_loss
+        self.cost=tf.reduce_sum(self.rpn_cls_loss + self.rpn_bbox_loss)
+                                #self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss)#self.rpn_cls_loss
         #self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
 
         decay_steps = cfg.TRAIN.LEARNING_RATE_DECAY_RATE * len(self.train_names)  # Number of Epochs x images/epoch
@@ -242,7 +242,7 @@ class FasterRcnnConv5():
                         [self.rpn_cls_loss, self.rpn_bbox_loss, self.fast_rcnn_cls_loss, self.fast_rcnn_bbox_loss],
                         feed_dict=feed_dict)
                     fr_cls , fr_bbox=self.sess.run([self.fast_rcnn_cls_logits , self.fast_rcnn_bbox_logits] , feed_dict = feed_dict)
-                    print rpn_cls_loss, rpn_bbox_loss, fast_rcnn_cls_loss, fast_rcnn_bbox_loss
+                    print rpn_cls_loss, rpn_bbox_loss, fast_rcnn_cls_loss, fast_rcnn_bbox_loss 
                     self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
 
                 except Exception as e:

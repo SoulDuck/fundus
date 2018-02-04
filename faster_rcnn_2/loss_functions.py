@@ -1,7 +1,5 @@
 from configure import cfg
 import tensorflow as tf
-
-
 def rpn_cls_loss(rpn_cls_score, rpn_labels):
     '''
     Calculate the Region Proposal Network classifier loss. Measures how well
@@ -53,12 +51,12 @@ def rpn_bbox_loss(rpn_bbox_pred, rpn_bbox_targets, rpn_inside_weights, rpn_outsi
         rpn_bbox_targets = tf.transpose(rpn_bbox_targets, [0, 2, 3, 1])
         rpn_inside_weights = tf.transpose(rpn_inside_weights, [0, 2, 3, 1])
         rpn_outside_weights = tf.transpose(rpn_outside_weights, [0, 2, 3, 1])
-
         # How far off was the prediction?
+
         diff = tf.multiply(rpn_inside_weights, rpn_bbox_pred - rpn_bbox_targets)
         diff_sL1 = smoothL1(diff, 3.0)
-
         # Only count loss for positive anchors. Make sure it's a sum.
+
         # tf.multiply(rpn_outside_weights, diff_sL1) shape : ? ? ? 36
         rpn_bbox_reg = tf.reduce_sum(tf.multiply(rpn_outside_weights, diff_sL1))
 

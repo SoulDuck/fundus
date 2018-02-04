@@ -10,8 +10,6 @@ https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/rpn/anchor_target_l
 
 # --------------------------------------------------------
 # Faster R-CNN
-# Copyright (c) 2015 Microsoft
-# Licensed under The MIT License [see LICENSE for details]
 # Written by KimSeongJung
 # --------------------------------------------------------
 import sys
@@ -59,7 +57,9 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     # measure GT overlap
     """
     im_dims = im_dims[0]
-    _anchors = generate_anchor.generate_anchors(scales=np.array(anchor_scales)) #_anchors ( 9, 4 )
+    # _anchors shape : ( 9, 4 ) anchor coordinate type : x1,y1,x2,y2
+    _anchors = generate_anchor.generate_anchors(scales=np.array(anchor_scales))
+
     _num_anchors = _anchors.shape[0]
     # allow boxes to sit over the edge by a small amount
     _allowed_border = 0
@@ -67,11 +67,9 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     # Only minibatch of 1 supported
     assert rpn_cls_score.shape[0] == 1, \
         'Only single item batches are supported'
-
     # map of shape (..., H, W)
     height, width = rpn_cls_score.shape[1:3]
     # 1. Generate proposals from bbox deltas and shifted anchors
-
     shift_x = np.arange(0, width) * _feat_stride
     shift_y = np.arange(0, height) * _feat_stride
     shift_x, shift_y = np.meshgrid(shift_x, shift_y)
@@ -79,14 +77,13 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
                         shift_x.ravel(), shift_y.ravel())).transpose() # 4,88 을 88,4 로 바꾼다
     A = _num_anchors # 9
     K = shifts.shape[0] # 88
-
     all_anchors=np.array([])
+
     for i in range(len(_anchors)):
         if i ==0 :
-            all_anchors=np.add(shifts , _anchors[i] )
+            all_anchors=np.add(shifts , _anchors[i])
         else:
-            all_anchors=np.concatenate((all_anchors , np.add(shifts , _anchors[i])) ,axis=0)
-
+            all_anchors = np.concatenate((all_anchors, np.add(shifts, _anchors[i])), axis=0)
     all_anchors = all_anchors.reshape((K * A, 4))
     total_anchors = int(K * A)
 
@@ -95,9 +92,11 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
         (all_anchors[:, 1] >= -_allowed_border) &
         (all_anchors[:, 2] < im_dims[1] + _allowed_border) &  # <-- width
         (all_anchors[:, 3] < im_dims[0] + _allowed_border))[0] # <-- height
+
     anchors = all_anchors[inds_inside]
     labels = np.empty((len(inds_inside),), dtype=np.float32)
     labels.fill(-1)
+
     overlaps = bbox_overlaps.bbox_overlaps(
         np.ascontiguousarray(anchors, dtype=np.float),
         np.ascontiguousarray(gt_boxes, dtype=np.float)) #anchor 별로 얼마나 겹치는지 확인해준다
@@ -122,6 +121,14 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
         # assign bg labels last so that negative labels can clobber positives
         labels[max_overlaps < cfg.TRAIN.RPN_NEGATIVE_OVERLAP] = 0
 
+    print 'the number of all lables : ',np.shape(all_anchors)
+    print 'the number of inside labels : ',np.shape(anchors)
+    print 'the number of positive labels :',np.sum(labels==1) , '(anchor_target_layer.py)'
+    print gt_boxes
+    for gt in gt_boxes:
+        x1,y1,x2,y2 , l=gt
+        print x2-x1 , y2-y1
+
     num_fg = int(cfg.TRAIN.RPN_FG_FRACTION * cfg.TRAIN.RPN_BATCHSIZE) # fg 와 bg 을 1:1 로 맞추어야 한다 .
     fg_inds = np.where(labels == 1)[0]
 
@@ -137,7 +144,6 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
             bg_inds, size=(len(bg_inds) - num_bg), replace=False)
         labels[disable_inds] = -1
     # fg 는 무조건 하나 포함되는데 그 이유는 max IOU을 가지고 있는건 무조건 FG로 보게 한다
-
     # bg or fg 가 지정한 갯수보다 많으면 -1 라벨해서 선택되지 않게 한다
     # bbox_targets: The deltas (relative to anchors) that Faster R-CNN should 
     # try to predict at each anchor
@@ -145,8 +151,10 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
 
     #bbox_targets = np.zeros((len(inds_inside), 4), dtype=np.float32) 이게 왜 필요하지
     bbox_targets = _compute_targets(anchors, gt_boxes[argmax_overlaps, :]) #  bbox_targets = dx , dy , dw , dh
+    #Regression 을 할수 있게 변형한다
     bbox_inside_weights = np.zeros((len(inds_inside), 4), dtype=np.float32)
     bbox_inside_weights[labels == 1, :] = np.array(cfg.TRAIN.RPN_BBOX_INSIDE_WEIGHTS) #(1.0, 1.0, 1.0, 1.0)
+
     # Give the positive RPN examples weight of p * 1 / {num positives}
     # and give negatives a weight of (1 - p)
     # Set to -1.0 to use uniform example weighting
@@ -157,6 +165,8 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
         num_examples = np.sum(labels >= 0) # get positive label
         positive_weights = np.ones((1, 4)) * 1.0 / num_examples
         negative_weights = np.ones((1, 4)) * 1.0 / num_examples
+        print 'positive weight ',positive_weights
+        print 'negative weight ',negative_weights
     else:
         assert ((cfg.TRAIN.RPN_POSITIVE_WEIGHT > 0) &
                 (cfg.TRAIN.RPN_POSITIVE_WEIGHT < 1))
@@ -166,9 +176,7 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
                             np.sum(labels == 0))
     bbox_outside_weights[labels == 1, :] = positive_weights
     bbox_outside_weights[labels == 0, :] = negative_weights
-
     # map up to original set of anchors
-
 
     #ins_inside
     labels = _unmap(labels, total_anchors, inds_inside, fill=-1)
@@ -192,8 +200,7 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
 
 
 def _unmap(data, count, inds, fill=0):
-    """ Unmap a subset of item (data) back to the original set of items (of
-    size count) """
+    """ Unmap a subset of item (data) back to the original set of items (of size count) """
     if len(data.shape) == 1:
         ret = np.empty((count,), dtype=np.float32)
         ret.fill(fill)

@@ -48,11 +48,3 @@ class rpn(object):
                 # Bounding-Box regression layer (bounding box predictions)
                 self.rpn_bbox_pred_layers = Layers(features)
                 self.rpn_bbox_pred_layers.conv2d(filter_size=1, output_channels=_num_anchors*4, activation_fn=None)
-
-
-
-
-
-
-rpnrpn()
-

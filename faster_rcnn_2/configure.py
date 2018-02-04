@@ -124,15 +124,15 @@ __C.TRAIN.BBOX_NORMALIZE_STDS = (0.1, 0.1, 0.2, 0.2)
 # Use RPN to detect objects
 #__C.TRAIN.HAS_RPN = True # Default: False
 # IOU >= thresh: positive example
-__C.TRAIN.RPN_POSITIVE_OVERLAP = 0.7
+__C.TRAIN.RPN_POSITIVE_OVERLAP = 0.5
 # IOU < thresh: negative example
-__C.TRAIN.RPN_NEGATIVE_OVERLAP = 0.3
+__C.TRAIN.RPN_NEGATIVE_OVERLAP = 0.1
 # If an anchor satisfied by positive and negative conditions set to negative
 __C.TRAIN.RPN_CLOBBER_POSITIVES = False
 # Max number of foreground examples
 __C.TRAIN.RPN_FG_FRACTION = 0.5
 # Total number of examples
-__C.TRAIN.RPN_BATCHSIZE = 256
+__C.TRAIN.RPN_BATCHSIZE = 64
 # NMS threshold used on RPN proposals
 __C.TRAIN.RPN_NMS_THRESH = 0.7
 # Number of top scoring boxes to keep before apply NMS to RPN proposals
@@ -148,7 +148,7 @@ __C.TRAIN.RPN_BBOX_INSIDE_WEIGHTS = (1.0, 1.0, 1.0, 1.0)
 # Set to -1.0 to use uniform example weighting
 __C.TRAIN.RPN_POSITIVE_WEIGHT = -1.0
 
-# Relative weight of RPN bounding box loss
+# Relative weight of RPN bounding bowx loss
 __C.TRAIN.RPN_BBOX_LAMBDA = 10.0
 
 # Relative weight of Fast RCNN bounding box loss
