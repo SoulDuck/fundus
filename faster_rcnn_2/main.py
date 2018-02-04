@@ -86,7 +86,7 @@ class FasterRcnnConv5():
         """
         rpn_out_ch = 256
         rpn_k=3
-        self.anchor_scales = [1, 2, 4]  # original anchor_scales
+        self.anchor_scales = [0.5, 1, 2]  # original anchor_scales
         n_anchors = len(self.anchor_scales) * 3 # len(ratio) =3
         #_n_anchors =len(self.anchor_scales)*3
         top_conv = self.top_conv
