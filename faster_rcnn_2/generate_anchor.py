@@ -57,13 +57,13 @@ def generate_anchors(base_size=16, ratios=[0.5, 1, 2],scales=2**np.arange(3, 6))
     ratio_anchors = _ratio_enum(base_anchor, ratios) # 0,0 , 15 ,15 #ratios , ratio_anchors shape = (3,4)
     anchors = np.vstack([_scale_enum(ratio_anchors[i, :], scales) #scales =  8 ,18 ,32 , _scale_enum = []
                          for i in range(ratio_anchors.shape[0])]) #ratio_anchors.shape[0] = 3
-
+    """
     print 'anchors width , height '
     for a in anchors:
         x1,y1,x2,y2=a
         print x2-x1 ,y2-y1
     return anchors
-
+    """
 def _whctrs(anchor):
     """
     Return width, height, x center, and y center for an anchor (window).

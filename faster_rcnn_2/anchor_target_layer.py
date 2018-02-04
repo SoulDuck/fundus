@@ -165,8 +165,8 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
         num_examples = np.sum(labels >= 0) # get positive label
         positive_weights = np.ones((1, 4)) * 1.0 / num_examples
         negative_weights = np.ones((1, 4)) * 1.0 / num_examples
-        print 'positive weight ',positive_weights
-        print 'negative weight ',negative_weights
+        #print 'positive weight ',positive_weights
+        #print 'negative weight ',negative_weights
     else:
         assert ((cfg.TRAIN.RPN_POSITIVE_WEIGHT > 0) &
                 (cfg.TRAIN.RPN_POSITIVE_WEIGHT < 1))
