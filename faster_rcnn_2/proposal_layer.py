@@ -106,7 +106,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
         keep = keep[:post_nms_topN]
     proposals = proposals[keep, :]
     scores = scores[keep]
-    print scores
+    print scores[:10]
 
     # Output rois blob
     # Our RPN implementation only supports a single input image, so all
