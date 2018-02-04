@@ -84,7 +84,7 @@ class FasterRcnnConv5():
         , RPN predicts the possibility of an anchor being background or foreground, and refine the anchor.
         :return:
         """
-        rpn_out_ch = 512
+        rpn_out_ch = 256
         rpn_k=3
         self.anchor_scales = [1, 2, 4]  # original anchor_scales
         n_anchors = len(self.anchor_scales) * 3 # len(ratio) =3
