@@ -237,18 +237,24 @@ class FasterRcnnConv5():
                     ##self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
                     _, loss, fr_labels , fr_cls= self.sess.run([self.optimizer, self.cost,self.labels , self.fast_rcnn_cls_logits],
                         feed_dict=feed_dict)
+
                     rois,image_size,ori_img= self.sess.run([self.rois,self.im_dims ,self.x_],feed_dict=feed_dict)
 
-                    ## to show each loss , uncomment bolow line
+                    ## to show each loss , uncomment below line
                     rpn_cls_loss, rpn_bbox_loss, fast_rcnn_cls_loss, fast_rcnn_bbox_loss = self.sess.run(
                         [self.rpn_cls_loss, self.rpn_bbox_loss, self.fast_rcnn_cls_loss, self.fast_rcnn_bbox_loss],
                         feed_dict=feed_dict)
+
+                    proposal_bbox =self.sess.run(self.blobs , feed_dict = feed_dict)
                     fr_cls , fr_bbox=self.sess.run([self.fast_rcnn_cls_logits , self.fast_rcnn_bbox_logits] , feed_dict = feed_dict)
+
                     print 'rpn cls loss :',rpn_cls_loss
                     print 'rpn bbox loss :',rpn_bbox_loss
                     print 'fastr rcnn cls loss :',fast_rcnn_cls_loss
                     print 'fast rcnn bbox loss : ',fast_rcnn_bbox_loss
+                    print '# blobs : {} '.format(len(proposal_bbox))
                     self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
+
 
                 except Exception as e:
                     print e

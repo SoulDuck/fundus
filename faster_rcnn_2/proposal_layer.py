@@ -33,7 +33,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     '''
     _anchors = generate_anchor.generate_anchors(scales=np.array(anchor_scales)) # #_anchors ( 9, 4 )
     _num_anchors = _anchors.shape[0] #9
-    rpn_bbox_cls_prob = np.transpose(rpn_bbox_cls_prob, [0, 3, 1, 2]) # rpn bbox _cls prob
+    rpn_bbox_cls_prob = np.transpose(rpn_bbox_cls_prob, [0, 3, 1, 2]) # rpn bbox _cls prob # 1, 18 , h , w
     rpn_bbox_pred = np.transpose(rpn_bbox_pred, [0, 3, 1, 2]) # 1, 36 , h , w
     # Only minibatch of 1 supported
     assert rpn_bbox_cls_prob.shape[0] == 1, \
@@ -92,6 +92,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # 5. take top pre_nms_topN (e.g. 6000)
     #print 'scores : ',np.shape(scores) #421 ,13 <--여기 13이 자꾸 바귄다..
     order = scores.ravel().argsort()[::-1] # 크기 순서를 뒤집는다 가장 큰 값이 먼저 오게 한다
+
     if pre_nms_topN > 0: #120000
         order = order[:pre_nms_topN]
     proposals = proposals[order, :]
@@ -107,11 +108,14 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     proposals = proposals[keep, :]
     scores = scores[keep]
 
+
     # Output rois blob
     # Our RPN implementation only supports a single input image, so all
     # batch inds are 0
     batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False))) # N , 5
+
+
     return blob
 
 
