@@ -108,7 +108,6 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     proposals = proposals[keep, :]
     scores = scores[keep]
 
-
     # Output rois blob
     # Our RPN implementation only supports a single input image, so all
     # batch inds are 0

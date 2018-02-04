@@ -253,12 +253,11 @@ class FasterRcnnConv5():
                     print 'fastr rcnn cls loss :',fast_rcnn_cls_loss
                     print 'fast rcnn bbox loss : ',fast_rcnn_bbox_loss
                     print '# blobs : {} '.format(len(proposal_bbox))
-                    self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
-
+                    #self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
 
                 except Exception as e:
                     print e
-                    pass;
+                    exit()
 
     def _show_result(self, rois , cls, bbox , im_dims , img):
 
