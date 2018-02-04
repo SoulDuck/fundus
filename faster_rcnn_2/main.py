@@ -101,6 +101,9 @@ class FasterRcnnConv5():
                 print layer
                 print self.gt_boxes
                 print self.im_dims
+                
+                
+                
                 print self._feat_stride
                 print anchor_scales
                 __C.TRAIN.RPN_BBOX_INSIDE_WEIGHTS = (1.0, 1.0, 1.0, 1.0)
