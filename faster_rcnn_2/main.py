@@ -246,7 +246,7 @@ class FasterRcnnConv5():
 
                     #image 정보에 대한 tensor
                     rois,image_size,ori_img= self.sess.run([self.rois,self.im_dims ,self.x_],feed_dict=feed_dict)
-                    if self.step == 1 or self.step ==100 or  self.step ==5000 or self.step ==10000 or self.step ==30000 :
+                    if self.step == 1 or self.step ==2 or  self.step ==5000 or self.step ==10000 or self.step ==30000 :
                         self._save_proposal_rpn_bbox(ori_img , proposal_rpn_bbox , proposal_rpn_scores)
 
                     #loss 정보에 대한 tensor
@@ -287,10 +287,10 @@ class FasterRcnnConv5():
                 save_dir = os.path.join(root_dir, str(count))
                 if not os.path.isdir(save_dir):
                     os.makedirs(save_dir)
-                    break;
+                    return save_dir
                 else:
                     count+=1
-            return save_dir
+
 
         assert len(rpn_bbox) == len(rpn_score)
         fg_keep = [rpn_score > 0.5]
@@ -304,7 +304,8 @@ class FasterRcnnConv5():
             x1,y1,x2,y2=bbox[1:]
             rect=patches.Rectangle((x1,y1) ,x2-x1 ,y2-y1 ,fill=False , edgecolor='w')
             ax.add_patch(rect)
-            save_path = os.path.join( save_dir , str(i)+'.png' )
+            save_path = os.path.join(save_dir , str(i)+'.png' )
+            print save_path
             plt.savefig(save_path)
             plt.close()
 
