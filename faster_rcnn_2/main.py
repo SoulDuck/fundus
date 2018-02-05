@@ -296,6 +296,7 @@ class FasterRcnnConv5():
         fg_keep = [rpn_score > 0.5]
         fg_bboxes=rpn_bbox[fg_keep]
         save_dir=_make_folder()
+        print 'save dir :',save_dir
         print 'saving....'
         print 'fg_bboxes',len(fg_bboxes)
         for i,bbox in enumerate(fg_bboxes):
@@ -305,7 +306,6 @@ class FasterRcnnConv5():
             x1,y1,x2,y2=bbox[1:]
             rect=patches.Rectangle((x1,y1) ,x2-x1 ,y2-y1 ,fill=False , edgecolor='w')
             ax.add_patch(rect)
-            print save_dir
             save_path = os.path.join(save_dir , str(i)+'.png' )
             plt.savefig(save_path)
             plt.close()
