@@ -272,7 +272,6 @@ class FasterRcnnConv5():
                     print 'rpn bbox loss :',rpn_bbox_loss
                     print 'fastr rcnn cls loss :',fast_rcnn_cls_loss
                     print 'fast rcnn bbox loss : ',fast_rcnn_bbox_loss
-                    exit()
                     #self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
 
                 except Exception as e:
