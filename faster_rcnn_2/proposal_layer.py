@@ -50,10 +50,9 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
         min_size = cfg.TEST.RPN_MIN_SIZE
 
     # the first set of _num_anchors channels are bg probs
-    # the second set are the fg probs, which we want
+    # the second set are the fg probs
     scores = rpn_bbox_cls_prob[:, _num_anchors:, :, :] # 1, 18  , H, W --> 1, 9, H, W
     bbox_deltas = rpn_bbox_pred
-
 
     # 1. Generate proposals from bbox deltas and shifted anchors
     height, width = scores.shape[-2:]
@@ -70,6 +69,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # reshape to (K*A, 4) shifted anchors
     A = _num_anchors
     K = shifts.shape[0]
+
     #anchors = _anchors.reshape((1, A, 4)) + shifts.reshape((1, K, 4)).transpose((1, 0, 2))
     anchors = np.array([])
     for i in range(len(_anchors)):
@@ -89,7 +89,6 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     proposals = proposals[keep, :]
     scores = scores[keep]
 
-
     # 4. sort all (proposal, score) pairs by score from highest to lowest
     # 5. take top pre_nms_topN (e.g. 6000)
     #print 'scores : ',np.shape(scores) #421 ,13 <--여기 13이 자꾸 바귄다..
@@ -97,6 +96,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
 
     if pre_nms_topN > 0: #120000
         order = order[:pre_nms_topN]
+    print np.sum([scores>0.7])
 
     proposals = proposals[order, :]
     scores = scores[order]
@@ -106,7 +106,6 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # 8. return the top proposals (-> RoIs top)
     #print np.shape(np.hstack ((proposals , scores))) # --> [x_start , y_start ,x_end, y_end , score ] 이런 형태로 만든다
     keep = nms(np.hstack((proposals, scores)), nms_thresh) # nms_thresh = 0.7 | hstack --> axis =1
-
     if post_nms_topN > 0:
         keep = keep[:post_nms_topN]
     #print post_nms_topN
@@ -119,6 +118,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # batch inds are 0
     batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False))) # N , 5
+
     return blob
 
 def _filter_boxes(boxes, min_size):

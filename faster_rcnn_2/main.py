@@ -80,9 +80,9 @@ class FasterRcnnConv5():
         print '###### Region Proposal Network building.... '
         print
         """
-        , RPN predicts the possibility of an anchor being background or foreground, and refine the anchor.
-        :return:
+        RPN predicts the possibility of an anchor being background or foreground, and refine the anchor.
         """
+
         rpn_out_ch = 256
         rpn_k=3
         self.anchor_scales = [11, 13, 16]  # original anchor_scales
@@ -112,7 +112,6 @@ class FasterRcnnConv5():
                                                             im_dims=self.im_dims,
                                                             _feat_stride=self._feat_stride,
                                                             anchor_scales=self.anchor_scales)
-
                 # layer shape : 1 ? ? 18
                 # gt.boxes placeholder : ? ,5
                 # img_dim : ? 2
@@ -132,6 +131,7 @@ class FasterRcnnConv5():
         self.blobs =proposal_layer.proposal_layer(rpn_bbox_cls_prob=self.rpn_cls_prob , rpn_bbox_pred=self.rpn_bbox_layer,
                                     im_dims=self.im_dims, cfg_key=key, _feat_stride=self._feat_stride,
                                     anchor_scales=self.anchor_scales)
+
         if self.eval_mode is False:
             # Calculate targets for proposals
             self.rois, self.labels, self.bbox_targets, self.bbox_inside_weights, self.bbox_outside_weights = \
@@ -140,8 +140,6 @@ class FasterRcnnConv5():
         else:
             # test
             self.rois=self.blobs
-
-
     def _fast_rcnn(self):
         print '###### Fast R-CNN building.... '
         print
@@ -255,17 +253,15 @@ class FasterRcnnConv5():
                         feed_dict=feed_dict)
 
                     #roi pooling에 대한 정보
-
                     rpn_cls, rpn_bbox, fr_cls, fr_bbox = self.sess.run(
                         [self.rpn_cls_prob, self.rpn_bbox_layer, self.fast_rcnn_cls_logits, self.fast_rcnn_bbox_logits],
                         feed_dict=feed_dict)
+
                     """
                     print np.shape(rpn_cls)
                     print 'rpn_cls',rpn_cls[0,0,0,:10]
-
                     print 'roi pool indices'
                     print roi_pool_index
-
                     print 'rpn cls loss :',rpn_cls_loss
                     print 'rpn bbox loss :',rpn_bbox_loss
                     print 'fastr rcnn cls loss :',fast_rcnn_cls_loss

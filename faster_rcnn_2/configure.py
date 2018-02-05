@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jan  1 20:47:15 2017
-@author: Kevin Liang (Modifications)
+Author Kim Seong Jung , Mediwhale
 """
 
 # --------------------------------------------------------
 # Fast R-CNN
-# Copyright (c) 2015 Microsoft
-# Licensed under The MIT License [see LICENSE for details]
-# Written by Ross Girshick
+
 # --------------------------------------------------------
 
 """Faster R-CNN config system.

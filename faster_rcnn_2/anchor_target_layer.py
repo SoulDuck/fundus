@@ -126,12 +126,13 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     num_fg = int(cfg.TRAIN.RPN_FG_FRACTION * cfg.TRAIN.RPN_BATCHSIZE) # fg 와 bg 을 1:1 로 맞추어야 한다 .
     fg_inds = np.where(labels == 1)[0]
 
-
+    """
     print 'the number of all lables : ', np.shape(all_anchors)
     print 'the number of inside labels : ', np.shape(anchors)
     print 'the number of positive labels :', np.sum(labels == 1), '(anchor_target_layer.py)'
     print 'positive overlaps : '
     print
+    """
     # print anchors[max_overlaps >= cfg.TRAIN.RPN_POSITIVE_OVERLAP]
     """
     print gt_boxes
