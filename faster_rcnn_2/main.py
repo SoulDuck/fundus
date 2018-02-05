@@ -304,6 +304,7 @@ class FasterRcnnConv5():
             x1,y1,x2,y2=bbox[1:]
             rect=patches.Rectangle((x1,y1) ,x2-x1 ,y2-y1 ,fill=False , edgecolor='w')
             ax.add_patch(rect)
+            print save_dir
             save_path = os.path.join(save_dir , str(i)+'.png' )
             plt.savefig(save_path)
             plt.close()
