@@ -96,7 +96,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
 
     if pre_nms_topN > 0: #120000
         order = order[:pre_nms_topN]
-    print np.sum([scores>0.7])
+    #print np.sum([scores>0.7])
 
     proposals = proposals[order, :]
     scores = scores[order]
