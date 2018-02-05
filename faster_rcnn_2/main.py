@@ -21,7 +21,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-
 class FasterRcnnConv5():
     def __init__(self , n_classes  , eval_mode , data_dir):
         self.n_classes  = n_classes
@@ -128,10 +127,11 @@ class FasterRcnnConv5():
         self.num_classes = 10 +1 # 1 -> background
         self.rpn_cls_prob=self._rpn_softmax()
         key = 'TRAIN' if self.eval_mode is False else 'TEST'
-        self.blobs =proposal_layer.proposal_layer(rpn_bbox_cls_prob=self.rpn_cls_prob , rpn_bbox_pred=self.rpn_bbox_layer,
-                                    im_dims=self.im_dims, cfg_key=key, _feat_stride=self._feat_stride,
-                                    anchor_scales=self.anchor_scales)
-
+        self.blobs, self.scores = proposal_layer.proposal_layer(rpn_bbox_cls_prob=self.rpn_cls_prob,
+                                                                rpn_bbox_pred=self.rpn_bbox_layer,
+                                                                im_dims=self.im_dims, cfg_key=key,
+                                                                _feat_stride=self._feat_stride,
+                                                                anchor_scales=self.anchor_scales)
         if self.eval_mode is False:
             # Calculate targets for proposals
             self.rois, self.labels, self.bbox_targets, self.bbox_inside_weights, self.bbox_outside_weights = \
@@ -241,11 +241,13 @@ class FasterRcnnConv5():
                         [self.optimizer, self.cost, self.labels, self.fast_rcnn_cls_logits],
                         feed_dict=feed_dict)
 
-                    proposal_bbox_1, roi_pool_boxes, roi_pool_index = self.sess.run(
-                        [self.blobs, self.boxes, self.box_ind], feed_dict=feed_dict)
+                    proposal_rpn_bbox,proposal_rpn_scores , roi_pool_boxes, roi_pool_index = self.sess.run(
+                        [self.blobs ,self.scores, self.boxes, self.box_ind], feed_dict=feed_dict)
 
                     #image 정보에 대한 tensor
                     rois,image_size,ori_img= self.sess.run([self.rois,self.im_dims ,self.x_],feed_dict=feed_dict)
+                    if self.step >1000:
+                        self._save_proposal_rpn_bbox(ori_img , proposal_rpn_bbox , proposal_rpn_scores)
 
                     #loss 정보에 대한 tensor
                     rpn_cls_loss, rpn_bbox_loss, fast_rcnn_cls_loss, fast_rcnn_bbox_loss = self.sess.run(
@@ -256,7 +258,7 @@ class FasterRcnnConv5():
                     rpn_cls, rpn_bbox, fr_cls, fr_bbox = self.sess.run(
                         [self.rpn_cls_prob, self.rpn_bbox_layer, self.fast_rcnn_cls_logits, self.fast_rcnn_bbox_logits],
                         feed_dict=feed_dict)
-
+                    self.step+=1
                     """
                     print np.shape(rpn_cls)
                     print 'rpn_cls',rpn_cls[0,0,0,:10]
@@ -275,6 +277,40 @@ class FasterRcnnConv5():
                 except Exception as e:
                     print e
                     exit()
+
+    def _save_proposal_rpn_bbox(self , img , rpn_bbox , rpn_score , root_dir = './rpn_bbox'):
+        def _make_folder():
+            if not os.path.isdir(root_dir):
+                os.makedirs(root_dir)
+            count = 0;
+            while(True):
+                save_dir = os.path.join(root_dir, str(count))
+                if not os.path.isdir(save_dir):
+                    os.makedirs(save_dir)
+                    break;
+                else:
+                    count+=1
+            return save_dir
+
+        assert len(rpn_bbox) == len(rpn_score)
+        fg_keep = [rpn_score > 0.5]
+        fg_bboxes=rpn_bbox[fg_keep]
+        save_dir=_make_folder()
+        print 'saving....'
+        for i,bbox in enumerate(fg_bboxes):
+            fig = plt.figure()
+            ax=fig.add_subplot(111)
+            ax.imshow(img.reshape(img.shape[1:3]))
+            x1,y1,x2,y2=bbox[1:]
+            rect=patches.Rectangle((x1,y1) ,x2-x1 ,y2-y1 ,fill=False , edgecolor='w')
+            ax.add_patch(rect)
+            save_path = os.path.join( save_dir , str(i)+'.png' )
+            plt.savefig(save_path)
+            plt.close()
+
+
+        print 'save proposal rpn bbox with image'
+
 
     def _show_result(self, rois , cls, bbox , im_dims , img):
 

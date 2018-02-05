@@ -11,9 +11,12 @@ from nms_wrapper import nms
 
 
 def proposal_layer(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat_stride, anchor_scales):
-    return tf.reshape(tf.py_func(_proposal_layer_py,
+    blobs , scores =tf.py_func(_proposal_layer_py,
                                  [rpn_bbox_cls_prob, rpn_bbox_pred, im_dims[0], cfg_key, _feat_stride, anchor_scales],
-                                 [tf.float32]), [-1, 5])
+                                 [tf.float32 , tf.float32 ])
+    blobs=tf.reshape(blobs , shape=[-1,5])
+    scores=tf.reshape(scores , shape=[-1])
+    return blobs ,  scores
 
 def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat_stride, anchor_scales):
     '''
@@ -118,8 +121,10 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # batch inds are 0
     batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False))) # N , 5
+    #blob=np.hstack((blob , scores))
 
-    return blob
+
+    return blob , scores
 
 def _filter_boxes(boxes, min_size):
     """Remove all boxes with any side smaller than min_size."""
