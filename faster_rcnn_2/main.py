@@ -185,7 +185,7 @@ class FasterRcnnConv5():
                                                    decay_steps=decay_steps, decay_rate=cfg.TRAIN.LEARNING_RATE_DECAY,
                                                    staircase=True)
         # Optimizer: ADAM
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(self.cost)
+        self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(self.cost)
 
         #cost = rpn_cls_loss+ rpn_bbox_loss + fast_rcnn_cls_loss + fast_rcnn_bbox_loss
 
