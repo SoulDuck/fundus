@@ -246,7 +246,7 @@ class FasterRcnnConv5():
 
                     #image 정보에 대한 tensor
                     rois,image_size,ori_img= self.sess.run([self.rois,self.im_dims ,self.x_],feed_dict=feed_dict)
-                    if self.step == 1 or self.step ==1000 or  self.step ==5000 or self.step ==10000 or self.step ==30000 :
+                    if self.step == 1 or self.step ==100 or  self.step ==5000 or self.step ==10000 or self.step ==30000 :
                         self._save_proposal_rpn_bbox(ori_img , proposal_rpn_bbox , proposal_rpn_scores)
 
                     #loss 정보에 대한 tensor
