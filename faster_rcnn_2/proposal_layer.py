@@ -54,6 +54,7 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     scores = rpn_bbox_cls_prob[:, _num_anchors:, :, :] # 1, 18  , H, W --> 1, 9, H, W
     bbox_deltas = rpn_bbox_pred
 
+
     # 1. Generate proposals from bbox deltas and shifted anchors
     height, width = scores.shape[-2:]
     # Enumerate all shifts
@@ -84,16 +85,20 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     proposals = bbox_transform_inv(anchors, bbox_deltas)
     proposals = clip_boxes(proposals, im_dims) # image size 보다 큰 proposals 들이 줄어 들수 있도록 한다.
     keep = _filter_boxes(proposals, min_size) # min size = 16 # min보다 큰 놈들만 살아남았다
+
     proposals = proposals[keep, :]
     scores = scores[keep]
+
 
     # 4. sort all (proposal, score) pairs by score from highest to lowest
     # 5. take top pre_nms_topN (e.g. 6000)
     #print 'scores : ',np.shape(scores) #421 ,13 <--여기 13이 자꾸 바귄다..
     order = scores.ravel().argsort()[::-1] # 크기 순서를 뒤집는다 가장 큰 값이 먼저 오게 한다
 
+
     if pre_nms_topN > 0: #120000
         order = order[:pre_nms_topN]
+
     proposals = proposals[order, :]
     scores = scores[order]
 
@@ -102,18 +107,19 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     # 8. return the top proposals (-> RoIs top)
     #print np.shape(np.hstack ((proposals , scores))) # --> [x_start , y_start ,x_end, y_end , score ] 이런 형태로 만든다
     keep = nms(np.hstack((proposals, scores)), nms_thresh) # nms_thresh = 0.7 | hstack --> axis =1
+
     if post_nms_topN > 0:
         keep = keep[:post_nms_topN]
+    print post_nms_topN
+
     proposals = proposals[keep, :]
     scores = scores[keep]
-    print scores[:10]
 
     # Output rois blob
     # Our RPN implementation only supports a single input image, so all
     # batch inds are 0
     batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False))) # N , 5
-
     return blob
 
 

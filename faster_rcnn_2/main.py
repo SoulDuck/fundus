@@ -67,7 +67,7 @@ class FasterRcnnConv5():
         print
         kernels=[5, 3, 3, 3, 3]
         out_channels=[32, 64, 64, 128, 128]
-        strides = [2, 2, 1, 2, 1]
+        strides = [2, 1, 1, 1, 1]
         layer=self.x_
         for i in range(5):
             layer = convolution2d(name='conv_{}'.format(i), x=layer, out_ch=out_channels[i], k=kernels[i], s=strides[i],
@@ -85,7 +85,7 @@ class FasterRcnnConv5():
         """
         rpn_out_ch = 256
         rpn_k=3
-        self.anchor_scales = [1.5, 2, 2.5]  # original anchor_scales
+        self.anchor_scales = [11, 13, 16]  # original anchor_scales
         n_anchors = len(self.anchor_scales) * 3 # len(ratio) =3
         #_n_anchors =len(self.anchor_scales)*3
         top_conv = self.top_conv
@@ -146,8 +146,8 @@ class FasterRcnnConv5():
         print
         with tf.variable_scope('fast_rcnn'):
             keep_prob = cfg.FRCNN_DROPOUT_KEEP_RATE if self.eval_mode is False else 1.0
-            pooledFeatures = roi_pool.roi_pool(self.top_conv, self.rois, self.im_dims) #roi pooling
-            layer = pooledFeatures # ? 7,7 128 Same Output
+            self.pooledFeatures , self.boxes , self.box_ind = roi_pool.roi_pool(self.top_conv, self.rois, self.im_dims) #roi pooling
+            layer = self.pooledFeatures # ? 7,7 128 Same Output
             # print layer
             for i in range(len(cfg.FRCNN_FC_HIDDEN)):
                 layer = affine('fc_{}'.format(i), layer, cfg.FRCNN_FC_HIDDEN[i])
@@ -233,25 +233,46 @@ class FasterRcnnConv5():
             for i in tqdm(train_order):
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
-                    ##self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
-                    _, loss, fr_labels , fr_cls= self.sess.run([self.optimizer, self.cost,self.labels , self.fast_rcnn_cls_logits],
+
+                    proposal_bbox_0, roi_pool_boxes, roi_pool_index = self.sess.run(
+                        [self.blobs, self.boxes, self.box_ind], feed_dict=feed_dict)
+
+                    _, loss, fr_labels, fr_cls = self.sess.run(
+                        [self.optimizer, self.cost, self.labels, self.fast_rcnn_cls_logits],
                         feed_dict=feed_dict)
 
+                    proposal_bbox_1, roi_pool_boxes, roi_pool_index = self.sess.run(
+                        [self.blobs, self.boxes, self.box_ind], feed_dict=feed_dict)
+
+                    #image 정보에 대한 tensor
                     rois,image_size,ori_img= self.sess.run([self.rois,self.im_dims ,self.x_],feed_dict=feed_dict)
 
-                    ## to show each loss , uncomment below line
+                    #loss 정보에 대한 tensor
                     rpn_cls_loss, rpn_bbox_loss, fast_rcnn_cls_loss, fast_rcnn_bbox_loss = self.sess.run(
                         [self.rpn_cls_loss, self.rpn_bbox_loss, self.fast_rcnn_cls_loss, self.fast_rcnn_bbox_loss],
                         feed_dict=feed_dict)
 
-                    proposal_bbox =self.sess.run(self.blobs , feed_dict = feed_dict)
+                    #roi pooling에 대한 정보
+
+
                     fr_cls , fr_bbox=self.sess.run([self.fast_rcnn_cls_logits , self.fast_rcnn_bbox_logits] , feed_dict = feed_dict)
+
+                    #pool_features=self.sess.run([self.pooledFeatures], feed_dict=feed_dict)
+                    #print 'pool features',pool_features
+                    #print np.shape(pool_features)
+                    #exit()
+                    print '# blobs : {} '.format(np.shape(proposal_bbox_0))
+                    print '# blobs : {} '.format(np.shape(proposal_bbox_1))
+                    print 'roi pool boxes '
+                    print roi_pool_boxes
+                    print 'roi pool indices'
+                    print roi_pool_index
 
                     print 'rpn cls loss :',rpn_cls_loss
                     print 'rpn bbox loss :',rpn_bbox_loss
                     print 'fastr rcnn cls loss :',fast_rcnn_cls_loss
                     print 'fast rcnn bbox loss : ',fast_rcnn_bbox_loss
-                    print '# blobs : {} '.format(len(proposal_bbox))
+                    exit()
                     #self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
 
                 except Exception as e:

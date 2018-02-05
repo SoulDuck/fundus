@@ -84,6 +84,7 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
             all_anchors=np.add(shifts , _anchors[i])
         else:
             all_anchors = np.concatenate((all_anchors, np.add(shifts, _anchors[i])), axis=0)
+
     all_anchors = all_anchors.reshape((K * A, 4))
     total_anchors = int(K * A)
 
@@ -122,16 +123,23 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
         # assign bg labels last so that negative labels can clobber positives
         labels[max_overlaps < cfg.TRAIN.RPN_NEGATIVE_OVERLAP] = 0
 
-    print 'the number of all lables : ',np.shape(all_anchors)
-    print 'the number of inside labels : ',np.shape(anchors)
-    print 'the number of positive labels :',np.sum(labels==1) , '(anchor_target_layer.py)'
-    print gt_boxes
-    for gt in gt_boxes:
-        x1,y1,x2,y2 , l=gt
-        print x2-x1 , y2-y1
-
     num_fg = int(cfg.TRAIN.RPN_FG_FRACTION * cfg.TRAIN.RPN_BATCHSIZE) # fg 와 bg 을 1:1 로 맞추어야 한다 .
     fg_inds = np.where(labels == 1)[0]
+
+    """
+    print 'the number of all lables : ', np.shape(all_anchors)
+    print 'the number of inside labels : ', np.shape(anchors)
+    print 'the number of positive labels :', np.sum(labels == 1), '(anchor_target_layer.py)'
+    print 'positive overlaps : '
+    print
+    """
+    # print anchors[max_overlaps >= cfg.TRAIN.RPN_POSITIVE_OVERLAP]
+    """
+    print gt_boxes
+    for gt in gt_boxes:
+        x1, y1, x2, y2, l = gt
+        print x2 - x1, y2 - y1
+    """
 
     if len(fg_inds) > num_fg:
         disable_inds = npr.choice(
