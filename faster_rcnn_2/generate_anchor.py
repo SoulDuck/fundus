@@ -62,7 +62,6 @@ def generate_anchors(base_size=16, ratios=[0.5, 1, 2],scales=2**np.arange(3, 6))
     for a in anchors:
         x1,y1,x2,y2=a
         print x2-x1 ,y2-y1
-    
     """
     return anchors
 def _whctrs(anchor):

@@ -32,7 +32,6 @@ class FasterRcnnConv5():
         self.im_dims = tf.placeholder(tf.int32 , [None ,2 ])
         self.gt_boxes = tf.placeholder(tf.int32 , [None ,5 ])
         self.phase_train = tf.placeholder(tf.bool)
-
         self.step=0
         self._build()
         self._start_session()
@@ -86,7 +85,7 @@ class FasterRcnnConv5():
         """
         rpn_out_ch = 256
         rpn_k=3
-        self.anchor_scales = [0.5, 1, 2]  # original anchor_scales
+        self.anchor_scales = [1.5, 2, 2.5]  # original anchor_scales
         n_anchors = len(self.anchor_scales) * 3 # len(ratio) =3
         #_n_anchors =len(self.anchor_scales)*3
         top_conv = self.top_conv

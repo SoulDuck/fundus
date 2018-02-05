@@ -100,6 +100,7 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     overlaps = bbox_overlaps.bbox_overlaps(
         np.ascontiguousarray(anchors, dtype=np.float),
         np.ascontiguousarray(gt_boxes, dtype=np.float)) #anchor 별로 얼마나 겹치는지 확인해준다
+
     argmax_overlaps = overlaps.argmax(axis=1) # 여러 gt box 중에 가장 많이 겹치는 gt 을 가져온다
     max_overlaps = overlaps[np.arange(len(inds_inside)), argmax_overlaps] # inds_inside 갯수 만큼 overlaps에서 가장 높은 overlays
     gt_argmax_overlaps = overlaps.argmax(axis=0)
