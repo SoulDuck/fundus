@@ -6,7 +6,6 @@ def roi_pool(featureMaps, rois, im_dims):
     Regions of Interest (ROIs) from the Region Proposal Network (RPN) are
     formatted as:
     (image_id, x1, y1, x2, y2)
-
     Note: Since mini-batches are sampled from a single image, image_id = 0s
     '''
     with tf.variable_scope('roi_pool'):

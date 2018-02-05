@@ -259,7 +259,7 @@ class FasterRcnnConv5():
                     rpn_cls, rpn_bbox, fr_cls, fr_bbox = self.sess.run(
                         [self.rpn_cls_prob, self.rpn_bbox_layer, self.fast_rcnn_cls_logits, self.fast_rcnn_bbox_logits],
                         feed_dict=feed_dict)
-
+                    """
                     print np.shape(rpn_cls)
                     print 'rpn_cls',rpn_cls[0,0,0,:10]
 
@@ -272,7 +272,7 @@ class FasterRcnnConv5():
                     print 'fast rcnn bbox loss : ',fast_rcnn_bbox_loss
 
                     print 'rpn cls : ' , np.shape(rpn_cls[0,:,:,:9])
-
+                    """
 
                     #self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
 
