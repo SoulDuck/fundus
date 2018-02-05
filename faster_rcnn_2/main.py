@@ -263,8 +263,8 @@ class FasterRcnnConv5():
                     #exit()
                     print '# blobs : {} '.format(np.shape(proposal_bbox_0))
                     print '# blobs : {} '.format(np.shape(proposal_bbox_1))
-                    print 'roi pool boxes '
-                    print roi_pool_boxes
+                    #print 'roi pool boxes '
+                    #print roi_pool_boxes
                     print 'roi pool indices'
                     print roi_pool_index
 

@@ -95,7 +95,6 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     #print 'scores : ',np.shape(scores) #421 ,13 <--여기 13이 자꾸 바귄다..
     order = scores.ravel().argsort()[::-1] # 크기 순서를 뒤집는다 가장 큰 값이 먼저 오게 한다
 
-
     if pre_nms_topN > 0: #120000
         order = order[:pre_nms_topN]
 
@@ -121,7 +120,6 @@ def _proposal_layer_py(rpn_bbox_cls_prob, rpn_bbox_pred, im_dims, cfg_key, _feat
     batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False))) # N , 5
     return blob
-
 
 def _filter_boxes(boxes, min_size):
     """Remove all boxes with any side smaller than min_size."""
