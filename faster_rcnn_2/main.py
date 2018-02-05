@@ -67,7 +67,7 @@ class FasterRcnnConv5():
         print
         kernels=[5, 3, 3, 3, 3]
         out_channels=[32, 64, 64, 128, 128]
-        strides = [2, 1, 1, 1, 1]
+        strides = [2, 2, 1, 1, 1]
         layer=self.x_
         for i in range(5):
             layer = convolution2d(name='conv_{}'.format(i), x=layer, out_ch=out_channels[i], k=kernels[i], s=strides[i],
@@ -100,9 +100,6 @@ class FasterRcnnConv5():
                 print layer
                 print self.gt_boxes
                 print self.im_dims
-                
-                
-                
                 print self._feat_stride
                 print anchor_scales
                 __C.TRAIN.RPN_BBOX_INSIDE_WEIGHTS = (1.0, 1.0, 1.0, 1.0)
@@ -113,6 +110,7 @@ class FasterRcnnConv5():
                 self.rpn_labels, self.rpn_bbox_targets, self.rpn_bbox_inside_weights, self.rpn_bbox_outside_weights = anchor_target_layer.anchor_target_layer(
                     rpn_cls_score=self.rpn_cls_layer, gt_boxes=self.gt_boxes, im_dims=self.im_dims,
                     _feat_stride=self._feat_stride, anchor_scales=self.anchor_scales)
+
                 # layer shape : 1 ? ? 18
                 # gt.boxes placeholder : ? ,5
                 # img_dim : ? 2
@@ -141,6 +139,7 @@ class FasterRcnnConv5():
             # test
             self.rois=self.blobs
 
+
     def _fast_rcnn(self):
         print '###### Fast R-CNN building.... '
         print
@@ -162,6 +161,7 @@ class FasterRcnnConv5():
         self.lr=0.01
         self.step=0
         # rpn optimzer
+
         self.rpn_cls_loss=loss_functions.rpn_cls_loss(self.rpn_cls_layer,self.rpn_labels)
         self.rpn_bbox_loss = loss_functions.rpn_bbox_loss(rpn_bbox_pred=self.rpn_bbox_layer,
                                                           rpn_bbox_targets=self.rpn_bbox_targets,
@@ -176,6 +176,7 @@ class FasterRcnnConv5():
                                                                       roi_inside_weights=self.bbox_inside_weights,
                                                                       roi_outside_weights=self.bbox_outside_weights)
         self.cost=tf.reduce_sum(self.rpn_cls_loss + self.rpn_bbox_loss)
+
                                 #self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss)#self.rpn_cls_loss
         #self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
 
@@ -201,7 +202,9 @@ class FasterRcnnConv5():
         rpn_cls_prob = tf.reshape(rpn_cls_prob, [shape[0], shape[3], shape[1], shape[2]]) #Tensor("transpose_2:0", shape=(?, ?, ?, ?), dtype=float32)
         rpn_cls_prob = tf.transpose(rpn_cls_prob, [0, 2, 3, 1])#Tensor("transpose_2:0", shape=(?, ?, ?, ?), dtype=float32)
 
+
         return rpn_cls_prob
+
 
     def flatten(self, input ,keep_prob=1):
         """
@@ -234,9 +237,6 @@ class FasterRcnnConv5():
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
 
-                    proposal_bbox_0, roi_pool_boxes, roi_pool_index = self.sess.run(
-                        [self.blobs, self.boxes, self.box_ind], feed_dict=feed_dict)
-
                     _, loss, fr_labels, fr_cls = self.sess.run(
                         [self.optimizer, self.cost, self.labels, self.fast_rcnn_cls_logits],
                         feed_dict=feed_dict)
@@ -254,17 +254,13 @@ class FasterRcnnConv5():
 
                     #roi pooling에 대한 정보
 
+                    rpn_cls, rpn_bbox, fr_cls, fr_bbox = self.sess.run(
+                        [self.rpn_cls_prob, self.rpn_bbox_layer, self.fast_rcnn_cls_logits, self.fast_rcnn_bbox_logits],
+                        feed_dict=feed_dict)
 
-                    fr_cls , fr_bbox=self.sess.run([self.fast_rcnn_cls_logits , self.fast_rcnn_bbox_logits] , feed_dict = feed_dict)
+                    print np.shape(rpn_cls)
+                    print 'rpn_cls',rpn_cls[0,0,0,:10]
 
-                    #pool_features=self.sess.run([self.pooledFeatures], feed_dict=feed_dict)
-                    #print 'pool features',pool_features
-                    #print np.shape(pool_features)
-                    #exit()
-                    print '# blobs : {} '.format(np.shape(proposal_bbox_0))
-                    print '# blobs : {} '.format(np.shape(proposal_bbox_1))
-                    #print 'roi pool boxes '
-                    #print roi_pool_boxes
                     print 'roi pool indices'
                     print roi_pool_index
 
@@ -272,6 +268,10 @@ class FasterRcnnConv5():
                     print 'rpn bbox loss :',rpn_bbox_loss
                     print 'fastr rcnn cls loss :',fast_rcnn_cls_loss
                     print 'fast rcnn bbox loss : ',fast_rcnn_bbox_loss
+
+                    print 'rpn cls : ' , np.shape(rpn_cls[0,:,:,:9])
+
+
                     #self._show_result(rois,fr_cls , fr_bbox , image_size  ,ori_img )
 
                 except Exception as e:
