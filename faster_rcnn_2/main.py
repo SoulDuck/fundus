@@ -66,8 +66,8 @@ class FasterRcnnConv5():
         print '###### Convolution Network building.... '
         print
         kernels=[5, 3, 3, 3, 3]
-        out_channels=[32, 64, 64, 128, 128]
-        strides = [2, 2, 1, 1, 1]
+        out_channels=[64, 96, 128, 172, 256]
+        strides = [2, 2, 1, 1 ,1 ]
         layer=self.x_
         for i in range(5):
             layer = convolution2d(name='conv_{}'.format(i), x=layer, out_ch=out_channels[i], k=kernels[i], s=strides[i],
@@ -107,9 +107,11 @@ class FasterRcnnConv5():
                 # and give negatives a weight of (1 - p)
                 # Set to -1.0 to use uniform example weighting
                 """
-                self.rpn_labels, self.rpn_bbox_targets, self.rpn_bbox_inside_weights, self.rpn_bbox_outside_weights = anchor_target_layer.anchor_target_layer(
-                    rpn_cls_score=self.rpn_cls_layer, gt_boxes=self.gt_boxes, im_dims=self.im_dims,
-                    _feat_stride=self._feat_stride, anchor_scales=self.anchor_scales)
+                self.rpn_labels, self.rpn_bbox_targets, self.rpn_bbox_inside_weights, self.rpn_bbox_outside_weights = \
+                    anchor_target_layer.anchor_target_layer(rpn_cls_score=self.rpn_cls_layer, gt_boxes=self.gt_boxes,
+                                                            im_dims=self.im_dims,
+                                                            _feat_stride=self._feat_stride,
+                                                            anchor_scales=self.anchor_scales)
 
                 # layer shape : 1 ? ? 18
                 # gt.boxes placeholder : ? ,5

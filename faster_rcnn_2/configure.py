@@ -124,7 +124,7 @@ __C.TRAIN.BBOX_NORMALIZE_STDS = (0.1, 0.1, 0.2, 0.2)
 # Use RPN to detect objects
 #__C.TRAIN.HAS_RPN = True # Default: False
 # IOU >= thresh: positive example
-__C.TRAIN.RPN_POSITIVE_OVERLAP = 0.6
+__C.TRAIN.RPN_POSITIVE_OVERLAP = 0.7
 # IOU < thresh: negative example
 __C.TRAIN.RPN_NEGATIVE_OVERLAP = 0.3
 # If an anchor satisfied by positive and negative conditions set to negative
