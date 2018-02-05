@@ -297,6 +297,7 @@ class FasterRcnnConv5():
         fg_bboxes=rpn_bbox[fg_keep]
         save_dir=_make_folder()
         print 'saving....'
+        print 'fg_bboxes',len(fg_bboxes)
         for i,bbox in enumerate(fg_bboxes):
             fig = plt.figure()
             ax=fig.add_subplot(111)
