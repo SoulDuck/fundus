@@ -226,7 +226,6 @@ class FasterRcnnConv5():
         self.print_log(scope + ' output: ' + str(input.get_shape()))
 
     def train(self , file_epoch):
-
         train_order = np.random.permutation(len(self.train_names))
         self.file_epoch=file_epoch
         #tf_inputs = (self.x_, self.im_dims, self.gt_boxes)
@@ -236,7 +235,6 @@ class FasterRcnnConv5():
             for i in tqdm(train_order):
                 feed_dict=self._create_feed_dict_for_train(i)
                 try:
-
                     _, loss, fr_labels, fr_cls = self.sess.run(
                         [self.optimizer, self.cost, self.labels, self.fast_rcnn_cls_logits],
                         feed_dict=feed_dict)
@@ -246,8 +244,17 @@ class FasterRcnnConv5():
 
                     #image 정보에 대한 tensor
                     rois,image_size,ori_img= self.sess.run([self.rois,self.im_dims ,self.x_],feed_dict=feed_dict)
-                    if self.step == 1 or self.step ==100 or  self.step ==1000 or self.step ==10000 or self.step ==30000 :
+                    if self.step % 100 ==0:
+
+                        print 'rpn_cls', rpn_cls[0, 0, 0, :10]
+                        print 'rpn cls loss :', rpn_cls_loss
+                        print 'rpn bbox loss :', rpn_bbox_loss
+                        print 'fastr rcnn cls loss :', fast_rcnn_cls_loss
+                        print 'fast rcnn bbox loss : ', fast_rcnn_bbox_loss
+                        print 'rpn cls : ', np.shape(rpn_cls[0, :, :, :9])
+
                         self._save_proposal_rpn_bbox(ori_img , proposal_rpn_bbox , proposal_rpn_scores)
+
 
                     #loss 정보에 대한 tensor
                     rpn_cls_loss, rpn_bbox_loss, fast_rcnn_cls_loss, fast_rcnn_bbox_loss = self.sess.run(
