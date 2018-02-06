@@ -226,10 +226,11 @@ class FasterRcnnConv5():
         self.print_log(scope + ' output: ' + str(input.get_shape()))
 
     def train(self , file_epoch):
+
         train_order = np.random.permutation(len(self.train_names))
         self.file_epoch=file_epoch
         #tf_inputs = (self.x_, self.im_dims, self.gt_boxes)
-        self.step +=1
+
         print self.step
         for self.epoch in trange(1, self.file_epoch + 1, desc='epochs'):
             for i in tqdm(train_order):
@@ -244,16 +245,6 @@ class FasterRcnnConv5():
 
                     #image 정보에 대한 tensor
                     rois,image_size,ori_img= self.sess.run([self.rois,self.im_dims ,self.x_],feed_dict=feed_dict)
-                    if self.step % 100 ==0:
-
-                        print 'rpn_cls', rpn_cls[0, 0, 0, :10]
-                        print 'rpn cls loss :', rpn_cls_loss
-                        print 'rpn bbox loss :', rpn_bbox_loss
-                        print 'fastr rcnn cls loss :', fast_rcnn_cls_loss
-                        print 'fast rcnn bbox loss : ', fast_rcnn_bbox_loss
-                        print 'rpn cls : ', np.shape(rpn_cls[0, :, :, :9])
-
-                        self._save_proposal_rpn_bbox(ori_img , proposal_rpn_bbox , proposal_rpn_scores)
 
 
                     #loss 정보에 대한 tensor
@@ -265,6 +256,17 @@ class FasterRcnnConv5():
                     rpn_cls, rpn_bbox, fr_cls, fr_bbox = self.sess.run(
                         [self.rpn_cls_prob, self.rpn_bbox_layer, self.fast_rcnn_cls_logits, self.fast_rcnn_bbox_logits],
                         feed_dict=feed_dict)
+                    if self.step % 100 ==0:
+
+                        print 'rpn_cls', rpn_cls[0, 0, 0, :10]
+                        print 'rpn cls loss :', rpn_cls_loss
+                        print 'rpn bbox loss :', rpn_bbox_loss
+                        print 'fastr rcnn cls loss :', fast_rcnn_cls_loss
+                        print 'fast rcnn bbox loss : ', fast_rcnn_bbox_loss
+                        print 'rpn cls : ', np.shape(rpn_cls[0, :, :, :9])
+
+                        self._save_proposal_rpn_bbox(ori_img , proposal_rpn_bbox , proposal_rpn_scores)
+
                     self.step+=1
                     """
                     print np.shape(rpn_cls)
