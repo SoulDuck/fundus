@@ -176,7 +176,7 @@ class FasterRcnnConv5():
                                                                       bbox_targets=self.bbox_targets,
                                                                       roi_inside_weights=self.bbox_inside_weights,
                                                                       roi_outside_weights=self.bbox_outside_weights)
-        self.cost=tf.reduce_sum(self.rpn_cls_loss + self.rpn_bbox_loss)
+        self.cost=tf.reduce_sum(self.rpn_cls_loss)# + self.rpn_bbox_loss)
 
                                 #self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss)#self.rpn_cls_loss
         #self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
@@ -186,7 +186,7 @@ class FasterRcnnConv5():
                                                    decay_steps=decay_steps, decay_rate=cfg.TRAIN.LEARNING_RATE_DECAY,
                                                    staircase=True)
         """
-        learning_rate=0.1
+        learning_rate=0.01
 
         # Optimizer: ADAM
         self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(self.cost)
