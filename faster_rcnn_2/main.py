@@ -66,7 +66,7 @@ class FasterRcnnConv5():
         print '###### Convolution Network building.... '
         print
         kernels=[5, 3, 3, 3, 3]
-        out_channels=[64, 96, 128, 172, 256]
+        out_channels=[16, 16, 32, 64, 128]
         strides = [2, 1, 1, 2 ,1 ]
         layer=self.x_
         for i in range(5):
@@ -180,11 +180,14 @@ class FasterRcnnConv5():
 
                                 #self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss)#self.rpn_cls_loss
         #self.rpn_bbox_loss + self.fast_rcnn_cls_loss + self.fast_rcnn_bbox_loss
-
+        """
         decay_steps = cfg.TRAIN.LEARNING_RATE_DECAY_RATE * len(self.train_names)  # Number of Epochs x images/epoch
         learning_rate = tf.train.exponential_decay(learning_rate=self.lr, global_step=self.step,
                                                    decay_steps=decay_steps, decay_rate=cfg.TRAIN.LEARNING_RATE_DECAY,
                                                    staircase=True)
+        """
+        learning_rate=0.1
+
         # Optimizer: ADAM
         self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(self.cost)
 
@@ -300,6 +303,7 @@ class FasterRcnnConv5():
                     return save_dir
                 else:
                     count+=1
+
 
         assert len(rpn_bbox) == len(rpn_score)
         fg_keep = [rpn_score > 0.5]
