@@ -126,13 +126,9 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     num_fg = int(cfg.TRAIN.RPN_FG_FRACTION * cfg.TRAIN.RPN_BATCHSIZE) # fg 와 bg 을 1:1 로 맞추어야 한다 .
     fg_inds = np.where(labels == 1)[0]
 
-    """
     print 'the number of all lables : ', np.shape(all_anchors)
     print 'the number of inside labels : ', np.shape(anchors)
     print 'the number of positive labels :', np.sum(labels == 1), '(anchor_target_layer.py)'
-    print 'positive overlaps : '
-    print
-    """
     # print anchors[max_overlaps >= cfg.TRAIN.RPN_POSITIVE_OVERLAP]
     """
     print gt_boxes
@@ -148,10 +144,18 @@ def _anchor_target_layer_py(rpn_cls_score, gt_boxes, im_dims, _feat_stride, anch
     # subsample negative labels if we have too many
     num_bg = cfg.TRAIN.RPN_BATCHSIZE - np.sum(labels == 1)
     bg_inds = np.where(labels == 0)[0]
-    if len(bg_inds) > num_bg:
+    if len(bg_inds) > len(fg_inds):
+        disable_inds = npr.choice(bg_inds , size=(len(bg_inds) - len(fg_inds)) , replace=False)
+        labels[disable_inds] = -1
+    else:
         disable_inds = npr.choice(
             bg_inds, size=(len(bg_inds) - num_bg), replace=False)
         labels[disable_inds] = -1
+
+    assert np.sum([labels ==0]) == np.sum([labels==1])
+    print 'bg inds', np.sum([labels ==0])
+    print 'fg inds', np.sum([labels == 1])
+
     # fg 는 무조건 하나 포함되는데 그 이유는 max IOU을 가지고 있는건 무조건 FG로 보게 한다
     # bg or fg 가 지정한 갯수보다 많으면 -1 라벨해서 선택되지 않게 한다
     # bbox_targets: The deltas (relative to anchors) that Faster R-CNN should 

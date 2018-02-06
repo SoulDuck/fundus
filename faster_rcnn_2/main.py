@@ -66,7 +66,7 @@ class FasterRcnnConv5():
         print
         kernels=[5, 3, 3, 3, 3]
         out_channels=[64, 96, 128, 172, 256]
-        strides = [2, 2, 1, 1 ,1 ]
+        strides = [2, 2, 1, 2 ,1 ]
         layer=self.x_
         for i in range(5):
             layer = convolution2d(name='conv_{}'.format(i), x=layer, out_ch=out_channels[i], k=kernels[i], s=strides[i],
@@ -256,16 +256,16 @@ class FasterRcnnConv5():
                     rpn_cls, rpn_bbox, fr_cls, fr_bbox = self.sess.run(
                         [self.rpn_cls_prob, self.rpn_bbox_layer, self.fast_rcnn_cls_logits, self.fast_rcnn_bbox_logits],
                         feed_dict=feed_dict)
-                    if self.step % 100 ==0:
 
+                    if self.step % 100 ==0:
                         print 'rpn_cls', rpn_cls[0, 0, 0, :10]
                         print 'rpn cls loss :', rpn_cls_loss
                         print 'rpn bbox loss :', rpn_bbox_loss
                         print 'fastr rcnn cls loss :', fast_rcnn_cls_loss
                         print 'fast rcnn bbox loss : ', fast_rcnn_bbox_loss
                         print 'rpn cls : ', np.shape(rpn_cls[0, :, :, :9])
-
                         self._save_proposal_rpn_bbox(ori_img , proposal_rpn_bbox , proposal_rpn_scores)
+
 
                     self.step+=1
                     """

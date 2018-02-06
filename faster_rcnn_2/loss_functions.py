@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 from configure import cfg
 import tensorflow as tf
 def rpn_cls_loss(rpn_cls_score, rpn_labels):
@@ -26,6 +27,9 @@ def rpn_cls_loss(rpn_cls_score, rpn_labels):
         lab_indices=tf.gather(rpn_labels, tf.where(tf.not_equal(rpn_labels, -1)) , name = 'lab_indices')
         rpn_cls_score = tf.reshape(cls_indices, [-1, 2])
         rpn_labels = tf.reshape(lab_indices, [-1])
+
+        # fg 가 너무 작으면 모두 bg라고 해버리는게 좋을것이다
+        # fg 와 bg을 2:1 로 맞춰야 한다
 
         # Cross entropy error
         rpn_cross_entropy = tf.reduce_mean(
