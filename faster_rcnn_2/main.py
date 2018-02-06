@@ -66,7 +66,7 @@ class FasterRcnnConv5():
         print
         kernels=[5, 3, 3, 3, 3]
         out_channels=[64, 96, 128, 172, 256]
-        strides = [2, 2, 1, 2 ,1 ]
+        strides = [2, 1, 1, 2 ,1 ]
         layer=self.x_
         for i in range(5):
             layer = convolution2d(name='conv_{}'.format(i), x=layer, out_ch=out_channels[i], k=kernels[i], s=strides[i],
