@@ -16,6 +16,7 @@ import proposal_layer
 import proposal_target_layer
 import roi_pool
 import loss_functions
+import random
 import image_preprocessing
 import matplotlib
 matplotlib.use('Agg')
@@ -300,13 +301,15 @@ class FasterRcnnConv5():
                 else:
                     count+=1
 
-
         assert len(rpn_bbox) == len(rpn_score)
         fg_keep = [rpn_score > 0.5]
         fg_bboxes=rpn_bbox[fg_keep]
         save_dir=_make_folder()
         print 'save dir :',save_dir
         print 'saving....'
+        if len(fg_bboxes) > 200:
+            indices=random.sample(range(len(fg_bboxes)) ,200)
+            fg_bboxes=fg_bboxes[indices]
         print 'fg_bboxes',len(fg_bboxes)
         for i,bbox in enumerate(fg_bboxes):
             fig = plt.figure()
