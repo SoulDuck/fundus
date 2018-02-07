@@ -64,8 +64,6 @@ def get_images_labels(*filenames):
                 images=np.vstack((images,data[b'data'].reshape([-1,3,32,32])))
                 labels=np.hstack((labels, data[b'labels']))
 
-    print np.shape(images)
-    print np.shape(labels)
     images = images.transpose([0, 2, 3, 1])
     return images , labels
 
