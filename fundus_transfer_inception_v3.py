@@ -14,7 +14,7 @@ import transfer
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--max_iter' , type=int);
+parser.add_argument('--max_iter' , type=intt);
 parser.add_argument('--optimizer' , type=str);
 args = parser.parse_args()
 """
