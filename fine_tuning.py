@@ -336,7 +336,9 @@ if '__main__' == __name__ :
     logs_path = os.path.join('./logs', args.ckpt_dir)
     tb_writer = tf.summary.FileWriter(logs_path)
     tb_writer.add_graph(tf.get_default_graph())
-    last_model_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'last_model')
+
+    model_root_dir = os.path.join('./model' , args.ckpt_dir)
+    last_model_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'last')
     last_model_ckpt_path = os.path.join(last_model_ckpt_dir, 'model')
     try:
         os.makedirs(last_model_ckpt_dir)
@@ -357,7 +359,6 @@ if '__main__' == __name__ :
         #training
         _, loss, acc = model.sess.run(fetches=[model.train_op, model.cost, model.accuracy],
                                 feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: lr , model.phase_train:True})
-        model.last_model_saver.save(model.sess, save_path=last_model_ckpt_path, global_step=step)
         #validation
         if step % 100 ==0:
             pred_list, cost_list = [], []
@@ -368,7 +369,7 @@ if '__main__' == __name__ :
                 cost_list.append(batch_cost)
             val_acc = utils.get_acc(pred_list, test_labs)
             val_cost = np.sum(cost_list) / float(len(cost_list))
-            max_acc, min_loss = utils.save_model(model.sess, max_acc, min_loss, val_acc, val_cost, step, logs_path,
+            max_acc, min_loss = utils.save_model(model.sess, max_acc, min_loss, val_acc, val_cost, step, model_root_dir,
                                                  model.last_model_saver, model.saver)
             utils.write_acc_loss(tb_writer, prefix='test', loss=val_cost, acc=val_acc, step=step)
             utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
