@@ -357,13 +357,28 @@ def make_saver():
     best_saver = tf.train.Saver(max_to_keep=100)
     return last_saver , best_saver
 def save_model(sess,max_acc, min_loss, acc, loss, step,model_dir , last_saver , best_saver):
+    """
+    model_dir/last
+    model_dir/acc
+    model_dir/loss
+
+    :param sess:
+    :param max_acc:
+    :param min_loss:
+    :param acc:
+    :param loss:
+    :param step:
+    :param model_dir:
+    :param last_saver:
+    :param best_saver:
+    :return:
+    """
     last_dir=os.path.join(model_dir , 'last' )
     root_best_acc_dir = os.path.join(model_dir, 'acc' )
     root_best_loss_dir = os.path.join(model_dir, 'loss' )
     if not os.path.isdir(last_dir):
         print 'construct last model Saver!'
         os.makedirs(last_dir)
-
     if not os.path.isdir(root_best_acc_dir):
         print 'construct best acc model Saver!'
         os.makedirs(root_best_acc_dir)

@@ -74,6 +74,7 @@ pred, pred_cls, cost, train_op, correct_pred, accuracy = cnn.algorithm(logit, y_
 """----------------------------------------------------------------------------------------------------------------
                                                 Make Session                                 
 ----------------------------------------------------------------------------------------------------------------"""
+
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 saver = tf.train.Saver(max_to_keep=10000000)
@@ -84,9 +85,8 @@ sess.run(init)
 logs_path = os.path.join('./logs', 'fundus_resnet', args.ckpt_dir)
 tb_writer = tf.summary.FileWriter(logs_path)
 tb_writer.add_graph(tf.get_default_graph())
-best_acc_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'best_acc')
-best_loss_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'best_loss')
-last_model_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'last_model')
+
+last_model_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'last')
 last_model_ckpt_path = os.path.join(last_model_ckpt_dir, 'model')
 
 try:

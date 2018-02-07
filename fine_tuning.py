@@ -200,6 +200,7 @@ class FineTuning_vgg_16(Transfer_vgg_16):
         # save parameters
         self._save_pretrained_weights()
 
+
         self._build_models()
         self._restore_best_model()
         self.weight_saved_dir = weight_saved_dir
@@ -330,7 +331,7 @@ if '__main__' == __name__ :
     """------------------------------------------------------------------------------
                                         Dir Setting                    
     -------------------------------------------------------------------------------"""
-    logs_path = os.path.join('./logs', 'fundus_fine_tuning_0', args.ckpt_dir)
+    logs_path = os.path.join('./logs', args.ckpt_dir)
     tb_writer = tf.summary.FileWriter(logs_path)
     tb_writer.add_graph(tf.get_default_graph())
     best_acc_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'best_acc')
@@ -368,7 +369,7 @@ if '__main__' == __name__ :
             val_acc = utils.get_acc(pred_list, test_labs)
             val_cost = np.sum(cost_list) / float(len(cost_list))
             max_acc, min_loss = utils.save_model(model.sess, max_acc, min_loss, val_acc, val_cost, step, logs_path,
-                                                 model.last_saver, model.saver)
+                                                 model.last_model_saver, model.saver)
             utils.write_acc_loss(tb_writer, prefix='test', loss=val_cost, acc=val_acc, step=step)
             utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
             lr_summary = tf.Summary(value=[tf.Summary.Value(tag='learning_rate', simple_value=float(lr))])
