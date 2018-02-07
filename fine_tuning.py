@@ -16,7 +16,7 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--ckpt_dir' , type=str ,default='finetuning_vgg_16_cifar' ) #default='finetuning_vgg_16'
 parser.add_argument('--batch_size' , type=int , default=40)
 parser.add_argument('--lr_iters' ,nargs='+', type=int, default=[5000 ,15000 , 40000 , 80000] )
-parser.add_argument('--lr_values',nargs='+', type=float, default=[0.0001 , 0.00007 , 0.00004 , 0.00001])
+parser.add_argument('--lr_values',nargs='+', type=float, default=[0.001 , 0.0007 , 0.0004 , 0.0001])
 parser.add_argument('--logits_type', type=str, default='fc')
 args=parser.parse_args()
 
