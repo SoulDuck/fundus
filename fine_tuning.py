@@ -168,8 +168,8 @@ class Transfer_vgg_16(object):
             with tf.variable_scope(conv_name):
                 w_name=os.path.join(conv_name , 'filters') # /conv1_1/filters
                 b_name = os.path.join(conv_name, 'biases')
-                w = tf.Variable(w , name=w_name , trainable=False) #frozen convolution weight
-                b = tf.Variable(b, name=b_name, trainable=False) #frozen convolution weight
+                w = tf.Variable(w , name=w_name , trainable=True) #frozen convolution weight
+                b = tf.Variable(b, name=b_name, trainable=True) #frozen convolution weight
                 layer=tf.nn.conv2d(layer ,w , strides=[1,1,1,1] , padding='SAME' , name=conv_name) + b
                 layer=tf.nn.relu(layer , name='activation')
                 if i in max_pool_idx:
