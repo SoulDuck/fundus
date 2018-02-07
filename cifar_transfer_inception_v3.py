@@ -32,7 +32,7 @@ args = parser.parse_args()
 
 inception_v3_url = "http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz"
 transfer.download_and_extract_model(url=inception_v3_url, data_dir='./pretrained_models/inception_v3')
-ckpt_dir = 'inception_v3_pretrained_dropout_0_8'
+ckpt_dir = 'inception_v3_pretrained_cifar'
 train_imgs  , train_labs , test_imgs ,test_labs =input.get_cifar_images_labels(True , './cifar_/cifar_10/cifar-10-batches-py')
 n_classes=10
 
