@@ -10,7 +10,7 @@ import argparse
 import data
 import aug
 from cifar_ import input as cifar_input
-
+import pickle
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--ckpt_dir' , type=str ,default='finetuning_vgg_16_cifar' ) #default='finetuning_vgg_16'
@@ -39,12 +39,8 @@ The difference between Transfer Learning and Fine-Tuning is that in Transfer Lea
     |- 
     
 """
-
-
-
-
 class Transfer_vgg_16(object):
-    def __init__(self, n_classes, optimizer, input_shape, use_l2_loss, img_size_cropped, color_aug):  # pb  = ProtoBuffer
+    def __init__(self, n_classes, optimizer, input_shape, use_l2_loss, img_size_cropped, color_aug=False):  # pb  = ProtoBuffer
         self.input_shape = input_shape #input shape = ( h ,w, ch )
         self.img_h,self.img_w,self.img_ch = self.input_shape
         self.n_classes=n_classes
@@ -87,17 +83,12 @@ class Transfer_vgg_16(object):
             self._save_pretrained_weights()
         tf.reset_default_graph() # reset pretrained train graph and load saved weights and re-draw graph
         self._load_pretrained_weights()
+        self._transfer_model()
         self._build_model()
-        """------------------------------------------------------------------------------
-                                            session setting
-        -------------------------------------------------------------------------------"""
-        self.saver = tf.train.Saver(max_to_keep=10000000)
-        self.last_model_saver = tf.train.Saver(max_to_keep=1)
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
-        self.sess = tf.Session(config=config)
-        init = tf.group(tf.global_variables_initializer() , tf.local_variables_initializer())
-        self.sess.run(init)
+        self._start_session()
+
+
+
 
     def _save_pretrained_weights(self):
         """------------------------------------------------------------------------------
@@ -123,7 +114,7 @@ class Transfer_vgg_16(object):
             w_path=os.path.join(self.weights_saved_dir, w_name+'.npy')
             b_path=os.path.join(self.weights_saved_dir, b_name+'.npy')
             if os.path.exists(w_path) and os.path.exists(b_path):
-                print 'weight {} , biases {} already exist'.format(w_name , b_name )
+                #print 'weight {} , biases {} already exist'.format(w_name , b_name )
                 continue;
             else:
                 np.save(os.path.join(self.weights_saved_dir,w_name),w_) #conv filter save
@@ -143,21 +134,25 @@ class Transfer_vgg_16(object):
             self.weights_list.append(w)
             self.biases_list.append(b)
 
-    def _build_model(self):
+    def _transfer_model(self):
+        """
+        building Vgg convolution layers for Transfer Learning.
+        :return:
+        """
         """------------------------------------------------------------------------------
                                         Input Data
         -------------------------------------------------------------------------------"""
         self.x_ = tf.placeholder(dtype = tf.float32 , shape = [None , self.img_h , self.img_w , self.img_ch ])
+        self.x_resize = tf.image.resize_bilinear(self.x_ , size=(224,224) , name='x_resize')
         self.y_ = tf.placeholder(dtype=tf.int32, shape=[None, self.n_classes], name='y_')
+        self.phase_train = tf.placeholder(dtype=tf.bool , name = 'phase_train')
         self.lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
-        self.phase_train = tf.placeholder(dtype=tf.bool)
         # data augmentation
         """------------------------------------------------------------------------------
                                         Build Up VGG 16 network
         -------------------------------------------------------------------------------"""
-        #max_pool_idx=[1,3,6,9,12]
-        max_pool_idx = [1, 6, 12]
-        layer = aug.aug_tensor_images(self.x_, phase_train=self.phase_train, img_size_cropped=self.img_size_cropped,
+        max_pool_idx=[1,3,6,9,12]
+        layer = aug.aug_tensor_images(self.x_resize, phase_train=self.phase_train, img_size_cropped=self.img_size_cropped,
                                       color_aug=self.color_aug)
         tl_flag=True # TL = Transfer_learning
         for i , name in enumerate(self.layer_names):
@@ -174,22 +169,66 @@ class Transfer_vgg_16(object):
                 layer=tf.nn.relu(layer , name='activation')
                 if i in max_pool_idx:
                     layer=tf.nn.max_pool(layer , ksize=[1,2,2,1] ,strides=[1,2,2,1], padding ='SAME' , name='pool')
-        top_conv = tf.identity(layer, 'top_conv')
-        print 'Logits type : {}'.format(args.logits_type)
-        if args.logits_type=='gap':
-            self.logits=gap('gap' , top_conv , self.n_classes)
-        elif args.logits_type=='fc':
-            fc_filters=[4096 , 4096]
-            for i,out_ch in enumerate(fc_filters):
-                layer=affine('fc_{}'.format(i) , layer, out_ch)
-                layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
-                print 'fc_{} dropout applied'.format(i)
-            self.logits=affine('logits'.format(i) , layer, self.n_classes,activation=None)
+        self.top_conv = tf.identity(layer, 'top_conv')
+        self.top_pool=tf.reduce_mean(self.top_conv, (1,2) ,name='global_average_pooling')
+
+
+    def _start_session(self):
+        self.saver = tf.train.Saver(max_to_keep=10000000)
+        self.last_model_saver = tf.train.Saver(max_to_keep=1)
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        self.sess = tf.Session(config=config)
+        init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+        self.sess.run(init)
+
+    def _cache(self, image ):
+        if np.ndim(image) == 3:
+            h,w,ch=list(np.shape(image))
+            image = image.reshape([1 , h , w ,ch ])
+        elif np.ndim(image) == 4:
+            pass;
+        else:
+            raise AssertionError
+        cache = self.sess.run(self.top_conv, feed_dict={self.x_: image , self.phase_train:False})
+        return cache
+
+
+    def images2caches(self, images ,cache_path):
+        if not os.path.exists(cache_path):
+            with open(cache_path , 'wb') as file:
+                caches = map(lambda img: self._cache(img), images)
+                pickle.dump(caches ,file)
+        else:
+            with open(cache_path , 'rb') as file:
+                caches=pickle.load(file)
+        return caches
+
+    def _build_model(self):
+        self.x_caches = tf.placeholder(dtype = tf.float32 , shape = [None , 512])
+        layer=self.x_caches
+        out_ch=[1024,1024]
+        for i,ch in enumerate(out_ch):
+            layer=affine('fc_{}'.format(i) , layer, ch)
+            layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
+            print 'fc_{} dropout applied'.format(i)
+        self.logits=affine('logits'.format(i) , layer, self.n_classes,activation=None)
         self.pred, self.pred_cls, self.cost, self.train_op, self.correct_pred, self.accuracy = algorithm(self.logits,
                                                                                                          self.y_,
                                                                                                          self.lr_,
                                                                                                          self.optimizer,
                                                                                                          self.use_l2_loss)
+    def train(self, caches , labels , lr ):
+        _ , loss, acc =self.sess.run([self.train_op , self.cost , self.accuracy],
+                                              feed_dict={self.x_caches : caches, self.y_ : labels , self.phase_train:True ,
+                                                         self.lr_ : lr })
+        return loss ,acc
+    def eval(self ,caches , labels):
+        loss ,preds ,acc=self.sess.run([self.cost , self.pred , self.accuracy] , feed_dict={self.x_caches : caches,
+                                                                                            self.y_ : labels ,
+                                                                                            self.phase_train:False })
+        return loss , preds , acc
+
 
 class FineTuning_vgg_16(Transfer_vgg_16):
     def __init__(self , model_dir , logits_type , weight_saved_dir):
@@ -319,17 +358,19 @@ if '__main__' == __name__ :
     """
     train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug',
                                                                                                save_dir_name=args.ckpt_dir)
-    """
-
-    test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)
+    test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)                                                                                               
     test_imgs_labs = zip(test_imgs_list, test_labs_list)
     train_imgs=train_imgs#/255.
     test_imgs = test_imgs#/255.
+    """
 
 
     model = Transfer_vgg_16(n_classes=n_classes, optimizer='adam', input_shape=(h, w, ch), use_l2_loss=False,
                             img_size_cropped=h,
                             color_aug=True)
+    train_caches=model.images2caches(train_imgs ,'./pretrained_models/vgg_16/caches/train_cache.pkl' )
+    test_caches=model.images2caches(test_imgs ,'./pretrained_models/vgg_16/caches/test_cache.pkl' )
+    train_caches , test_caches = map(np.squeeze , [train_caches , test_caches])
 
     """------------------------------------------------------------------------------
                                         Dir Setting                    
@@ -355,25 +396,18 @@ if '__main__' == __name__ :
     for step in range(start_step , max_iter):
         lr = lr_schedule(step, args.lr_iters, args.lr_values)
         utils.show_progress(step , max_iter)
-        batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=args.batch_size)
-        rotate_imgs = map(lambda batch_x: aug.random_rotate(batch_x), batch_xs)
-        #training
-        _, loss, acc = model.sess.run(fetches=[model.train_op, model.cost, model.accuracy],
-                                feed_dict={model.x_: batch_xs, model.y_: batch_ys,  model.lr_: lr , model.phase_train:True})
-        #validation
+        batch_xs, batch_ys = data.next_batch(train_caches, train_labs, batch_size=args.batch_size)
+        acc,loss=model.train(batch_xs, labels=batch_ys , lr =lr)
+
+
+        # Validation
         if step % 100 ==0:
-            pred_list, cost_list = [], []
-            for batch_xs, batch_ys in test_imgs_labs:
-                batch_pred, batch_cost = model.sess.run(fetches=[model.pred, model.cost],
-                                                  feed_dict={model.x_: batch_xs, model.y_: batch_ys,model.phase_train:False})
-                pred_list.extend(batch_pred)
-                cost_list.append(batch_cost)
-            val_acc = utils.get_acc(pred_list, test_labs)
-            val_cost = np.sum(cost_list) / float(len(cost_list))
+            val_cost , preds , val_acc=model.eval(test_caches , labels=test_labs)
             max_acc, min_loss = utils.save_model(model.sess, max_acc, min_loss, val_acc, val_cost, step, model_root_dir,
                                                  model.last_model_saver, model.saver)
             utils.write_acc_loss(tb_writer, prefix='test', loss=val_cost, acc=val_acc, step=step)
             utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
+
             lr_summary = tf.Summary(value=[tf.Summary.Value(tag='learning_rate', simple_value=float(lr))])
             tb_writer.add_summary(lr_summary, step)
             print 'train acc :{:06.4f} train loss : {:06.4f} val acc : {:06.4f} val loss : {:06.4f}'.format(acc, loss,

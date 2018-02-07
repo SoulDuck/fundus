@@ -125,7 +125,7 @@ class Transfer_inception_v3(object):
         print 'multiple values shape {}'.format(np.shape(multiple_values))
         return multiple_values
 
-    def images2caches(self ,cache_path , images , new_flag=True):
+    def images2caches(self ,cache_path , images ):
         """if os.path.isfile(cache_path):
             print 'load saved caches '
             with open(cache_path, mode='rb') as file:
