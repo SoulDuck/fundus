@@ -77,9 +77,12 @@ def cls2onehot(cls , depth):
         labs[i,c]=1
     return labs
 
-def get_cifar_images_labels(onehot=True):
-    train_filenames = glob.glob('./cifar_10/cifar-10-batches-py/data_batch*')
-    test_filenames = glob.glob('./cifar_10/cifar-10-batches-py/test_batch*')
+def get_cifar_images_labels(onehot=True , data_dir ='./cifar_10/cifar-10-batches-py' ):
+    train_filenames = glob.glob(os.path.join(data_dir, 'data_batch*'))
+    test_filenames = glob.glob(os.path.join(data_dir, 'test_batch*'))
+    assert len(train_filenames) != 0
+    assert len(test_filenames) != 0
+
     train_imgs, train_labs=get_images_labels(*train_filenames)
     test_imgs , test_labs=get_images_labels(*test_filenames)
     if onehot ==True:

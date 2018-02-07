@@ -38,7 +38,6 @@ class Transfer
 
 class Transfer_inception_v3(object):
     """
-
     """
     def __init__(self , data_dir ,x_ , phase_train , keep_prob ,out_channels ):
         """

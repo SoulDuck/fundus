@@ -133,6 +133,7 @@ class FasterRcnnConv5():
                                                                 im_dims=self.im_dims, cfg_key=key,
                                                                 _feat_stride=self._feat_stride,
                                                                 anchor_scales=self.anchor_scales)
+    
         if self.eval_mode is False:
             # Calculate targets for proposals
             self.rois, self.labels, self.bbox_targets, self.bbox_inside_weights, self.bbox_outside_weights = \
