@@ -367,6 +367,8 @@ if '__main__' == __name__ :
     train_caches=model.images2caches(train_imgs ,'./pretrained_models/vgg_16/caches/train_cache.pkl' )
     test_caches=model.images2caches(test_imgs ,'./pretrained_models/vgg_16/caches/test_cache.pkl' )
     train_caches , test_caches = map(np.squeeze , [train_caches , test_caches])
+    train_caches=train_caches/255.
+    test_caches = test_caches/255.
 
     """------------------------------------------------------------------------------
                                         Dir Setting                    
