@@ -347,28 +347,20 @@ class FineTuning_vgg_16(Transfer_vgg_16):
 
             # fc_0 --> fc_1--> logits
 
-
-
 if '__main__' == __name__ :
-
-
     #cifar-test
     train_imgs, train_labs, test_imgs, test_labs = cifar_input.get_cifar_images_labels(onehot=True,
                                                                                        data_dir='cifar_/cifar_10/cifar-10-batches-py')
     n,h,w,ch = np.shape(train_imgs)
     n,n_classes=np.shape(train_labs)
-
     #fundus-test
     """
     train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug',
-                                                                                               save_dir_name=args.ckpt_dir)
     test_imgs_list, test_labs_list = utils.divide_images_labels_from_batch(test_imgs, test_labs, batch_size=60)                                                                                               
     test_imgs_labs = zip(test_imgs_list, test_labs_list)
     train_imgs=train_imgs#/255.
     test_imgs = test_imgs#/255.
     """
-
-
     model = Transfer_vgg_16(n_classes=n_classes, optimizer='adam', input_shape=(h, w, ch), use_l2_loss=False,
                             img_size_cropped=h,
                             color_aug=True)
@@ -392,7 +384,7 @@ if '__main__' == __name__ :
         pass;
     start_step = utils.restore_model(saver=model.last_model_saver, sess=model.sess, ckpt_dir=last_model_ckpt_dir)
     max_acc, min_loss = 0, 10000000
-    max_iter=10000
+    max_iter=100000
     """------------------------------------------------------------------------------
                                 Transfer Learning Stage                     
     -------------------------------------------------------------------------------"""
@@ -404,7 +396,7 @@ if '__main__' == __name__ :
         acc,loss=model.train(batch_xs, labels=batch_ys , lr =lr)
 
 
-        # Validation
+        # Validtion
         if step % 100 ==0:
             val_cost , preds , val_acc=model.eval(test_caches , labels=test_labs)
             max_acc, min_loss = utils.save_model(model.sess, max_acc, min_loss, val_acc, val_cost, step, model_root_dir,
