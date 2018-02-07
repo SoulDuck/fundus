@@ -49,7 +49,7 @@ model = transfer.Transfer_inception_v3('./pretrained_models/inception_v3', x_, p
 train_imgs = model.images2caches('./pretrained_models/inception_v3/cifar10_train_cache.pkl', train_imgs)
 test_imgs = model.images2caches('./pretrained_models/inception_v3/cifar10_test_cache.pkl', test_imgs)
 train_imgs = train_imgs / 255.
-ctest_imgs = test_imgs / 255.
+test_imgs = test_imgs / 255.
 pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(model.logits, y_=y_, learning_rate=lr_,
                                                                    optimizer=args.optimizer, use_l2_loss=False)
 
