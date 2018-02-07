@@ -155,7 +155,8 @@ class Transfer_vgg_16(object):
         """------------------------------------------------------------------------------
                                         Build Up VGG 16 network
         -------------------------------------------------------------------------------"""
-        max_pool_idx=[1,3,6,9,12]
+        #max_pool_idx=[1,3,6,9,12]
+        max_pool_idx = [1, 6, 12]
         layer = aug.aug_tensor_images(self.x_, phase_train=self.phase_train, img_size_cropped=self.img_size_cropped,
                                       color_aug=self.color_aug)
         tl_flag=True # TL = Transfer_learning
