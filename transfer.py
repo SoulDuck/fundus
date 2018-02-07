@@ -142,6 +142,7 @@ class Transfer_inception_v3(object):
                 obj = self.images_to_transfer_values(images)
                 pickle.dump(obj, file)
         else:
+            print 'cache file already existed!'
             with open(cache_path, mode='rb') as file:
                 obj=pickle.load(file)
         return obj
