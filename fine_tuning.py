@@ -334,8 +334,6 @@ if '__main__' == __name__ :
     logs_path = os.path.join('./logs', args.ckpt_dir)
     tb_writer = tf.summary.FileWriter(logs_path)
     tb_writer.add_graph(tf.get_default_graph())
-    best_acc_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'best_acc')
-    best_loss_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'best_loss')
     last_model_ckpt_dir = os.path.join('./model', args.ckpt_dir, 'last_model')
     last_model_ckpt_path = os.path.join(last_model_ckpt_dir, 'model')
     try:
