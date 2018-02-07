@@ -80,7 +80,7 @@ start_step = utils.restore_model(saver=last_model_saver, sess=sess, ckpt_dir=las
 ----------------------------------------------------------------------------------------------------------------"""
 batch_size = 120
 lr_iters = [5000, 10000]
-lr_values = [0.0001, 0.0001]
+lr_values = [0.01, 0.01]
 max_acc, min_loss = 0, 10000000
 max_iter = args.max_iter;
 for step in range(start_step, max_iter):
