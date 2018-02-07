@@ -63,12 +63,11 @@ last_model_saver = tf.train.Saver(max_to_keep=1)
 sess = tf.Session(config=config)
 init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
 sess.run(init)
-logs_path = os.path.join('./logs', 'fundus_resnet', ckpt_dir)
+logs_path = os.path.join('./logs', ckpt_dir)
 tb_writer = tf.summary.FileWriter(logs_path)
 tb_writer.add_graph(tf.get_default_graph())
-best_acc_ckpt_dir = os.path.join('./model', ckpt_dir, 'best_acc')
-best_loss_ckpt_dir = os.path.join('./model', ckpt_dir, 'best_loss')
-last_model_ckpt_dir = os.path.join('./model', ckpt_dir, 'last_model')
+model_root_dir = os.path.join('./model', ckpt_dir)
+last_model_ckpt_dir = os.path.join(model_root_dir ,'last')
 last_model_ckpt_path = os.path.join(last_model_ckpt_dir, 'model')
 try:
     os.makedirs(last_model_ckpt_dir)
@@ -96,9 +95,8 @@ for step in range(start_step, max_iter):
                                       feed_dict={x_: test_imgs, y_: test_labs, phase_train: False})
         val_acc = utils.get_acc(val_pred, test_labs)
 
-        max_acc, min_loss = utils.save_model(sess, saver, max_acc, min_loss, val_acc, val_cost, best_acc_ckpt_dir,
-                                             best_loss_ckpt_dir,
-                                             step)
+        max_acc, min_loss = utils.save_model(sess, max_acc, min_loss, val_acc, val_cost, step, model_root_dir,
+                                             last_model_saver, saver)
         utils.write_acc_loss(tb_writer, prefix='test', loss=val_cost, acc=val_acc, step=step)
         utils.write_acc_loss(tb_writer, prefix='train', loss=loss, acc=acc, step=step)
         lr_summary = tf.Summary(value=[tf.Summary.Value(tag='learning_rate', simple_value=float(lr))])
