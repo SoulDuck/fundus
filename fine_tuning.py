@@ -196,7 +196,7 @@ class Transfer_vgg_16(object):
 
     def images2caches(self, images ,cache_path):
         if not os.path.isdir(os.path.split(cache_path)[0]):
-            os.makedirs(cache_path)
+            os.makedirs(os.path.split(cache_path)[0])
             
 
         if not os.path.exists(cache_path):
