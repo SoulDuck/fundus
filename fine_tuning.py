@@ -329,7 +329,7 @@ if '__main__' == __name__ :
 
     model = Transfer_vgg_16(n_classes=n_classes, optimizer='adam', input_shape=(h, w, ch), use_l2_loss=False,
                             img_size_cropped=h,
-                            color_aug=False)
+                            color_aug=True)
 
     """------------------------------------------------------------------------------
                                         Dir Setting                    
