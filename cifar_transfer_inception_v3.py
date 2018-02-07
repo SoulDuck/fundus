@@ -48,8 +48,8 @@ lr_ = tf.placeholder(dtype=tf.float32, name='learning_rate')
 model = transfer.Transfer_inception_v3('./pretrained_models/inception_v3', x_, phase_train, 0.5, [n_classes])
 train_imgs = model.images2caches('./pretrained_models/inception_v3/cifar10_train_cache.pkl', train_imgs)
 test_imgs = model.images2caches('./pretrained_models/inception_v3/cifar10_test_cache.pkl', test_imgs)
-train_imgs = train_imgs / 255.
-test_imgs = test_imgs / 255.
+#train_imgs = train_imgs / 255.
+#ctest_imgs = test_imgs / 255.
 pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(model.logits, y_=y_, learning_rate=lr_,
                                                                    optimizer=args.optimizer, use_l2_loss=False)
 
@@ -88,7 +88,7 @@ for step in range(start_step, max_iter):
     batch_xs, batch_ys = data.next_batch(train_imgs, train_labs, batch_size=batch_size)
     _, loss, acc = sess.run(fetches=[train_op, cost, accuracy],
                             feed_dict={x_: batch_xs, y_: batch_ys, phase_train: True, lr_: lr})
-    last_model_saver.save(sess, save_path=last_model_ckpt_path, global_step=step)
+    #last_model_saver.save(sess, save_path=last_model_ckpt_path, global_step=step)
     if step % 100 == 0:
         # Get Validation Accuracy and Loss
         val_pred, val_cost = sess.run(fetches=[pred, cost],
