@@ -195,6 +195,10 @@ class Transfer_vgg_16(object):
 
 
     def images2caches(self, images ,cache_path):
+        if not os.path.isdir(os.path.split(cache_path)[0]):
+            os.makedirs(cache_path)
+            
+
         if not os.path.exists(cache_path):
             with open(cache_path , 'wb') as file:
                 caches = map(lambda img: self._cache(img), images)
