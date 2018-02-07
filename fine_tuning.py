@@ -395,7 +395,7 @@ if '__main__' == __name__ :
         lr = lr_schedule(step, args.lr_iters, args.lr_values)
         utils.show_progress(step , max_iter)
         batch_xs, batch_ys = data.next_batch(train_caches, train_labs, batch_size=args.batch_size)
-        acc,loss=model.train(batch_xs, labels=batch_ys , lr =lr)
+        loss,acc = model.train(batch_xs, labels=batch_ys , lr =lr)
 
 
         # Validtion
