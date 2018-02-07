@@ -16,7 +16,7 @@ from cifar_  import input
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--max_iter', type=int);
+parser.add_argument('--max_iter', type=int , default=100000);
 parser.add_argument('--optimizer', type=str , default='sgd');
 args = parser.parse_args()
 """
