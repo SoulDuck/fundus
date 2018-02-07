@@ -174,6 +174,7 @@ class Transfer_vgg_16(object):
                 if i in max_pool_idx:
                     layer=tf.nn.max_pool(layer , ksize=[1,2,2,1] ,strides=[1,2,2,1], padding ='SAME' , name='pool')
         top_conv = tf.identity(layer, 'top_conv')
+        print 'Logits type : {}'.format(args.logits_type)
         if args.logits_type=='gap':
             self.logits=gap('gap' , top_conv , self.n_classes)
         elif args.logits_type=='fc':
@@ -182,7 +183,7 @@ class Transfer_vgg_16(object):
                 layer=affine('fc_{}'.format(i) , layer, out_ch)
                 layer=dropout(layer , phase_train=self.phase_train , keep_prob=0.5)
                 print 'fc_{} dropout applied'.format(i)
-            self.logits=affine('logits'.format(i) , layer, self.n_classes)
+            self.logits=affine('logits'.format(i) , layer, self.n_classes,activation=None)
         self.pred, self.pred_cls, self.cost, self.train_op, self.correct_pred, self.accuracy = algorithm(self.logits,
                                                                                                          self.y_,
                                                                                                          self.lr_,
@@ -312,6 +313,7 @@ if '__main__' == __name__ :
                                                                                        data_dir='cifar_/cifar_10/cifar-10-batches-py')
     n,h,w,ch = np.shape(train_imgs)
     n,n_classes=np.shape(train_labs)
+
     #fundus-test
     """
     train_imgs, train_labs, train_filenames, test_imgs, test_labs, test_filenames = data.type2('./fundus_300_debug',
