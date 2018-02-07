@@ -137,10 +137,13 @@ class Transfer_inception_v3(object):
                 pickle.dump(obj, file)
         """
         print("- create Data and csaved to cache-file: " + cache_path)
-        with open(cache_path, mode='wb') as file:
-            obj = self.images_to_transfer_values(images)
-            pickle.dump(obj, file)
-
+        if not os.path.exists(cache_path):
+            with open(cache_path, mode='wb') as file:
+                obj = self.images_to_transfer_values(images)
+                pickle.dump(obj, file)
+        else:
+            with open(cache_path, mode='rb') as file:
+                obj=pickle.load(file)
         return obj
     def _build_model(self):
         n_classes=self.out_channels[-1]

@@ -53,7 +53,6 @@ test_imgs = test_imgs / 255.
 pred, pred_cls, cost, train_op, correct_pred, accuracy = algorithm(model.logits, y_=y_, learning_rate=lr_,
                                                                    optimizer=args.optimizer, use_l2_loss=False)
 
-exit()
 """----------------------------------------------------------------------------------------------------------------
                                                 Make Session                                 
 ----------------------------------------------------------------------------------------------------------------"""
