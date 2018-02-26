@@ -25,9 +25,9 @@ args=parser.parse_args()
 The difference between Transfer Learning and Fine-Tuning is that in Transfer Learning we only optimize the weights of
  the new classification layers we have added, while we keep the weights of the original VGG16 model.
  we keep the weights of the original VGG16 model.
- 
+
  -saved model
- 
+  
  class fine_tuning 
     |- alexnet 
     |- resnet
