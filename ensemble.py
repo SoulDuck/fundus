@@ -187,13 +187,21 @@ if __name__ == '__main__':
 
     models_paths = get_models_paths(args.models_path)
     print 'number of model paths : {}'.format(len(models_paths))
-    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1(
-        './fundus_300', resize=(299, 299))
+    #train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1(
+    #    './fundus_300_debug', resize=(299, 299))
+
+    #Iruda Image File
+
+    paths=glob.glob('./iruda/*.JPG')
+    test_images=map(lambda path :Image.open(path).resize((299,299) , Image.ANTIALIAS), paths)
+    test_labels=np.zeros([len(test_images),2])
+    test_labels[:,0]=1
 
     acc, max_list, pred = ensemble_with_all_combibation(models_paths, test_images[:], test_labels)
+    print pred
     np.save('./best_preds', pred)
     np.save('./test_labels', test_labels)  #
-    np.save('./test_images', train_images)
+    #np.save('./test_images', train_images)
 
     names = map(lambda path: path.split('/')[-2], max_list)
     print 'best model list : ', names

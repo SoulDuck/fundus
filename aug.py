@@ -72,8 +72,6 @@ def aug_level_1(imgs):
     imgs = map(random_rotate, imgs)
     return imgs
 
-
-
 def aug_tensor_images(images , phase_train , img_size_cropped , color_aug=True):
     num_channels=int(images.get_shape()[-1])
     print num_channels
@@ -150,16 +148,17 @@ def histo_equalized(imgs):
 
 # CLAHE (Contrast Limited Adaptive Histogram Equalization)
 #adaptive histogram equalization is used. In this, image is divided into small blocks called "tiles" (tileSize is 8x8 by default in OpenCV). Then each of these blocks are histogram equalized as usual. So in a small area, histogram would confine to a small region (unless there is noise). If noise is there, it will be amplified. To avoid this, contrast limiting is applied. If any histogram bin is above the specified contrast limit (by default 40 in OpenCV), those pixels are clipped and distributed uniformly to other bins before applying histogram equalization. After equalization, to remove artifacts in tile borders, bilinear interpolation is applied
-def clahe_equalized(imgs):
-    assert (len(imgs.shape)==4)  #4D arrays
-    assert (imgs.shape[1]==1)  #check the channel is 1
-    #create a CLAHE object (Arguments are optional).
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-    imgs_equalized = np.empty(imgs.shape)
-    for i in range(imgs.shape[0]):
-        imgs_equalized[i,0] = clahe.apply(np.array(imgs[i,0], dtype = np.uint8))
-    return imgs_equalized
-
+#create a CLAHE object (Arguments are optional).
+def clahe_equalized(img):
+    assert (len(img.shape)==3)  #4D arrays
+    img=img.copy()
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    if img.shape[-1] ==3: # if color shape
+        for i in range(3):
+            img[:, :, i]=clahe.apply(np.array(img[:,:,i], dtype=np.uint8))
+    elif img.shape[-1] ==1: # if Greys,
+        img = clahe.apply(np.array(img, dtype = np.uint8))
+    return img
 
 # ===== normalize over the dataset
 def dataset_normalized(imgs):
@@ -192,21 +191,14 @@ def adjust_gamma(imgs, gamma=1.0):
 
 if __name__ == '__main__':
     img=Image.open('./debug/0.png').convert('RGB')
-    np_img = np.asarray(img)
-    print np.shape(np_img)
-    print np_img[:10, :10, :]
+    img=np.asarray(img)
+    plt.imshow(img)
+    plt.show()
+    img=clahe_equalized(img)
+    plt.imshow(img)
+    plt.show()
 
+    np_img = np.asarray(img)
     img=random_rotate(img)
     np_img=np.asarray(img)
-    print np_img[:10 , :10 , :]
-    plt.imshow(img)
-    plt.show()
-    img = Image.open('./debug/0.png').convert('RGB')
-    np_img = np.asarray(img)
-    print np.shape(np_img)
-    img=random_rotate(img)
-
-    plt.imshow(img)
-    plt.show()
-
 

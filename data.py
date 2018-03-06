@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import aug
 import tensorflow as tf
-
 def divide_images_labels_from_batch(images, labels ,batch_size):
     debug_flag=False
 
