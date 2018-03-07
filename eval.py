@@ -189,15 +189,12 @@ if __name__ =='__main__':
                                                                                                        299, 299))
     model_path = './ensemble_models/bottlenect_fc_16@3_32@4_64@6_128@3_no_color_aug_bf_4_l2loss_rotateAug_adam/model'
     model_path = './ensemble_models/alexnet_step_312700_acc_0.849180327869/model'
-    model_path = './ensemble_models/residual_fc_16@2_32@2_64@2_128@2_no_color_aug_2/model'
     model_path = './ensemble_models/5556_resnet_step_47800_acc_0.84262295082/model'
+    model_path = './ensemble_models/residual_fc_16@2_32@2_64@2_128@2_no_color_aug_2/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
     preds=eval_images(model_path ,  test_images/255. , (224,224) , 'central',test_labels)
-
     print len(preds)
     print len(preds[:2])
-
-
     """
     sparse_cropped_images=fundus_processing.sparse_crop(test_images[0] , 224 ,224 ,lr_flip=True , ud_flip=True)
     print np.shape(sparse_cropped_images)
