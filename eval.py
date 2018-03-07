@@ -7,10 +7,12 @@ if "DISPLAY" not in os.environ:
 
 import tensorflow as tf
 import cam
+import glob
 import numpy as np
 import os
 import utils
 import data
+from PIL import Image
 import fundus_processing
 
 ## for mnist dataset ##
@@ -184,15 +186,24 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
 #def get_cam_with_sparse_cropped_images()
 if __name__ =='__main__':
 
-    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300',
-                                                                                                       resize=(
-                                                                                                       299, 299))
+    #train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300',
+    #                                                                                                   resize=(
+    #                                                                                                   299, 299))
+
+    #Iruda Image File
+    paths=glob.glob('./iruda/*.JPG')
+    test_images=map(lambda path :Image.open(path).resize((299,299) , Image.ANTIALIAS), paths)
+    test_labels=np.zeros([len(test_images),2])
+    test_labels[:,0]=1
+
     model_path = './ensemble_models/bottlenect_fc_16@3_32@4_64@6_128@3_no_color_aug_bf_4_l2loss_rotateAug_adam/model'
     model_path = './ensemble_models/alexnet_step_312700_acc_0.849180327869/model'
     model_path = './ensemble_models/5556_resnet_step_47800_acc_0.84262295082/model'
     model_path = './ensemble_models/residual_fc_16@2_32@2_64@2_128@2_no_color_aug_2/model'
     model_path ='./ensemble_models/vgg11_5_step_24000_acc_0.848333358765/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
+
+
     preds=eval_images(model_path ,  test_images/255. , (224,224) , 'central',test_labels)
     print len(preds)
     print len(preds[:2])

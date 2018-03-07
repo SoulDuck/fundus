@@ -190,14 +190,6 @@ if __name__ == '__main__':
     train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1(
         './fundus_300_debug', resize=(299, 299))
 
-    """
-    #Iruda Image File
-
-    paths=glob.glob('./iruda/*.JPG')
-    test_images=map(lambda path :Image.open(path).resize((299,299) , Image.ANTIALIAS), paths)
-    test_labels=np.zeros([len(test_images),2])
-    test_labels[:,0]=1
-    """
 
     acc, max_list, pred = ensemble_with_all_combibation(models_paths, test_images[:], test_labels)
     print pred
