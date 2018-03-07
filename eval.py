@@ -210,7 +210,7 @@ if __name__ =='__main__':
 
     preds=eval_images(model_path ,  test_images/255. , (224,224) , 'central')
     preds=np.asarray(preds)
-    np.save('./iruda_preds.npy')
+    np.save('./iruda_preds.npy' , preds)
 
 
     print len(preds)
