@@ -166,7 +166,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
             elif cropping_type == 'dense':
                 mean_pred = eval_image_with_dense_croppping(model_path, image, image_size,
                                                              actmap_save_folder=os.path.join('./actmap' , str(i)))
-            elif cropping_type =='central':
+            else:
                 raise AssertionError
             print mean_pred
             print np.shape(mean_pred)
@@ -184,7 +184,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
 #def get_cam_with_sparse_cropped_images()
 if __name__ =='__main__':
 
-    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300_debug',
+    train_images, train_labels, train_filenames, test_images, test_labels, test_filenames = data.type1('./fundus_300',
                                                                                                        resize=(
                                                                                                        299, 299))
     model_path = './ensemble_models/bottlenect_fc_16@3_32@4_64@6_128@3_no_color_aug_bf_4_l2loss_rotateAug_adam/model'
