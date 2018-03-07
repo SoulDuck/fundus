@@ -191,6 +191,7 @@ if __name__ =='__main__':
     model_path = './ensemble_models/alexnet_step_312700_acc_0.849180327869/model'
     model_path = './ensemble_models/5556_resnet_step_47800_acc_0.84262295082/model'
     model_path = './ensemble_models/residual_fc_16@2_32@2_64@2_128@2_no_color_aug_2/model'
+    model_path ='./ensemble_models/vgg11_5_step_24000_acc_0.848333358765/model'
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
     preds=eval_images(model_path ,  test_images/255. , (224,224) , 'central',test_labels)
     print len(preds)
