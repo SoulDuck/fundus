@@ -155,8 +155,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
     assert  len(images) > 1
     print 'n images : {} '.format(len(images))
     if cropping_type == 'central':
-        mean_pred = np.squeeze(
-            mean_preds=eval(model_path, images, batch_size=60,
+        mean_pred = np.squeeze(eval(model_path, images, batch_size=60,
                             actmap_save_root_folder=os.path.join('./actmap', 'central')))
         # 이걸 너무 느리다  batch size  만큼 수정하게 해야 한다
     else:
@@ -179,7 +178,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
     if not labels is None:
         acc = utils.get_acc(true=labels,pred=mean_preds )
         print acc
-    return mean_preds, acc
+    return mean_pred
 
 
 
@@ -209,6 +208,10 @@ if __name__ =='__main__':
 
 
     preds=eval_images(model_path ,  test_images/255. , (224,224) , 'central',test_labels)
+    preds=np.asarray(preds)
+    np.save('./iruda_preds.npy')
+
+
     print len(preds)
     print len(preds[:2])
     """
