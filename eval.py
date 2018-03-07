@@ -193,7 +193,8 @@ if __name__ =='__main__':
     #Iruda Image File
 
     paths=glob.glob('./iruda/*.JPG')
-    print paths
+    for path in paths :
+        print path
     exit()
     test_images=map(lambda path :Image.open(path).resize((299,299) , Image.ANTIALIAS), paths)
 
