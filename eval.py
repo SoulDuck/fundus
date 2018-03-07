@@ -157,6 +157,7 @@ def eval_images(model_path , images , image_size , cropping_type , labels=None )
     if cropping_type == 'central':
         mean_pred = np.squeeze(eval(model_path, images, batch_size=60,
                             actmap_save_root_folder=os.path.join('./actmap', 'central')))
+
         # 이걸 너무 느리다  batch size  만큼 수정하게 해야 한다
     else:
         for i , image in enumerate(images):
@@ -207,7 +208,7 @@ if __name__ =='__main__':
     #mean_pred=eval_image_with_sparse_croppping(model_path , test_images[0] , (224, 224) )
 
 
-    preds=eval_images(model_path ,  test_images/255. , (224,224) , 'central',test_labels)
+    preds=eval_images(model_path ,  test_images/255. , (224,224) , 'central')
     preds=np.asarray(preds)
     np.save('./iruda_preds.npy')
 
