@@ -192,7 +192,7 @@ if __name__ =='__main__':
 
     #Iruda Image File
 
-    paths=glob.glob('./iruda/*.JPG')
+    paths=glob.glob('./iruda_1/*.JPG')
     for path in paths :
         print path
     exit()
