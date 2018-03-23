@@ -195,7 +195,6 @@ if __name__ =='__main__':
     paths=glob.glob('./iruda_1/*.JPG')
     for path in paths :
         print path
-    exit()
     test_images=map(lambda path :Image.open(path).resize((299,299) , Image.ANTIALIAS), paths)
 
     test_images=map(np.asarray , test_images)
