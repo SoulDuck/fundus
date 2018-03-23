@@ -193,6 +193,7 @@ if __name__ =='__main__':
     #Iruda Image File
 
     paths=glob.glob('./iruda_1/*.JPG')
+    paths=paths + glob.glob('./iruda_1/*.png')
     for path in paths :
         print path
     test_images=map(lambda path :Image.open(path).resize((299,299) , Image.ANTIALIAS), paths)
@@ -212,7 +213,7 @@ if __name__ =='__main__':
 
     preds=eval_images(model_path ,  test_images/255. , (224,224) , 'central')
     preds=np.asarray(preds)
-    np.save('./iruda_preds.npy' , preds)
+    np.save('./iruda_preds_1.npy' , preds)
 
 
     print len(preds)

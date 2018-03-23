@@ -1,5 +1,12 @@
 import numpy as np
 import os , glob , shutil
+
+
+preds=np.load('iruda_preds_1.npy')
+print preds
+
+
+exit()
 preds=np.load('./iruda_preds.npy')
 f=open('./iruda_paths.txt' ,'r')
 lines=f.readlines()
@@ -31,9 +38,6 @@ for i,line in enumerate(lines):
 
     else:
         raise AssertionError
-
-
-
 
 
 
